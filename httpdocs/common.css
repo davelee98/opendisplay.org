@@ -1,0 +1,321 @@
+/* Common CSS for Open Display website */
+* {box-sizing: border-box;}
+
+:root {
+  --foreground: #1a1a1a;
+  --background: #ffffff;
+  --muted-foreground: #6b7280;
+  --accent: #00bfff;
+  --accent-hover: #0099cc;
+  --accent-button: #fff;
+  --card-background: #ffffff;
+  --card-foreground: #1a1a1a;
+  --border-color: #e5e7eb;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #f9fafb;
+    --background: #111827;
+    --muted-foreground: #9ca3af;
+    --accent: #00d4ff;
+    --accent-hover: #00bfff;
+    --accent-button: #fff;
+    --card-background: #1f2937;
+    --card-foreground: #f9fafb;
+    --border-color: #374151;
+  }
+}
+
+/* Skip to content link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--accent);
+  color: var(--accent-button);
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.skip-link:focus {
+  top: 0;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Focus indicators for keyboard navigation */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Body styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  padding: 15px;
+  background: var(--background);
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1 {
+  color: var(--foreground);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+h2 {
+  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+h3 {
+  color: var(--foreground);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+/* Layout */
+.col {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 20px;
+}
+
+.panel {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  transition: .3s;
+}
+
+.panel:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+}
+
+/* Text styles */
+.intro-text {
+  color: var(--muted-foreground);
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+/* Tool card styles */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tool-card:last-child {
+  margin-bottom: 0;
+}
+
+.tool-description {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.tool-link {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-button);
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-align: center;
+  width: 100%;
+}
+
+.tool-link:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,191,255,.3);
+  color: var(--accent-button);
+  text-decoration: none;
+}
+
+.tool-link:active {
+  transform: none;
+}
+
+/* Link styles */
+a {
+  color: var(--muted-foreground);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+}
+
+.footer-links {
+  text-align: center;
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+}
+
+.footer-links a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+.footer-links .footer-separator {
+  color: var(--muted-foreground);
+  user-select: none;
+}
+
+/* Breadcrumb navigation */
+.breadcrumb {
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.breadcrumb a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: var(--muted-foreground);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.back-link::before {
+  content: "← ";
+  margin-right: 4px;
+}
+
+/* Quick links grid (for index page) */
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.quick-link-card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.quick-link-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.quick-link-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 8px;
+}
+
+.quick-link-description {
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--background);
+}
+
+/* Remove scrollbar arrows in WebKit browsers */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+

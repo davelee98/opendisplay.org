@@ -1,0 +1,1392 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="../install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Battery Life Calculator</title>
+<style>
+/* Page-specific styles */
+label{font-weight:600;font-size:1.1rem;color:var(--foreground);margin-bottom:16px;display:block}
+input,select,button{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+}
+button{
+  background:var(--accent);
+  border:none;border-radius:8px;padding:10px 16px;margin:4px 6px 4px 0;
+  color:var(--accent-button);font-weight:500;cursor:pointer;transition:.2s;font-size:14px
+}
+button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,191,255,.3)}
+button:active{transform:none}
+button:disabled{background:var(--muted-foreground);cursor:not-allowed;transform:none}
+.field-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.field-row label{font-size:.9rem;margin:0;min-width:200px}
+.field-row input,.field-row select{
+  background:var(--card-background)!important;border:1px solid var(--border-color)!important;border-radius:6px!important;
+  padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace!important;
+  min-height:40px!important;transition:.2s;appearance:none;flex:1;min-width:200px
+}
+input:focus,select:focus{
+  outline:none!important;border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px rgba(0,191,255,.1)!important;background:var(--card-background)!important
+}
+input:hover,select:hover{border-color:var(--accent)!important;background:var(--card-background)!important}
+input::placeholder{color:#8b949e!important}
+input.invalid,select.invalid{
+  border-color:#f85149!important;
+  box-shadow:0 0 0 3px rgba(248,81,73,.1)!important;
+}
+input.valid{
+  border-color:#3fb950!important;
+}
+.field-wrapper{position:relative;flex:1;min-width:200px;display:flex;flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap}
+.field-wrapper input,.field-wrapper select{
+  flex:1;min-width:120px
+}
+.field-wrapper .unit-label{flex:0 0 auto}
+.error-message{
+  color:#f85149;font-size:.75rem;margin-top:4px;display:none;width:100%;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif
+}
+.error-message.show{display:block}
+.tooltip-trigger{
+  display:inline-block;width:16px;height:16px;border-radius:50%;
+  background:var(--muted-foreground);color:var(--accent-button);text-align:center;line-height:16px;
+  font-size:11px;cursor:help;margin-left:4px;vertical-align:middle;
+  font-weight:600;position:relative
+}
+.tooltip-trigger:hover{background:var(--accent)}
+.tooltip{
+  position:absolute;background:var(--foreground);color:var(--background);padding:8px 12px;
+  border-radius:6px;font-size:.75rem;white-space:normal;width:200px;
+  z-index:1000;bottom:100%;left:50%;transform:translateX(-50%);
+  margin-bottom:8px;opacity:0;pointer-events:none;transition:opacity .2s;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
+  box-shadow:0 4px 6px rgba(0,0,0,.2)
+}
+.tooltip::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--foreground)
+}
+.tooltip-trigger:hover .tooltip{opacity:1;pointer-events:auto}
+.loading-spinner{
+  display:inline-block;width:16px;height:16px;border:2px solid var(--border-color);
+  border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;
+  margin-left:8px;vertical-align:middle
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+button.loading{position:relative;color:transparent!important}
+button.loading::after{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite
+}
+.inline-error{
+  background:#fef2f2;border:1px solid #fecaca;border-radius:6px;
+  padding:12px;margin-top:12px;color:#991b1b;font-size:.875rem;
+  display:none
+}
+.inline-error.show{display:block}
+.unit-label{color:#8b949e;font-size:.85rem;margin-left:8px}
+.result-panel{
+  background:#f9fafb;border:2px solid #00bfff;border-radius:12px;padding:24px;
+  margin-top:20px
+}
+.result-value{
+  font-size:2.5rem;font-weight:700;color:#1a1a1a;margin:16px 0
+}
+.result-details{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:20px
+}
+.result-item{
+  background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;padding:16px
+}
+.result-item-label{font-size:.85rem;color:#8b949e;margin-bottom:4px}
+.result-item-value{font-size:1.2rem;font-weight:600;color:#1a1a1a}
+.ble-controls{display:flex;flex-direction:column;gap:16px}
+.ble-input-group,.ble-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ble-input-group label{font-size:.9rem;margin:0;min-width:120px}
+.ble-input-group input[type=text]{flex:1;min-width:200px}
+.ble-actions button{flex:1;min-width:120px}
+.status-display{padding:12px;min-height:100px;background:#ffffff;border:1px solid #e5e7eb;border-radius:6px}
+.status-text{font-weight:600;color:#f85149;margin-bottom:8px}
+.status-text.connected{color:#3fb950}
+.log-display{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-size:12px;color:#8b949e;max-height:200px;overflow-y:auto;white-space:pre-wrap
+}
+.log-entry{margin-bottom:2px}
+.log-entry.error{color:#f85149}
+.log-entry.success{color:#3fb950}
+.log-entry.info{color:#58a6ff}
+.small{font-size:.85rem;color:#8b949e;margin-top:8px}
+.chart-container{
+  background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;padding:20px;margin-top:20px
+}
+.chart-title{font-size:1.1rem;font-weight:600;color:#1a1a1a;margin-bottom:16px}
+.chart-wrapper{position:relative;width:100%;height:300px;margin-bottom:20px}
+.chart-wrapper canvas{max-width:100%;height:auto}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-top:20px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.85rem}
+.legend-color{width:16px;height:16px;border-radius:4px}
+.progress-bar-container{width:100%;height:24px;background:#f3f4f6;border-radius:12px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;transition:width .3s;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.75rem;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="../../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="../index.html">Firmware</a><span class="breadcrumb-separator">/</span>
+      <span>Battery Calculator</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Battery Life Calculator</h1>
+  
+  <div class="col panel">
+    <label>Load Configuration</label>
+    <div class="field-row">
+      <label for="driverBoardSelect">Driver Board:</label>
+      <select id="driverBoardSelect" style="flex: 1; min-width: 200px;">
+        <option value="">-- Select driver board --</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label for="displaySelect">Display:</label>
+      <select id="displaySelect" style="flex: 1; min-width: 200px;" disabled>
+        <option value="">-- Select display --</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <label for="powerSelect">Power:</label>
+      <select id="powerSelect" style="flex: 1; min-width: 200px;">
+        <option value="">-- Select power option --</option>
+      </select>
+    </div>
+    <div class="field-row" style="margin-top: 12px;">
+      <button type="button" onclick="loadFromBleDevice();" style="flex: 1; min-width: 120px;">Load from BLE Device</button>
+      <button type="button" onclick="loadFromConfigFile();" style="flex: 1; min-width: 120px;">Upload from File</button>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <label>Battery Parameters</label>
+    <div class="field-row">
+      <label for="batteryCapacity">
+        Battery Capacity:
+        <span class="tooltip-trigger">?
+          <span class="tooltip">Total usable battery capacity in milliampere-hours (mAh)</span>
+        </span>
+      </label>
+      <div class="field-wrapper">
+        <input type="number" id="batteryCapacity" placeholder="2000" step="1" min="0" />
+        <span class="unit-label">mAh</span>
+        <div class="error-message" id="batteryCapacityError"></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <label for="standbyCurrent">
+        Standby Current:
+        <span class="tooltip-trigger">?
+          <span class="tooltip">Average deep sleep current of the board in microamperes (µA), including coms in idle mode</span>
+        </span>
+      </label>
+      <div class="field-wrapper">
+        <input type="number" id="standbyCurrent" placeholder="50" step="0.1" min="0" />
+        <select id="standbyCurrentUnit">
+          <option value="ua" selected>µA</option>
+          <option value="ma">mA</option>
+        </select>
+        <div class="error-message" id="standbyCurrentError"></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <label for="chargePerUpdate">
+        Charge per Update:
+        <span class="tooltip-trigger">?
+          <span class="tooltip">Energy consumed for a full display update in millicoulombs (mC), excluding idle consumption. Can also be entered in mAh or µAh</span>
+        </span>
+      </label>
+      <div class="field-wrapper">
+        <input type="number" id="chargePerUpdate" placeholder="10" step="0.1" min="0" />
+        <select id="chargePerUpdateUnit">
+          <option value="mc" selected>mC</option>
+          <option value="mah">mAh</option>
+          <option value="uah">µAh</option>
+        </select>
+        <div class="error-message" id="chargePerUpdateError"></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <label for="updatesPerDay">
+        Updates per Day:
+        <span class="tooltip-trigger">?
+          <span class="tooltip">Number of display updates performed per day</span>
+        </span>
+      </label>
+      <div class="field-wrapper">
+        <input type="number" id="updatesPerDay" placeholder="24" step="1" min="0" />
+        <div class="error-message" id="updatesPerDayError"></div>
+      </div>
+    </div>
+    <div class="inline-error" id="generalError"></div>
+  </div>
+
+  <div id="resultPanel" class="col panel result-panel" style="display:none;">
+    <label>Battery Life Estimate</label>
+    <div id="resultValue" class="result-value"></div>
+    <div class="result-details">
+      <div class="result-item">
+        <div class="result-item-label">Total Days</div>
+        <div id="resultDays" class="result-item-value"></div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Months (30 days)</div>
+        <div id="resultMonths" class="result-item-value"></div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Daily Consumption</div>
+        <div id="resultDaily" class="result-item-value"></div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Standby Consumption</div>
+        <div id="resultStandby" class="result-item-value"></div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Update Consumption</div>
+        <div id="resultUpdate" class="result-item-value"></div>
+      </div>
+    </div>
+    
+    <div class="charts-grid">
+      <div class="chart-container">
+        <div class="chart-title">Consumption Breakdown</div>
+        <div class="chart-wrapper">
+          <canvas id="consumptionChart"></canvas>
+        </div>
+        <div class="legend" id="consumptionLegend"></div>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Daily Consumption Distribution</div>
+        <div class="chart-wrapper">
+          <canvas id="pieChart"></canvas>
+        </div>
+        <div class="legend" id="pieLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="blePanel" class="col panel" style="display:none;">
+    <label>BLE Connection</label>
+    <div class="ble-controls">
+      <div class="ble-input-group">
+        <label for="namePrefix">OD Device Filter:</label>
+        <input type="text" id="namePrefix" value="OD" placeholder="OD (comma separated)" />
+      </div>
+      <div class="ble-actions">
+        <button id="connectbutton" type="button" onclick="preConnect();">Connect</button>
+        <button type="button" onclick="readConfigFromBle();">Load from Device</button>
+      </div>
+      <div class="status-display">
+        <div id="statusText" class="status-text">Not Connected</div>
+        <div id="logDisplay" class="log-display"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://opendisplay.org/js/js-yaml.min.js"></script>
+  <script src="../../js/ble-common.js"></script>
+<script>
+let bleLib = null;
+
+function addLog(message, type = 'info') {
+  const logDisplay = document.getElementById('logDisplay');
+  const logEntry = document.createElement('div');
+  logEntry.className = `log-entry ${type}`;
+  logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  logDisplay.appendChild(logEntry);
+  logDisplay.scrollTop = logDisplay.scrollHeight;
+  while (logDisplay.children.length > 50) {
+    logDisplay.removeChild(logDisplay.firstChild);
+  }
+}
+
+function setStatus(message, isConnected = false) {
+  const statusText = document.getElementById('statusText');
+  statusText.textContent = message;
+  statusText.className = isConnected ? 'status-text connected' : 'status-text';
+}
+
+function resetVariables() {
+  // State reset handled by library
+}
+
+function setButtonLoading(buttonId, isLoading, text = null) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+  
+  if (isLoading) {
+    button.classList.add('loading');
+    button.disabled = true;
+    if (text) {
+      button.setAttribute('data-original-text', button.textContent);
+      button.textContent = text;
+    }
+  } else {
+    button.classList.remove('loading');
+    button.disabled = false;
+    const originalText = button.getAttribute('data-original-text');
+    if (originalText) {
+      button.textContent = originalText;
+      button.removeAttribute('data-original-text');
+    }
+  }
+}
+
+function handleError(error) {
+  addLog(`Error: ${error.name} - ${error.message}`, 'error');
+  setStatus(`Error: ${error.message}`);
+  setButtonLoading('connectbutton', false);
+  document.getElementById("connectbutton").innerHTML = 'Connect';
+  resetVariables();
+}
+
+function preConnect() {
+  if (bleLib && bleLib.isConnected) {
+    addLog("Disconnecting...");
+    setStatus("Disconnecting...");
+    setButtonLoading('connectbutton', false);
+    document.getElementById("connectbutton").innerHTML = 'Connect';
+    bleLib.disconnect();
+  } else {
+    const namePrefix = document.getElementById('namePrefix').value.trim();
+    if (!namePrefix) {
+      addLog("Error: Device filter needed.", 'error');
+      setStatus("Error: No device filter");
+      return;
+    }
+    
+    // Initialize BLE library
+    bleLib = new OpenDisplayBLE({
+      deviceNamePrefix: namePrefix,
+      maxReconnectAttempts: 5,
+      reconnectDelay: 2000,
+      onConnect: () => {
+        addLog("BLE Connection established successfully!", 'success');
+        setStatus("Connected", true);
+        setButtonLoading('connectbutton', false);
+        document.getElementById("connectbutton").innerHTML = 'Disconnect';
+      },
+      onDisconnect: () => {
+        addLog('Device disconnected.');
+        setStatus("Disconnected");
+        setButtonLoading('connectbutton', false);
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+        resetVariables();
+      },
+      onError: (error) => {
+        handleError(error);
+      },
+      onNotification: handleNotification,
+      onLog: (message, type) => {
+        addLog(message, type);
+      },
+      onStatusChange: (message, isConnected) => {
+        setStatus(message, isConnected);
+      }
+    });
+    
+    // Connect
+    setButtonLoading('connectbutton', true, 'Scanning...');
+    bleLib.connect(namePrefix).catch(error => {
+      setButtonLoading('connectbutton', false);
+      if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+        addLog("No device selected/found.");
+        setStatus("No device selected");
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+      } else {
+        handleError(error);
+      }
+    });
+  }
+}
+
+function handleNotification(bytes, hexString, event) {
+  // Config read responses are now handled by the library's built-in handler
+  // Just log the notification for debugging
+  addLog("BLE< " + hexString, 'info');
+}
+
+function parseConfigForBattery(bytes) {
+  const view = bytes.slice();
+  if (view.length < 3) {
+    addLog("Config too short for outer packet header", 'error');
+    return;
+  }
+  
+  let offset = 0;
+  const outerLength = view[offset] | (view[offset + 1] << 8);
+  offset += 2;
+  const version = view[offset++];
+  addLog(`Config outer packet: length=${outerLength}, version=${version}, actual bytes=${view.length}`, 'info');
+  
+  // The outer packet includes a 2-byte CRC at the end, so we stop 2 bytes before the end
+  const dataEnd = view.length - 2;
+  if (outerLength !== view.length) {
+    addLog(`Length mismatch: header says ${outerLength}, actual is ${view.length}`, 'warning');
+  }
+  
+  let powerOptionFound = false;
+  let displayFound = false;
+  
+  while (offset < dataEnd) {
+    if (offset + 2 > dataEnd) break;
+    const packetNumber = view[offset++];
+    const packetId = view[offset++];
+    addLog(`Parsing packet ${packetNumber}, ID=0x${packetId.toString(16).padStart(2, '0')} at offset ${offset - 2}`, 'info');
+    
+    if (packetId === 0x04) {
+      powerOptionFound = true;
+      const powerOptionSize = bleLib.getPacketSize(0x04);
+      if (offset + powerOptionSize > dataEnd) {
+        addLog("Power option packet too short", 'error');
+        break;
+      }
+      
+      // Use library function to parse power option packet
+      const packetData = view.slice(offset, Math.min(offset + powerOptionSize, dataEnd));
+      const powerFields = bleLib.parsePowerOptionPacketFields(packetData);
+      
+      if (!powerFields) {
+        addLog("Failed to parse power option packet fields", 'error');
+        offset += powerOptionSize;
+        continue;
+      }
+      
+      const batteryCapacity = powerFields.batteryCapacity;
+      const deepSleepCurrent = powerFields.deepSleepCurrent;
+      
+      if (isValidValue(batteryCapacity)) {
+        document.getElementById('batteryCapacity').value = batteryCapacity;
+      } else {
+        document.getElementById('batteryCapacity').value = '';
+      }
+      if (isValidValue(deepSleepCurrent)) {
+        document.getElementById('standbyCurrent').value = deepSleepCurrent;
+        document.getElementById('standbyCurrentUnit').value = 'ua';
+        addLog(`Loaded: Battery=${batteryCapacity}mAh, DeepSleep=${deepSleepCurrent}µA`, 'success');
+      } else {
+        if (isValidValue(batteryCapacity)) {
+          document.getElementById('batteryCapacity').value = batteryCapacity;
+          addLog(`Loaded: Battery=${batteryCapacity}mAh (deep sleep current not available)`, 'success');
+        }
+        document.getElementById('standbyCurrent').value = '';
+      }
+      offset += powerOptionSize;
+    } else if (packetId === 0x20) {
+      displayFound = true;
+      const displayConfigSize = bleLib.getPacketSize(0x20);
+      // offset is currently at the start of the display packet payload (after packet number and ID)
+      const payloadStart = offset;
+      const bytesRemaining = dataEnd - payloadStart;
+      addLog(`Display packet found at payload offset ${payloadStart}, need ${displayConfigSize} bytes, have ${bytesRemaining} bytes remaining`, 'info');
+      
+      // Use library function to parse display packet
+      const packetData = view.slice(offset, Math.min(offset + displayConfigSize, dataEnd));
+      const displayFields = bleLib.parseDisplayPacketFields(packetData);
+      
+      if (!displayFields) {
+        addLog("Failed to parse display packet fields", 'error');
+        offset += Math.min(displayConfigSize, bytesRemaining);
+        addLog(`After display packet, offset is now ${offset}, dataEnd is ${dataEnd}`, 'info');
+        continue;
+      }
+      
+      const fullUpdateMc = displayFields.fullUpdateMc;
+      
+      if (fullUpdateMc !== null) {
+        addLog(`Parsed full_update_mC = ${fullUpdateMc} (0x${fullUpdateMc.toString(16)})`, 'info');
+        if (isValidValue(fullUpdateMc)) {
+          document.getElementById('chargePerUpdate').value = fullUpdateMc;
+          document.getElementById('chargePerUpdateUnit').value = 'mc';
+          addLog(`Loaded: Full update energy=${fullUpdateMc}mC`, 'success');
+        } else {
+          addLog(`full_update_mC value ${fullUpdateMc} is invalid (0 or 0xFFFF)`, 'warning');
+          document.getElementById('chargePerUpdate').value = '';
+        }
+      } else {
+        addLog(`Display packet too short for full_update_mC (need 33 bytes, have ${bytesRemaining} bytes)`, 'warning');
+        document.getElementById('chargePerUpdate').value = '';
+      }
+      
+      offset += Math.min(displayConfigSize, bytesRemaining);
+      addLog(`After display packet, offset is now ${offset}, dataEnd is ${dataEnd}`, 'info');
+    } else {
+      // Use library function to get packet size
+      const packetSize = bleLib.getPacketSize(packetId);
+      if (packetSize) {
+        offset += packetSize;
+      } else {
+        addLog(`Unknown packet type 0x${packetId.toString(16).padStart(2, '0')} at offset ${offset - 2}, skipping`, 'info');
+        // For unknown packets, we can't determine the size reliably
+        // Try to find the next packet by looking ahead, but limit search to avoid infinite loops
+        let foundNext = false;
+        for (let searchOffset = offset; searchOffset < Math.min(dataEnd - 1, offset + 100); searchOffset++) {
+          const possibleId = view[searchOffset + 1];
+          // Check if this looks like a valid packet header (packet number should be reasonable, ID should be known)
+          const knownPacketIds = [0x01, 0x02, 0x04, 0x20, 0x21, 0x23, 0x24, 0x25, 0x26];
+          if (knownPacketIds.includes(possibleId)) {
+            offset = searchOffset;
+            foundNext = true;
+            break;
+          }
+        }
+        if (!foundNext) {
+          // Couldn't find next packet, skip to end
+          break;
+        }
+      }
+    }
+  }
+  
+  if (powerOptionFound || displayFound) {
+    calculateBatteryLife(false);
+  } else {
+    addLog("Power option or display packet not found in config", 'info');
+  }
+}
+
+async function sendCommand(cmd) {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot send command: Not connected.", 'error');
+    setStatus("Not Connected");
+    return;
+  }
+  try {
+    await bleLib.sendCommand(cmd);
+  } catch (error) {
+    addLog("Send Error: " + error.message, 'error');
+    handleError(error);
+  }
+}
+
+// delayPromise is now available via bleLib.delay() if needed
+
+async function sendcmd(cmdTXT) {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot send command: Not connected.", 'error');
+    setStatus("Not Connected");
+    return;
+  }
+  try {
+    await bleLib.sendHexCommand(cmdTXT);
+  } catch (error) {
+    addLog(`Error: ${error.message}`, 'error');
+  }
+}
+
+function hexToBytes(hexString) {
+  const bytes = [];
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes.push(parseInt(hexString.substr(i, 2), 16));
+  }
+  return new Uint8Array(bytes);
+}
+
+function readConfigFromBle() {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot read config: Not connected.", 'error');
+    return;
+  }
+  addLog("Reading current config from device...", 'info');
+  setStatus("Reading config...", false);
+  // Use library's built-in config read handler
+  bleLib.readConfig((configBytes, error) => {
+    if (error) {
+      addLog("Config read failed: " + error.message, 'error');
+      setStatus("Config read failed", false);
+      return;
+    }
+    addLog(`Config read callback received ${configBytes ? configBytes.length : 0} bytes`, 'info');
+    if (!configBytes || configBytes.length === 0) {
+      addLog("Config read callback received empty data", 'error');
+      setStatus("Config read failed", false);
+      return;
+    }
+    try {
+      parseConfigForBattery(configBytes);
+      addLog("Config successfully loaded into calculator", 'success');
+      setStatus("Config loaded", false);
+    } catch (error) {
+      addLog("Error parsing config: " + error.message, 'error');
+      setStatus("Error loading config", false);
+    }
+  }, (received, total) => {
+    addLog(`Progress: ${received}/${total} bytes`, 'info');
+  });
+}
+
+function connectAndReadConfig() {
+  // Check if already connected
+  if (bleLib && bleLib.isConnected) {
+    addLog("Already connected, reading config...", 'info');
+    readConfigFromBle();
+    return;
+  }
+  
+  // Not connected, attempt to connect first
+  addLog("Not connected. Attempting to connect to BLE device...", 'info');
+  const namePrefix = document.getElementById('namePrefix').value.trim();
+  if (!namePrefix) {
+    addLog("Error: Device filter needed. Please set Device Filter.", 'error');
+    return;
+  }
+  
+  // Initialize BLE library if not already done
+  if (!bleLib) {
+    bleLib = new OpenDisplayBLE({
+      deviceNamePrefix: namePrefix,
+      maxReconnectAttempts: 5,
+      reconnectDelay: 2000,
+      onConnect: () => {
+        addLog("BLE Connection established successfully!", 'success');
+        setStatus("Connected", true);
+        setButtonLoading('connectbutton', false);
+        document.getElementById("connectbutton").innerHTML = 'Disconnect';
+        // Now read the config
+        readConfigFromBle();
+      },
+      onDisconnect: () => {
+        addLog('Device disconnected.');
+        setStatus("Disconnected");
+        setButtonLoading('connectbutton', false);
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+        resetVariables();
+      },
+      onError: (error) => {
+        handleError(error);
+      },
+      onNotification: handleNotification,
+      onLog: (message, type) => {
+        addLog(message, type);
+      },
+      onStatusChange: (message, isConnected) => {
+        setStatus(message, isConnected);
+      }
+    });
+  }
+  
+  addLog("Requesting device with filters: " + namePrefix);
+  setStatus("Requesting device...");
+  setButtonLoading('connectbutton', true, 'Scanning...');
+  
+  bleLib.connect(namePrefix).catch(error => {
+    setButtonLoading('connectbutton', false);
+    if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+      addLog("No device selected/found.", 'error');
+      setStatus("No device selected");
+      document.getElementById("connectbutton").innerHTML = 'Connect';
+    } else {
+      handleError(error);
+    }
+  });
+}
+
+// Simple config presets database
+let simpleConfigPresets = null;
+let simpleConfigSelections = { driverBoard: null, display: null, power: null };
+
+// Load simple config presets from JSON file
+async function loadSimpleConfigPresets() {
+  try {
+    const response = await fetch('../toolbox/simple-config-presets.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    simpleConfigPresets = await response.json();
+    initializeSimpleConfigSelects();
+    // Load from URL parameters after initialization
+    setTimeout(() => {
+      loadSimpleConfigFromUrl();
+      loadLegacyPremadeConfigFromUrl();
+    }, 100);
+  } catch (error) {
+    addLog(`Error loading simple config presets: ${error.message}`, 'error');
+    console.error('Failed to load simple config presets:', error);
+  }
+}
+
+function initializeSimpleConfigSelects() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  // Populate driver board dropdown
+  const driverBoardSelect = document.getElementById('driverBoardSelect');
+  driverBoardSelect.innerHTML = '<option value="">-- Select driver board --</option>';
+  simpleConfigPresets.driverBoards.forEach(board => {
+    const option = document.createElement('option');
+    option.value = board.id;
+    option.textContent = board.name;
+    driverBoardSelect.appendChild(option);
+  });
+  
+  // Populate power dropdown
+  const powerSelect = document.getElementById('powerSelect');
+  powerSelect.innerHTML = '<option value="">-- Select power option --</option>';
+  simpleConfigPresets.powerOptions.forEach(power => {
+    const option = document.createElement('option');
+    option.value = power.id;
+    option.textContent = power.name;
+    powerSelect.appendChild(option);
+  });
+  
+  // Event handlers
+  driverBoardSelect.onchange = handleDriverBoardChange;
+  document.getElementById('displaySelect').onchange = handleDisplayChange;
+  powerSelect.onchange = handlePowerChange;
+}
+
+function handleDriverBoardChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const driverBoardSelect = document.getElementById('driverBoardSelect');
+  const displaySelect = document.getElementById('displaySelect');
+  const selectedBoardId = driverBoardSelect.value;
+  
+  if (!selectedBoardId) {
+    displaySelect.disabled = true;
+    displaySelect.innerHTML = '<option value="">-- Select display --</option>';
+    simpleConfigSelections.driverBoard = null;
+    updateBatteryParams();
+    return;
+  }
+  
+  const selectedBoard = simpleConfigPresets.driverBoards.find(b => b.id === selectedBoardId);
+  simpleConfigSelections.driverBoard = selectedBoard;
+  
+  // Filter displays by connector compatibility
+  displaySelect.innerHTML = '<option value="">-- Select display --</option>';
+  const compatibleDisplays = simpleConfigPresets.displays.filter(display => {
+    return selectedBoard.connectorPins.some(pin => display.connectorPins.includes(pin));
+  });
+  
+  compatibleDisplays.forEach(display => {
+    const option = document.createElement('option');
+    option.value = display.id;
+    option.textContent = display.name;
+    displaySelect.appendChild(option);
+  });
+  
+  displaySelect.disabled = false;
+  
+  // Apply default display if not already selected and default is defined
+  if (selectedBoard.defaultDisplay && !displaySelect.value) {
+    const defaultDisplayExists = compatibleDisplays.some(d => d.id === selectedBoard.defaultDisplay);
+    if (defaultDisplayExists) {
+      displaySelect.value = selectedBoard.defaultDisplay;
+      handleDisplayChange();
+    }
+  }
+  
+  // Apply default power if not already selected and default is defined
+  if (selectedBoard.defaultPower) {
+    const powerSelect = document.getElementById('powerSelect');
+    if (powerSelect && !powerSelect.value) {
+      const defaultPowerExists = simpleConfigPresets.powerOptions.some(p => p.id === selectedBoard.defaultPower);
+      if (defaultPowerExists) {
+        powerSelect.value = selectedBoard.defaultPower;
+        handlePowerChange();
+      }
+    }
+  }
+  
+  updateBatteryParams();
+}
+
+function handleDisplayChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const displaySelect = document.getElementById('displaySelect');
+  const selectedDisplayId = displaySelect.value;
+  
+  if (!selectedDisplayId) {
+    simpleConfigSelections.display = null;
+    updateBatteryParams();
+    return;
+  }
+  
+  const selectedDisplay = simpleConfigPresets.displays.find(d => d.id === selectedDisplayId);
+  simpleConfigSelections.display = selectedDisplay;
+  updateBatteryParams();
+}
+
+function handlePowerChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const powerSelect = document.getElementById('powerSelect');
+  const selectedPowerId = powerSelect.value;
+  
+  if (!selectedPowerId) {
+    simpleConfigSelections.power = null;
+    updateBatteryParams();
+    return;
+  }
+  
+  const selectedPower = simpleConfigPresets.powerOptions.find(p => p.id === selectedPowerId);
+  simpleConfigSelections.power = selectedPower;
+  updateBatteryParams();
+}
+
+function updateBatteryParams() {
+  // Extract battery parameters from simple config selections
+  let batteryCapacity = null;
+  let standbyCurrent = null;
+  let chargePerUpdate = null;
+  
+  // Get battery capacity from power option
+  if (simpleConfigSelections.power && simpleConfigSelections.power.powerOption) {
+    const powerOption = simpleConfigSelections.power.powerOption;
+    if (powerOption.battery_capacity_mah) {
+      const capacity = parseHexOrDecimal(powerOption.battery_capacity_mah);
+      if (isValidValue(capacity)) {
+        batteryCapacity = capacity;
+      }
+    }
+  }
+  
+  // Get standby current from power option or driver board defaults
+  if (simpleConfigSelections.power && simpleConfigSelections.power.powerOption) {
+    const powerOption = simpleConfigSelections.power.powerOption;
+    if (powerOption.deep_sleep_current_ua) {
+      const current = parseHexOrDecimal(powerOption.deep_sleep_current_ua);
+      if (isValidValue(current)) {
+        standbyCurrent = current;
+      }
+    }
+  }
+  
+  // If not found in power option, try driver board defaults
+  if (!standbyCurrent && simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.powerDefaults) {
+    const current = parseHexOrDecimal(simpleConfigSelections.driverBoard.powerDefaults.deep_sleep_current_ua);
+    if (isValidValue(current)) {
+      standbyCurrent = current;
+    }
+  }
+  
+  // Get charge per update from display config
+  if (simpleConfigSelections.display && simpleConfigSelections.display.config) {
+    const fullUpdateMc = parseHexOrDecimal(simpleConfigSelections.display.config.full_update_mC);
+    if (isValidValue(fullUpdateMc)) {
+      chargePerUpdate = fullUpdateMc;
+    }
+  }
+  
+  // Update form fields
+  if (batteryCapacity !== null) {
+    document.getElementById('batteryCapacity').value = batteryCapacity;
+  }
+  if (standbyCurrent !== null) {
+    document.getElementById('standbyCurrent').value = standbyCurrent;
+    document.getElementById('standbyCurrentUnit').value = 'ua';
+  }
+  if (chargePerUpdate !== null) {
+    document.getElementById('chargePerUpdate').value = chargePerUpdate;
+    document.getElementById('chargePerUpdateUnit').value = 'mc';
+  }
+  
+  // Recalculate if we have all values
+  if (batteryCapacity !== null || standbyCurrent !== null || chargePerUpdate !== null) {
+    calculateBatteryLife(false);
+  }
+}
+
+function applySimpleConfigByIds(driverBoardId, displayId, powerId) {
+  if (!simpleConfigPresets) {
+    return;
+  }
+  if (!driverBoardId && !displayId && !powerId) {
+    return;
+  }
+  if (driverBoardId) {
+    const driverBoard = simpleConfigPresets.driverBoards.find(b => b.id === driverBoardId);
+    if (driverBoard) {
+      const driverBoardSelect = document.getElementById('driverBoardSelect');
+      driverBoardSelect.value = driverBoardId;
+      handleDriverBoardChange();
+      setTimeout(() => {
+        if (displayId) {
+          const display = simpleConfigPresets.displays.find(d => d.id === displayId);
+          if (display) {
+            const displaySelect = document.getElementById('displaySelect');
+            displaySelect.value = displayId;
+            handleDisplayChange();
+          }
+        }
+        setTimeout(() => {
+          if (powerId) {
+            const power = simpleConfigPresets.powerOptions.find(p => p.id === powerId);
+            if (power) {
+              const powerSelect = document.getElementById('powerSelect');
+              powerSelect.value = powerId;
+              handlePowerChange();
+            }
+          }
+        }, 100);
+      }, 100);
+    }
+  } else if (powerId) {
+    const power = simpleConfigPresets.powerOptions.find(p => p.id === powerId);
+    if (power) {
+      const powerSelect = document.getElementById('powerSelect');
+      powerSelect.value = powerId;
+      handlePowerChange();
+    }
+  }
+}
+
+function loadSimpleConfigFromUrl() {
+  applySimpleConfigByIds(getUrlParameter('driver'), getUrlParameter('display'), getUrlParameter('power'));
+}
+
+function loadLegacyPremadeConfigFromUrl() {
+  const driverParam = getUrlParameter('driver');
+  const displayParam = getUrlParameter('display');
+  const powerParam = getUrlParameter('power');
+  if (driverParam || displayParam || powerParam) {
+    return;
+  }
+  const configParam = getUrlParameter('config');
+  if (!configParam) {
+    return;
+  }
+  const triple = typeof getPremadeLegacySimpleTriple === 'function' ? getPremadeLegacySimpleTriple(configParam) : null;
+  if (!triple) {
+    addLog('Unknown ?config= preset. Use a known preset name (e.g. nrf52840-en04) or ?driver=&display=&power=.', 'error');
+    return;
+  }
+  addLog('Applying premade preset via simple config', 'info');
+  applySimpleConfigByIds(triple.driverBoardId, triple.displayId, triple.powerId);
+}
+
+function loadFromBleDevice() {
+  const blePanel = document.getElementById('blePanel');
+  if (blePanel) blePanel.style.display = 'block';
+  connectAndReadConfig();
+}
+
+function loadFromConfigFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const config = JSON.parse(e.target.result);
+        loadBatteryParamsFromConfig(config);
+      } catch (error) {
+        addLog('Error parsing JSON file: ' + error.message, 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+function parseHexOrDecimal(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  const str = String(value).trim();
+  
+  if (str.startsWith('0x') || str.startsWith('0X')) {
+    return parseInt(str, 16);
+  }
+  
+  if (str.toLowerCase().match(/[a-f]/)) {
+    return parseInt(str, 16);
+  }
+  
+  const decParsed = parseInt(str, 10);
+  if (!isNaN(decParsed)) {
+    return decParsed;
+  }
+  
+  return null;
+}
+
+function isValidValue(value) {
+  if (value === null || value === undefined) {
+    return false;
+  }
+  if (value === 0 || value === 0xFFFF || value === 65535) {
+    return false;
+  }
+  return value > 0;
+}
+
+function loadBatteryParamsFromConfig(config) {
+  if (!config.packets || !Array.isArray(config.packets)) {
+    addLog('Invalid JSON configuration: missing or invalid packets array', 'error');
+    return;
+  }
+  
+  const powerOption = config.packets.find(p => p.id === '4' || p.id === 4);
+  if (powerOption) {
+    const fields = powerOption.fields || {};
+    
+    if (fields.battery_capacity_mah !== undefined) {
+      const capacity = parseHexOrDecimal(fields.battery_capacity_mah);
+      if (isValidValue(capacity)) {
+        document.getElementById('batteryCapacity').value = capacity;
+      } else {
+        document.getElementById('batteryCapacity').value = '';
+      }
+    }
+    
+    if (fields.deep_sleep_current_ua !== undefined) {
+      const current = parseHexOrDecimal(fields.deep_sleep_current_ua);
+      if (isValidValue(current)) {
+        document.getElementById('standbyCurrent').value = current;
+        document.getElementById('standbyCurrentUnit').value = 'ua';
+        addLog(`Loaded: Deep sleep current=${current}µA`, 'success');
+      } else {
+        document.getElementById('standbyCurrent').value = '';
+      }
+    }
+  }
+  
+  const displayConfig = config.packets.find(p => p.id === '32' || p.id === 32);
+  if (displayConfig) {
+    const fields = displayConfig.fields || {};
+    
+    if (fields.full_update_mC !== undefined) {
+      const fullUpdateMc = parseHexOrDecimal(fields.full_update_mC);
+      if (isValidValue(fullUpdateMc)) {
+        document.getElementById('chargePerUpdate').value = fullUpdateMc;
+        document.getElementById('chargePerUpdateUnit').value = 'mc';
+        addLog(`Loaded: Full update energy=${fullUpdateMc}mC from display config`, 'success');
+      } else {
+        document.getElementById('chargePerUpdate').value = '';
+      }
+    } else {
+      document.getElementById('chargePerUpdate').value = '';
+    }
+  } else {
+    document.getElementById('chargePerUpdate').value = '';
+  }
+  
+  addLog('Config loaded successfully', 'success');
+  calculateBatteryLife(false);
+}
+
+function resetFields() {
+  document.getElementById('batteryCapacity').value = '2000';
+  document.getElementById('standbyCurrent').value = '300';
+  document.getElementById('chargePerUpdate').value = '38';
+  document.getElementById('updatesPerDay').value = '24';
+  document.getElementById('standbyCurrentUnit').value = 'ua';
+  document.getElementById('chargePerUpdateUnit').value = 'mc';
+  document.getElementById('configSelect').value = '';
+  document.getElementById('resultPanel').style.display = 'none';
+  calculateBatteryLife();
+}
+
+function setFieldValidation(fieldId, isValid, errorMessage = '') {
+  const field = document.getElementById(fieldId);
+  const errorElement = document.getElementById(fieldId + 'Error');
+  
+  if (field) {
+    field.classList.remove('invalid', 'valid');
+    if (isValid === false) {
+      field.classList.add('invalid');
+    } else if (isValid === true && field.value) {
+      field.classList.add('valid');
+    }
+  }
+  
+  if (errorElement) {
+    if (errorMessage) {
+      errorElement.textContent = errorMessage;
+      errorElement.classList.add('show');
+    } else {
+      errorElement.textContent = '';
+      errorElement.classList.remove('show');
+    }
+  }
+}
+
+function clearAllValidation() {
+  const fields = ['batteryCapacity', 'standbyCurrent', 'chargePerUpdate', 'updatesPerDay'];
+  fields.forEach(fieldId => {
+    setFieldValidation(fieldId, null, '');
+  });
+  const generalError = document.getElementById('generalError');
+  if (generalError) {
+    generalError.classList.remove('show');
+    generalError.textContent = '';
+  }
+}
+
+function calculateBatteryLife(userInitiated = true) {
+  const batteryCapacity = parseFloat(document.getElementById('batteryCapacity').value);
+  const standbyCurrent = parseFloat(document.getElementById('standbyCurrent').value);
+  const standbyUnit = document.getElementById('standbyCurrentUnit').value;
+  const chargePerUpdate = parseFloat(document.getElementById('chargePerUpdate').value);
+  const chargeUnit = document.getElementById('chargePerUpdateUnit').value;
+  const updatesPerDay = parseFloat(document.getElementById('updatesPerDay').value);
+  
+  // Clear previous validation
+  clearAllValidation();
+  
+  // Validate each field
+  let hasErrors = false;
+  
+  if (!batteryCapacity || batteryCapacity <= 0 || isNaN(batteryCapacity)) {
+    setFieldValidation('batteryCapacity', false, 'Please enter a valid battery capacity (must be greater than 0)');
+    hasErrors = true;
+  } else {
+    setFieldValidation('batteryCapacity', true);
+  }
+  
+  if (standbyCurrent === null || standbyCurrent === undefined || standbyCurrent < 0 || isNaN(standbyCurrent)) {
+    setFieldValidation('standbyCurrent', false, 'Please enter a valid standby current (must be 0 or greater)');
+    hasErrors = true;
+  } else {
+    setFieldValidation('standbyCurrent', true);
+  }
+  
+  if (chargePerUpdate === null || chargePerUpdate === undefined || chargePerUpdate < 0 || isNaN(chargePerUpdate)) {
+    setFieldValidation('chargePerUpdate', false, 'Please enter a valid charge per update (must be 0 or greater)');
+    hasErrors = true;
+  } else {
+    setFieldValidation('chargePerUpdate', true);
+  }
+  
+  if (!updatesPerDay || updatesPerDay < 0 || isNaN(updatesPerDay)) {
+    setFieldValidation('updatesPerDay', false, 'Please enter a valid number of updates per day (must be 0 or greater)');
+    hasErrors = true;
+  } else {
+    setFieldValidation('updatesPerDay', true);
+  }
+  
+  if (hasErrors) {
+    // Hide result panel if values are missing
+    document.getElementById('resultPanel').style.display = 'none';
+    return;
+  }
+  
+  const standbyCurrentMa = standbyUnit === 'ua' ? standbyCurrent / 1000 : standbyCurrent;
+  
+  let chargePerUpdateMah;
+  if (chargeUnit === 'mc') {
+    chargePerUpdateMah = chargePerUpdate / 3600;
+  } else if (chargeUnit === 'uah') {
+    chargePerUpdateMah = chargePerUpdate / 1000;
+  } else {
+    chargePerUpdateMah = chargePerUpdate;
+  }
+  
+  const standbyConsumptionMah = (standbyCurrentMa * 24);
+  const updateConsumptionMah = chargePerUpdateMah * updatesPerDay;
+  const totalDailyConsumptionMah = standbyConsumptionMah + updateConsumptionMah;
+  
+  if (totalDailyConsumptionMah <= 0) {
+    const generalError = document.getElementById('generalError');
+    if (generalError) {
+      generalError.textContent = 'Total daily consumption must be greater than 0. Please check your input values.';
+      generalError.classList.add('show');
+    }
+    document.getElementById('resultPanel').style.display = 'none';
+    return;
+  }
+  
+  const batteryLifeDays = batteryCapacity / totalDailyConsumptionMah;
+  const batteryLifeMonths = batteryLifeDays / 30;
+  const batteryLifeYears = batteryLifeDays / 365;
+  
+  let resultText;
+  if (batteryLifeYears >= 1) {
+    resultText = `${batteryLifeYears.toFixed(2)} years`;
+  } else if (batteryLifeMonths >= 1) {
+    resultText = `${batteryLifeMonths.toFixed(2)} months`;
+  } else {
+    resultText = `${batteryLifeDays.toFixed(1)} days`;
+  }
+  
+  document.getElementById('resultValue').textContent = resultText;
+  document.getElementById('resultDays').textContent = `${batteryLifeDays.toFixed(1)} days`;
+  document.getElementById('resultMonths').textContent = `${batteryLifeMonths.toFixed(2)} months`;
+  document.getElementById('resultDaily').textContent = `${totalDailyConsumptionMah.toFixed(3)} mAh/day`;
+  document.getElementById('resultStandby').textContent = `${standbyConsumptionMah.toFixed(3)} mAh/day`;
+  document.getElementById('resultUpdate').textContent = `${updateConsumptionMah.toFixed(3)} mAh/day`;
+  
+  document.getElementById('resultPanel').style.display = 'block';
+  
+  drawCharts(standbyConsumptionMah, updateConsumptionMah, batteryLifeDays);
+}
+
+function drawCharts(standbyConsumption, updateConsumption, batteryLifeDays) {
+  drawConsumptionChart(standbyConsumption, updateConsumption);
+  drawPieChart(standbyConsumption, updateConsumption);
+}
+
+function drawConsumptionChart(standby, update) {
+  const canvas = document.getElementById('consumptionChart');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.parentElement.clientWidth - 40;
+  const height = 250;
+  canvas.width = width;
+  canvas.height = height;
+  
+  const maxValue = Math.max(standby, update) * 1.2;
+  const barWidth = Math.min(width / 4, 120);
+  const barHeight = height - 60;
+  const gap = (width - (barWidth * 2)) / 3; // Equal gaps on sides and between bars
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  const colors = { standby: '#3b82f6', update: '#a855f7' };
+  
+  function drawBar(x, value, label, color) {
+    const barH = (value / maxValue) * barHeight;
+    const y = height - 40 - barH;
+    
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barWidth, barH);
+    
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + barWidth / 2, height - 20);
+    ctx.fillText(`${value.toFixed(2)} mAh/day`, x + barWidth / 2, y - 5);
+  }
+  
+  // Center the bars with equal spacing
+  const firstBarX = gap;
+  const secondBarX = gap + barWidth + gap;
+  drawBar(firstBarX, standby, 'Standby', colors.standby);
+  drawBar(secondBarX, update, 'Updates', colors.update);
+  
+  const legend = document.getElementById('consumptionLegend');
+  legend.innerHTML = `
+    <div class="legend-item"><span class="legend-color" style="background:${colors.standby}"></span><span>Standby</span></div>
+    <div class="legend-item"><span class="legend-color" style="background:${colors.update}"></span><span>Updates</span></div>
+  `;
+}
+
+function drawPieChart(standby, update) {
+  const canvas = document.getElementById('pieChart');
+  const ctx = canvas.getContext('2d');
+  const width = canvas.parentElement.clientWidth - 40;
+  const height = 250;
+  canvas.width = width;
+  canvas.height = height;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  // Center the pie chart
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radius = Math.min(width, height) / 2 - 40;
+  
+  const total = standby + update;
+  const standbyAngle = (standby / total) * 2 * Math.PI;
+  const updateAngle = (update / total) * 2 * Math.PI;
+  
+  const colors = { standby: '#3b82f6', update: '#a855f7' };
+  
+  ctx.fillStyle = colors.standby;
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, 0, standbyAngle);
+  ctx.closePath();
+  ctx.fill();
+  
+  ctx.fillStyle = colors.update;
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, standbyAngle, standbyAngle + updateAngle);
+  ctx.closePath();
+  ctx.fill();
+  
+  const legend = document.getElementById('pieLegend');
+  const standbyPercent = ((standby / total) * 100).toFixed(1);
+  const updatePercent = ((update / total) * 100).toFixed(1);
+  legend.innerHTML = `
+    <div class="legend-item"><span class="legend-color" style="background:${colors.standby}"></span><span>Standby: ${standbyPercent}%</span></div>
+    <div class="legend-item"><span class="legend-color" style="background:${colors.update}"></span><span>Updates: ${updatePercent}%</span></div>
+  `;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadSimpleConfigPresets();
+  
+  // Add event listeners for automatic calculation
+  const inputs = ['batteryCapacity', 'standbyCurrent', 'chargePerUpdate', 'updatesPerDay'];
+  const selects = ['standbyCurrentUnit', 'chargePerUpdateUnit'];
+  
+  inputs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', () => {
+        // Clear validation for this field when user starts typing
+        setFieldValidation(id, null, '');
+        calculateBatteryLife(false);
+      });
+      element.addEventListener('change', () => calculateBatteryLife(false));
+      element.addEventListener('blur', () => calculateBatteryLife(false));
+    }
+  });
+  
+  selects.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('change', () => calculateBatteryLife(false));
+    }
+  });
+});
+
+</script>
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="../../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+</body>
+</html>
+
+

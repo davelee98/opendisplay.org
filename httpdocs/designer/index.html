@@ -1,0 +1,4103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Visual editor for designing OpenDisplay layouts with OpenDisplay Language output">
+  <link rel="canonical" href="https://opendisplay.org/designer/">
+  <meta property="og:title" content="OpenDisplay Visual Designer">
+  <meta property="og:description" content="Visual editor for designing OpenDisplay layouts with OpenDisplay Language output">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/designer/">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico">
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Visual Designer</title>
+  <style>
+    label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--foreground);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    textarea, input, select, button {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 191, 255, 0.1);
+    }
+
+    button {
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 4px 6px 4px 0;
+      color: var(--accent-button);
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 14px;
+      min-height: 44px;
+    }
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+    }
+
+    button:active {
+      transform: none;
+    }
+
+    button.secondary {
+      background: var(--card-background);
+      color: var(--foreground);
+      border: 1px solid var(--border-color);
+    }
+
+    button.secondary:hover {
+      background: var(--border-color);
+    }
+
+    input[type="text"], input[type="number"], select {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--foreground);
+      font-size: 14px;
+      min-height: 44px;
+      transition: 0.2s;
+      appearance: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+      padding-right: 32px;
+    }
+
+    select option {
+      background: var(--card-background);
+      color: var(--foreground);
+      padding: 8px 12px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .field-row label {
+      font-size: 0.9rem;
+      margin: 0;
+      min-width: 120px;
+      font-weight: 500;
+    }
+
+    .field-row input, .field-row select {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .field-row.full-width {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .field-row.full-width label {
+      min-width: auto;
+    }
+
+    .canvas-container {
+      width: 100%;
+      overflow: visible;
+      max-width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-background);
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 0;
+      position: relative;
+      min-height: 200px;
+    }
+
+    .canvas-panel {
+      margin-top: 0 !important;
+      margin-bottom: 20px !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .canvas-panel .canvas-container {
+      margin-bottom: 0 !important;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .canvas-container canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .coordinate-label {
+      position: absolute;
+      font-family: monospace;
+      font-size: 10px;
+      color: #999;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .button-group button {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    @media (max-width: 1024px) {
+      .canvas-container {
+        max-height: 60vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .field-row label {
+        min-width: auto;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+      }
+
+      .field-row input, .field-row select {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .element-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+      }
+
+      .element-actions {
+        width: 100%;
+        justify-content: stretch;
+        margin-top: 8px;
+      }
+
+      .element-actions button {
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+        min-width: 0;
+        margin: 4px 0;
+      }
+
+      .canvas-container {
+        padding: 8px;
+        max-height: 50vh;
+      }
+
+      textarea {
+        height: 200px;
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+      }
+
+      .col.panel {
+        padding: 16px;
+      }
+
+      .add-element-section {
+        padding: 12px;
+      }
+
+      .element-editor {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .designer-container {
+        gap: 16px;
+      }
+
+      .canvas-container {
+        max-height: 40vh;
+      }
+
+      textarea {
+        height: 150px;
+      }
+
+      .element-list {
+        max-height: 300px;
+      }
+    }
+
+    #previewCanvas {
+      border: 1px solid var(--border-color);
+      background: white;
+      display: block;
+      margin: 0 auto;
+      border-radius: 8px;
+      max-width: 100%;
+      height: auto;
+      cursor: default;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    #previewCanvas.dragging {
+      cursor: move;
+    }
+
+    #previewCanvas.resizing {
+      cursor: nwse-resize;
+    }
+
+    .element-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .element-item {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .element-item:hover {
+      border-color: var(--accent);
+    }
+
+    .element-item.selected {
+      border-color: var(--accent);
+      background: rgba(0, 191, 255, 0.1);
+    }
+
+    .element-info {
+      flex: 1;
+    }
+
+    .element-type {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 0.9rem;
+    }
+
+    .element-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .element-actions button {
+      padding: 4px 8px;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .element-editor,
+    .add-element-section,
+    .yaml-output {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .yaml-output {
+      margin-bottom: 0;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .toggle-group input[type="checkbox"] {
+      transform: scale(1.4);
+      accent-color: var(--accent);
+      cursor: pointer;
+      width: auto;
+      min-height: auto;
+    }
+
+    .toggle-group label {
+      margin: 0;
+      font-weight: normal;
+      font-size: 0.9rem;
+    }
+
+    .color-picker-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .color-option {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .color-option:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .color-option.selected {
+      border-color: var(--accent);
+      border-width: 3px;
+    }
+
+    .element-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .element-type-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 8px;
+      background: var(--card-background);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      min-height: 100px;
+    }
+
+    .element-type-button:hover {
+      border-color: var(--accent);
+      background: rgba(0, 191, 255, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 191, 255, 0.2);
+    }
+
+    .element-type-button:active {
+      transform: translateY(0);
+    }
+
+    .element-type-icon {
+      font-family: 'MaterialDesignIcons';
+      font-size: 32px;
+      color: var(--accent);
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .element-type-label {
+      font-size: 0.75rem;
+      color: var(--foreground);
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    @media (max-width: 768px) {
+      .element-type-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+      }
+
+      .element-type-button {
+        padding: 12px 6px;
+        min-height: 80px;
+      }
+
+      .element-type-icon {
+        font-size: 24px;
+        margin-bottom: 6px;
+      }
+
+      .element-type-label {
+        font-size: 0.7rem;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <span>Visual Designer</span>
+    </div>
+  </div>
+
+  <h1>OpenDisplay Visual Designer</h1>
+
+  <main id="main-content">
+    <div class="col panel">
+      <h2>Display Configuration</h2>
+      <div class="field-row">
+        <label for="presetSelect">Preset:</label>
+        <select id="presetSelect">
+          <option value="">-- Select a preset --</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label for="displayWidth">Width (pixels):</label>
+        <input type="number" id="displayWidth" min="1" max="2000" value="800">
+        </div>
+      <div class="field-row">
+        <label for="displayHeight">Height (pixels):</label>
+        <input type="number" id="displayHeight" min="1" max="2000" value="480">
+      </div>
+      <div class="field-row">
+        <label for="colorSchemeSelect">Color Scheme:</label>
+        <select id="colorSchemeSelect">
+          <option value="0">Monochrome (B/W)</option>
+          <option value="1">B/W + Red</option>
+          <option value="2">B/W + Yellow</option>
+          <option value="3">B/W + Red + Yellow</option>
+          <option value="4">6-Color</option>
+          <option value="5">4 Grayscale</option>
+          <option value="6">16 Grayscale (4bpp)</option>
+        </select>
+      </div>
+      <div class="toggle-group">
+        <input type="checkbox" id="fullColorToggle" checked>
+        <label for="fullColorToggle">Show full color preview (uncheck to see color scheme reduction)</label>
+      </div>
+      <div class="toggle-group">
+        <input type="checkbox" id="showCoordinates" checked>
+        <label for="showCoordinates">Show coordinate labels</label>
+      </div>
+    </div>
+
+    <div id="blePanel" class="col panel">
+      <h2>BLE Connection</h2>
+      <div class="field-row">
+        <label for="bleDeviceFilter">Device Filter:</label>
+        <input type="text" id="bleDeviceFilter" value="OD" placeholder="OD (comma separated)">
+      </div>
+      <div class="button-group">
+        <button type="button" id="bleConnectButton" onclick="connectBLE()">Connect</button>
+        <button type="button" onclick="sendCanvasToDisplay()">Send to Display</button>
+      </div>
+      <div id="bleStatus" style="margin-top: 12px; padding: 8px; background: var(--card-background); border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem;">
+        <div id="bleStatusText" style="font-weight: 600; color: #00bfff;">Not Connected</div>
+        <div id="bleLog" style="font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 12px; color: #8b949e; max-height: 150px; overflow-y: auto; white-space: pre-wrap; margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <div class="col panel canvas-panel">
+      <div class="canvas-container">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="previewCanvas" width="800" height="480"></canvas>
+        </div>
+      </div>
+    </div>
+
+        <div class="col panel">
+          <h2>Elements</h2>
+          <div class="add-element-section">
+            <h3 style="margin-top: 0; margin-bottom: 16px;">Add Element</h3>
+            <div class="element-type-grid" id="elementTypeGrid">
+            </div>
+          </div>
+          <div class="element-list" id="elementList">
+          </div>
+        </div>
+
+        <div class="col panel element-editor hidden" id="elementEditor">
+          <h2>Edit Element</h2>
+          <div id="elementEditorContent">
+
+          </div>
+          <div class="field-row">
+            <button type="button" class="secondary" onclick="cancelEdit()">Cancel</button>
+            <button type="button" class="secondary" onclick="deleteElement()" style="background: #00bfff; color: white;">Delete</button>
+        </div>
+      </div>
+
+        <div class="col panel">
+      <h2>OpenDisplay Language Output</h2>
+      <p class="intro-text">Copy this OpenDisplay Language code to use with Home Assistant's drawcustom service.
+        For complete documentation, see the <a href="../protocol/open-display-language.html" style="color: var(--accent);">OpenDisplay Language specification</a>.</p>
+      <textarea id="yamlOutput" readonly></textarea>
+      <div class="field-row">
+        <button type="button" onclick="copyYAML()">Copy OpenDisplay Language</button>
+        <button type="button" class="secondary" onclick="downloadYAML()">Download OpenDisplay Language</button>
+        <button type="button" class="secondary" onclick="downloadImage()">Download Image</button>
+        <button type="button" class="secondary" onclick="shareDesign()">Share Design</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="../firmware/index.html">Firmware</a>
+      <span class="footer-separator">•</span>
+      <a href="../firmware/display/index.html">BLE Tester</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">Impressum</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">Datenschutz</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/opendisplay" target="_blank" rel="noopener noreferrer" aria-label="Discord (opens in new tab)">Discord</a>
+    </div>
+  </div>
+
+      <script src="https://opendisplay.org/js/js-yaml.min.js"></script>
+      <script src="../js/ble-common.js"></script>
+  <script src="https://opendisplay.org/js/pako.js"></script>
+  <script>
+    let currentPreset = null;
+    let designerSimplePresetsCache = null;
+    let displayConfig = { width: 800, height: 480, colorScheme: 0 };
+    let elements = [];
+    let selectedElementIndex = -1;
+    let canvas, ctx;
+    let showFullColor = true;
+    let isDragging = false;
+    let isResizing = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragElementIndex = -1;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let resizeHandle = null;
+    let initialElementState = null;
+    let bleLib = null;
+    const colorSchemes = {
+      0: { name: 'Monochrome (B/W)', colors: ['black', 'white'] },
+      1: { name: 'B/W + Red', colors: ['black', 'white', 'red'] },
+      2: { name: 'B/W + Yellow', colors: ['black', 'white', 'yellow'] },
+      3: { name: 'B/W + Red + Yellow', colors: ['black', 'white', 'red', 'yellow'] },
+      4: { name: '6-Color', colors: ['black', 'white', 'red', 'yellow', 'green', 'blue'] },
+      5: { name: '4 Grayscale', colors: ['black', 'gray1', 'gray2', 'white'] },
+      6: { name: '16 Grayscale (4bpp)', colors: ['g0', 'g15'] }
+    };
+    const presets = getPremadeSimplePresets();
+    const elementTypes = [
+      { type: 'text', label: 'Text', icon: 'mdi:format-text' },
+      { type: 'multiline', label: 'Multiline', icon: 'mdi:text-box' },
+      { type: 'line', label: 'Line', icon: 'mdi:vector-line' },
+      { type: 'rectangle', label: 'Rectangle', icon: 'mdi:rectangle-outline' },
+      { type: 'rectangle_pattern', label: 'Pattern', icon: 'mdi:grid' },
+      { type: 'polygon', label: 'Polygon', icon: 'mdi:vector-polygon' },
+      { type: 'circle', label: 'Circle', icon: 'mdi:circle-outline' },
+      { type: 'ellipse', label: 'Ellipse', icon: 'mdi:ellipse-outline' },
+      { type: 'arc', label: 'Arc/Pie', icon: 'mdi:chart-arc' },
+      { type: 'icon', label: 'Icon', icon: 'mdi:emoticon' },
+      { type: 'icon_sequence', label: 'Icon Seq', icon: 'mdi:format-list-bulleted' },
+      { type: 'dlimg', label: 'Image', icon: 'mdi:image' },
+      { type: 'qrcode', label: 'QR Code', icon: 'mdi:qrcode' },
+      { type: 'plot', label: 'Plot', icon: 'mdi:chart-line' },
+      { type: 'progress_bar', label: 'Progress', icon: 'mdi:progress-bar' },
+      { type: 'debug_grid', label: 'Grid', icon: 'mdi:view-grid' }
+    ];
+    document.addEventListener('DOMContentLoaded', () => {
+      canvas = document.getElementById('previewCanvas');
+      ctx = canvas.getContext('2d');
+      const presetSelect = document.getElementById('presetSelect');
+      presets.forEach((preset, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = preset.name;
+        presetSelect.appendChild(option);
+      });
+
+      presetSelect.onchange = loadPreset;
+      document.getElementById('displayWidth').value = displayConfig.width;
+      document.getElementById('displayHeight').value = displayConfig.height;
+      document.getElementById('colorSchemeSelect').value = displayConfig.colorScheme;
+      canvas.width = displayConfig.width;
+      canvas.height = displayConfig.height;
+      document.getElementById('displayWidth').addEventListener('change', applyDisplayConfig);
+      document.getElementById('displayWidth').addEventListener('input', applyDisplayConfig);
+      document.getElementById('displayHeight').addEventListener('change', applyDisplayConfig);
+      document.getElementById('displayHeight').addEventListener('input', applyDisplayConfig);
+      document.getElementById('colorSchemeSelect').addEventListener('change', applyDisplayConfig);
+
+      document.getElementById('fullColorToggle').onchange = (e) => {
+        showFullColor = e.target.checked;
+        renderPreview();
+      };
+      initElementTypeGrid();
+      setupCanvasInteraction();
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          const showCoords = document.getElementById('showCoordinates');
+          if (showCoords && showCoords.checked) {
+            drawCoordinateLabels();
+          }
+        }, 100);
+      });
+      document.getElementById('showCoordinates').addEventListener('change', () => {
+        const showCoords = document.getElementById('showCoordinates');
+        if (showCoords && showCoords.checked) {
+          drawCoordinateLabels();
+        } else {
+          const container = document.querySelector('.canvas-container');
+          if (container) {
+            const existingLabels = container.querySelectorAll('.coordinate-label');
+            existingLabels.forEach(label => label.remove());
+          }
+        }
+      });
+      loadDesignFromURL().then(() => {
+        iconLoadPromise.then(() => {
+          updateElementList();
+          renderPreview();
+          updateYAML();
+        }).catch(() => {
+          updateElementList();
+          renderPreview();
+          updateYAML();
+        });
+      }).catch(() => {
+        loadFromLocalStorage();
+        iconLoadPromise.then(() => {
+          updateElementList();
+          renderPreview();
+          updateYAML();
+        }).catch(() => {
+          updateElementList();
+          renderPreview();
+          updateYAML();
+        });
+      });
+    });
+
+    function saveToLocalStorage() {
+      try {
+        const data = {
+          elements: elements,
+          displayConfig: displayConfig,
+          selectedElementIndex: selectedElementIndex
+        };
+        localStorage.setItem('opendisplay_designer', JSON.stringify(data));
+      } catch (e) {
+      }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const saved = localStorage.getItem('opendisplay_designer');
+        if (saved) {
+          const data = JSON.parse(saved);
+          if (data.elements && Array.isArray(data.elements)) {
+            elements = data.elements;
+            if (data.displayConfig) {
+              displayConfig = { ...displayConfig, ...data.displayConfig };
+              if (data.displayConfig.width && data.displayConfig.height) {
+                canvas.width = data.displayConfig.width;
+                canvas.height = data.displayConfig.height;
+                document.getElementById('displayWidth').value = data.displayConfig.width;
+                document.getElementById('displayHeight').value = data.displayConfig.height;
+                document.getElementById('colorSchemeSelect').value = data.displayConfig.colorScheme || 0;
+              }
+            }
+            if (data.selectedElementIndex !== undefined && data.selectedElementIndex >= 0 && data.selectedElementIndex < elements.length) {
+              selectedElementIndex = data.selectedElementIndex;
+              selectElement(selectedElementIndex);
+            } else {
+              selectedElementIndex = -1;
+            }
+            updateElementList();
+            renderPreview();
+            updateYAML();
+          }
+        }
+      } catch (e) {
+      }
+    }
+
+    function setupCanvasInteraction() {
+      canvas.addEventListener('mousedown', handleMouseDown);
+      canvas.addEventListener('mousemove', handleMouseMove);
+      canvas.addEventListener('mouseup', handleMouseUp);
+      canvas.addEventListener('mouseleave', handleMouseUp);
+    }
+
+    function handleMouseDown(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const scaleX = rect.width > 0 ? canvas.width / rect.width : 1;
+      const scaleY = rect.height > 0 ? canvas.height / rect.height : 1;
+      const canvasX = x * scaleX;
+      const canvasY = y * scaleY;
+
+      if (selectedElementIndex >= 0) {
+        const handle = getResizeHandle(canvasX, canvasY, selectedElementIndex);
+        if (handle) {
+          isResizing = true;
+          resizeHandle = handle;
+          dragElementIndex = selectedElementIndex;
+          dragStartX = canvasX;
+          dragStartY = canvasY;
+          initialElementState = JSON.parse(JSON.stringify(elements[selectedElementIndex]));
+          canvas.classList.add('resizing');
+          return;
+        }
+      }
+
+      const hitIndex = getElementAt(canvasX, canvasY);
+      if (hitIndex >= 0) {
+        isDragging = true;
+        dragElementIndex = hitIndex;
+        dragStartX = canvasX;
+        dragStartY = canvasY;
+        const element = elements[hitIndex];
+
+        if (element.type === 'text' || element.type === 'icon' || element.type === 'qrcode') {
+          dragOffsetX = canvasX - (element.x || 0);
+          dragOffsetY = canvasY - (element.y || 0);
+        } else if (element.type === 'circle' || element.type === 'arc') {
+          dragOffsetX = canvasX - (element.x || 0);
+          dragOffsetY = canvasY - (element.y || 0);
+        } else if (element.type === 'rectangle' || element.type === 'rectangle_pattern' || element.type === 'progress_bar' || element.type === 'plot') {
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          dragOffsetX = canvasX - minX;
+          dragOffsetY = canvasY - minY;
+        } else if (element.type === 'ellipse') {
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          dragOffsetX = canvasX - minX;
+          dragOffsetY = canvasY - minY;
+        } else if (element.type === 'line') {
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          dragOffsetX = canvasX - minX;
+          dragOffsetY = canvasY - minY;
+        } else if (element.type === 'multiline') {
+          dragOffsetX = canvasX - (element.x || 0);
+          dragOffsetY = canvasY - (element.y || 0);
+        } else if (element.type === 'polygon') {
+          const points = element.points || [];
+          if (points.length > 0) {
+            const minX = Math.min(...points.map(p => p[0]));
+            const minY = Math.min(...points.map(p => p[1]));
+            dragOffsetX = canvasX - minX;
+            dragOffsetY = canvasY - minY;
+          } else {
+            dragOffsetX = 0;
+            dragOffsetY = 0;
+          }
+        } else if (element.type === 'dlimg') {
+          dragOffsetX = canvasX - (element.x || 0);
+          dragOffsetY = canvasY - (element.y || 0);
+        } else {
+          dragOffsetX = 0;
+          dragOffsetY = 0;
+        }
+
+        selectElement(hitIndex);
+        canvas.classList.add('dragging');
+      }
+    }
+
+    function handleMouseMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const scaleX = rect.width > 0 ? canvas.width / rect.width : 1;
+      const scaleY = rect.height > 0 ? canvas.height / rect.height : 1;
+      const canvasX = x * scaleX;
+      const canvasY = y * scaleY;
+
+      if (isResizing && dragElementIndex >= 0) {
+        resizeElement(canvasX, canvasY);
+        renderPreview();
+      } else if (isDragging && dragElementIndex >= 0) {
+        moveElement(canvasX, canvasY);
+        renderPreview();
+      } else {
+        if (selectedElementIndex >= 0) {
+          const handle = getResizeHandle(canvasX, canvasY, selectedElementIndex);
+          if (handle) {
+            canvas.style.cursor = getResizeCursor(handle);
+            return;
+          }
+        }
+        const hitIndex = getElementAt(canvasX, canvasY);
+        if (hitIndex >= 0) {
+          canvas.style.cursor = 'move';
+        } else {
+          canvas.style.cursor = 'default';
+        }
+      }
+    }
+
+    function handleMouseUp(e) {
+      if (isDragging || isResizing) {
+        isDragging = false;
+        isResizing = false;
+        dragElementIndex = -1;
+        resizeHandle = null;
+        initialElementState = null;
+        canvas.classList.remove('dragging', 'resizing');
+        canvas.style.cursor = 'default';
+
+        if (selectedElementIndex >= 0) {
+          updateYAML();
+          updateElementList();
+          saveToLocalStorage();
+        }
+      }
+    }
+
+    function getElementAt(x, y) {
+      for (let i = elements.length - 1; i >= 0; i--) {
+        if (!elements[i].visible) continue;
+        if (isPointInElement(x, y, elements[i], i === selectedElementIndex)) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function isPointInElement(x, y, element, isSelected = false) {
+      switch(element.type) {
+        case 'text':
+          ctx.font = `${element.size || 20}px Arial`;
+          ctx.textBaseline = 'top';
+          const textMetrics = ctx.measureText(element.value || '');
+          const textX = element.x || 0;
+          const textY = element.y || 0;
+          const textSize = element.size || 20;
+          return x >= textX && x <= textX + textMetrics.width && y >= textY && y <= textY + textSize;
+        case 'multiline':
+          const lines = (element.value || '').split(element.delimiter || '|');
+          ctx.font = `${element.size || 20}px Arial`;
+          ctx.textBaseline = 'top';
+          const multilineMaxWidth = lines.length > 0 ? Math.max(...lines.map(l => ctx.measureText(l).width)) : 0;
+          const lineSize = element.size || 20;
+          const offsetY = element.offset_y || 50;
+          const multilineHeight = lines.length * lineSize + (lines.length - 1) * (offsetY - lineSize);
+          return x >= (element.x || 0) && x <= (element.x || 0) + multilineMaxWidth &&
+                 y >= (element.y || 0) && y <= (element.y || 0) + multilineHeight;
+        case 'line':
+          const dist = distanceToLine(x, y, element.x_start || 0, element.y_start || 0, element.x_end || 0, element.y_end || 0);
+          return dist < 5;
+        case 'rectangle':
+        case 'rectangle_pattern':
+        case 'progress_bar':
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const maxX = Math.max(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          const maxY = Math.max(element.y_start || 0, element.y_end || 0);
+          return x >= minX && x <= maxX && y >= minY && y <= maxY;
+        case 'circle':
+          const radius = element.radius || 20;
+          const distToCenter = Math.sqrt(Math.pow(x - (element.x || 0), 2) + Math.pow(y - (element.y || 0), 2));
+          return distToCenter <= radius;
+        case 'ellipse':
+          const centerX = ((element.x_start || 0) + (element.x_end || 0)) / 2;
+          const centerY = ((element.y_start || 0) + (element.y_end || 0)) / 2;
+          const radiusX = Math.abs((element.x_end || 0) - (element.x_start || 0)) / 2;
+          const radiusY = Math.abs((element.y_end || 0) - (element.y_start || 0)) / 2;
+          const dx = (x - centerX) / radiusX;
+          const dy = (y - centerY) / radiusY;
+          return (dx * dx + dy * dy) <= 1;
+        case 'polygon':
+          return isPointInPolygon(x, y, element.points || []);
+        case 'arc':
+          const arcX = element.x || 0;
+          const arcY = element.y || 0;
+          const arcRadius = element.radius || 50;
+          const distToArcCenter = Math.sqrt(Math.pow(x - arcX, 2) + Math.pow(y - arcY, 2));
+          if (isSelected) {
+            return distToArcCenter <= arcRadius;
+          }
+          if (distToArcCenter > arcRadius) return false;
+          const angle = Math.atan2(y - arcY, x - arcX) * 180 / Math.PI;
+          const startAngle = element.start_angle || 0;
+          const endAngle = element.end_angle || 90;
+          let normalizedAngle = angle < 0 ? angle + 360 : angle;
+          let normalizedStart = startAngle < 0 ? startAngle + 360 : startAngle;
+          let normalizedEnd = endAngle < 0 ? endAngle + 360 : endAngle;
+          if (normalizedStart > normalizedEnd) {
+            return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
+          }
+          return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+        case 'icon':
+          const iconSize = element.size || 24;
+          return x >= (element.x || 0) && x <= (element.x || 0) + iconSize &&
+                 y >= (element.y || 0) && y <= (element.y || 0) + iconSize;
+        case 'icon_sequence':
+          const seqIconSize = element.size || 24;
+          const icons = element.icons || [];
+          const direction = element.direction || 'right';
+          const spacing = element.spacing || (seqIconSize / 4);
+          let iconX = element.x || 0;
+          let iconY = element.y || 0;
+          for (let i = 0; i < icons.length; i++) {
+            switch(direction) {
+              case 'right': iconX = (element.x || 0) + (i * (seqIconSize + spacing)); break;
+              case 'left': iconX = (element.x || 0) - (i * (seqIconSize + spacing)); break;
+              case 'down': iconY = (element.y || 0) + (i * (seqIconSize + spacing)); break;
+              case 'up': iconY = (element.y || 0) - (i * (seqIconSize + spacing)); break;
+            }
+            if (x >= iconX && x <= iconX + seqIconSize && y >= iconY && y <= iconY + seqIconSize) {
+              return true;
+            }
+          }
+          return false;
+        case 'qrcode':
+          const qrSize = (element.boxsize || 2) * 25 + (element.border || 2) * 2;
+          return x >= (element.x || 0) && x <= (element.x || 0) + qrSize &&
+                 y >= (element.y || 0) && y <= (element.y || 0) + qrSize;
+        case 'dlimg':
+          return x >= (element.x || 0) && x <= (element.x || 0) + (element.xsize || 100) &&
+                 y >= (element.y || 0) && y <= (element.y || 0) + (element.ysize || 100);
+        case 'plot':
+          return x >= (element.x_start || 0) && x <= (element.x_end || canvas.width) &&
+                 y >= (element.y_start || 0) && y <= (element.y_end || canvas.height);
+        case 'debug_grid':
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    function distanceToLine(px, py, x1, y1, x2, y2) {
+      const A = px - x1;
+      const B = py - y1;
+      const C = x2 - x1;
+      const D = y2 - y1;
+      const dot = A * C + B * D;
+      const lenSq = C * C + D * D;
+      let param = -1;
+      if (lenSq !== 0) param = dot / lenSq;
+      let xx, yy;
+      if (param < 0) {
+        xx = x1;
+        yy = y1;
+      } else if (param > 1) {
+        xx = x2;
+        yy = y2;
+      } else {
+        xx = x1 + param * C;
+        yy = y1 + param * D;
+      }
+      const dx = px - xx;
+      const dy = py - yy;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function isPointInPolygon(x, y, points) {
+      let inside = false;
+      for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+        const xi = points[i][0], yi = points[i][1];
+        const xj = points[j][0], yj = points[j][1];
+        const intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    function getResizeHandle(x, y, elementIndex) {
+      const element = elements[elementIndex];
+      if (!element) return null;
+
+      const handleSize = 8;
+
+      switch(element.type) {
+        case 'rectangle':
+        case 'rectangle_pattern':
+        case 'progress_bar':
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const maxX = Math.max(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          const maxY = Math.max(element.y_start || 0, element.y_end || 0);
+
+          if (Math.abs(x - minX) < handleSize && Math.abs(y - minY) < handleSize) return 'nw';
+          if (Math.abs(x - maxX) < handleSize && Math.abs(y - minY) < handleSize) return 'ne';
+          if (Math.abs(x - minX) < handleSize && Math.abs(y - maxY) < handleSize) return 'sw';
+          if (Math.abs(x - maxX) < handleSize && Math.abs(y - maxY) < handleSize) return 'se';
+          if (Math.abs(x - minX) < handleSize && y >= minY && y <= maxY) return 'w';
+          if (Math.abs(x - maxX) < handleSize && y >= minY && y <= maxY) return 'e';
+          if (Math.abs(y - minY) < handleSize && x >= minX && x <= maxX) return 'n';
+          if (Math.abs(y - maxY) < handleSize && x >= minX && x <= maxX) return 's';
+          break;
+        case 'circle':
+        case 'arc':
+          const radius = element.radius || 20;
+          const dist = Math.sqrt(Math.pow(x - (element.x || 0), 2) + Math.pow(y - (element.y || 0), 2));
+          if (Math.abs(dist - radius) < handleSize) {
+            const angle = Math.atan2(y - (element.y || 0), x - (element.x || 0));
+            if (angle >= -Math.PI/4 && angle < Math.PI/4) return 'e';
+            if (angle >= Math.PI/4 && angle < 3*Math.PI/4) return 's';
+            if (angle >= 3*Math.PI/4 || angle < -3*Math.PI/4) return 'w';
+            return 'n';
+          }
+          break;
+        case 'ellipse':
+          const centerX = ((element.x_start || 0) + (element.x_end || 0)) / 2;
+          const centerY = ((element.y_start || 0) + (element.y_end || 0)) / 2;
+          const radiusX = Math.abs((element.x_end || 0) - (element.x_start || 0)) / 2;
+          const radiusY = Math.abs((element.y_end || 0) - (element.y_start || 0)) / 2;
+          const minX_ell = Math.min(element.x_start || 0, element.x_end || 0);
+          const maxX_ell = Math.max(element.x_start || 0, element.x_end || 0);
+          const minY_ell = Math.min(element.y_start || 0, element.y_end || 0);
+          const maxY_ell = Math.max(element.y_start || 0, element.y_end || 0);
+
+          if (Math.abs(x - minX_ell) < handleSize && Math.abs(y - centerY) < handleSize) return 'w';
+          if (Math.abs(x - maxX_ell) < handleSize && Math.abs(y - centerY) < handleSize) return 'e';
+          if (Math.abs(x - centerX) < handleSize && Math.abs(y - minY_ell) < handleSize) return 'n';
+          if (Math.abs(x - centerX) < handleSize && Math.abs(y - maxY_ell) < handleSize) return 's';
+          if (Math.abs(x - minX_ell) < handleSize && Math.abs(y - minY_ell) < handleSize) return 'nw';
+          if (Math.abs(x - maxX_ell) < handleSize && Math.abs(y - minY_ell) < handleSize) return 'ne';
+          if (Math.abs(x - minX_ell) < handleSize && Math.abs(y - maxY_ell) < handleSize) return 'sw';
+          if (Math.abs(x - maxX_ell) < handleSize && Math.abs(y - maxY_ell) < handleSize) return 'se';
+          break;
+        case 'dlimg':
+          const imgX = element.x || 0;
+          const imgY = element.y || 0;
+          const imgW = element.xsize || 100;
+          const imgH = element.ysize || 100;
+          if (Math.abs(x - imgX) < handleSize && Math.abs(y - imgY) < handleSize) return 'nw';
+          if (Math.abs(x - (imgX + imgW)) < handleSize && Math.abs(y - imgY) < handleSize) return 'ne';
+          if (Math.abs(x - imgX) < handleSize && Math.abs(y - (imgY + imgH)) < handleSize) return 'sw';
+          if (Math.abs(x - (imgX + imgW)) < handleSize && Math.abs(y - (imgY + imgH)) < handleSize) return 'se';
+          if (Math.abs(x - imgX) < handleSize && y >= imgY && y <= imgY + imgH) return 'w';
+          if (Math.abs(x - (imgX + imgW)) < handleSize && y >= imgY && y <= imgY + imgH) return 'e';
+          if (Math.abs(y - imgY) < handleSize && x >= imgX && x <= imgX + imgW) return 'n';
+          if (Math.abs(y - (imgY + imgH)) < handleSize && x >= imgX && x <= imgX + imgW) return 's';
+          break;
+        case 'qrcode':
+          const qrSize = (element.boxsize || 2) * 25 + (element.border || 2) * 2;
+          const qrX = element.x || 0;
+          const qrY = element.y || 0;
+          if (Math.abs(x - qrX) < handleSize && Math.abs(y - qrY) < handleSize) return 'nw';
+          if (Math.abs(x - (qrX + qrSize)) < handleSize && Math.abs(y - qrY) < handleSize) return 'ne';
+          if (Math.abs(x - qrX) < handleSize && Math.abs(y - (qrY + qrSize)) < handleSize) return 'sw';
+          if (Math.abs(x - (qrX + qrSize)) < handleSize && Math.abs(y - (qrY + qrSize)) < handleSize) return 'se';
+          break;
+        case 'icon':
+          const iconSize = element.size || 24;
+          const iconX = element.x || 0;
+          const iconY = element.y || 0;
+          if (Math.abs(x - (iconX + iconSize)) < handleSize && Math.abs(y - (iconY + iconSize)) < handleSize) return 'se';
+          break;
+        case 'text':
+          const textSize = element.size || 20;
+          const textX = element.x || 0;
+          const textY = element.y || 0;
+          ctx.font = `${textSize}px Arial`;
+          ctx.textBaseline = 'top';
+          const textMetrics = ctx.measureText(element.value || '');
+          const textWidth = textMetrics.width;
+
+          const padding = 2;
+          const handleX = textX + textWidth + padding;
+          const handleY = textY + textSize + padding;
+          if (Math.abs(x - handleX) < handleSize && Math.abs(y - handleY) < handleSize) return 'se';
+          break;
+      }
+
+      return null;
+    }
+
+    function getResizeCursor(handle) {
+      const cursors = {
+        'nw': 'nwse-resize', 'ne': 'nesw-resize', 'sw': 'nesw-resize', 'se': 'nwse-resize',
+        'n': 'ns-resize', 's': 'ns-resize', 'e': 'ew-resize', 'w': 'ew-resize'
+      };
+      return cursors[handle] || 'default';
+    }
+
+    function moveElement(x, y) {
+      if (dragElementIndex < 0) return;
+      const element = elements[dragElementIndex];
+
+      const newX = Math.round(x - dragOffsetX);
+      const newY = Math.round(y - dragOffsetY);
+
+      switch(element.type) {
+        case 'text':
+        case 'icon':
+        case 'qrcode':
+          element.x = Math.round(Math.max(0, Math.min(canvas.width, newX)));
+          element.y = Math.round(Math.max(0, Math.min(canvas.height, newY)));
+          break;
+        case 'circle':
+        case 'arc':
+          element.x = Math.round(Math.max((element.radius || 20), Math.min(canvas.width - (element.radius || 20), newX)));
+          element.y = Math.round(Math.max((element.radius || 20), Math.min(canvas.height - (element.radius || 20), newY)));
+          break;
+        case 'rectangle':
+        case 'rectangle_pattern':
+        case 'progress_bar':
+          const width = Math.abs((element.x_end || 0) - (element.x_start || 0));
+          const height = Math.abs((element.y_end || 0) - (element.y_start || 0));
+          element.x_start = Math.round(Math.max(0, Math.min(canvas.width - width, newX)));
+          element.y_start = Math.round(Math.max(0, Math.min(canvas.height - height, newY)));
+          element.x_end = element.x_start + width;
+          element.y_end = element.y_start + height;
+          break;
+        case 'multiline':
+          element.x = Math.round(Math.max(0, Math.min(canvas.width, newX)));
+          element.y = Math.round(Math.max(0, Math.min(canvas.height, newY)));
+          break;
+        case 'ellipse':
+          const ellWidth = Math.abs((element.x_end || 0) - (element.x_start || 0));
+          const ellHeight = Math.abs((element.y_end || 0) - (element.y_start || 0));
+          element.x_start = Math.round(Math.max(0, Math.min(canvas.width - ellWidth, newX)));
+          element.y_start = Math.round(Math.max(0, Math.min(canvas.height - ellHeight, newY)));
+          element.x_end = element.x_start + ellWidth;
+          element.y_end = element.y_start + ellHeight;
+          break;
+        case 'polygon':
+          const points = element.points || [];
+          if (points.length > 0) {
+            const minX = Math.min(...points.map(p => p[0]));
+            const minY = Math.min(...points.map(p => p[1]));
+            const deltaX = newX - minX;
+            const deltaY = newY - minY;
+            element.points = points.map(p => [
+              Math.round(Math.max(0, Math.min(canvas.width, p[0] + deltaX))),
+              Math.round(Math.max(0, Math.min(canvas.height, p[1] + deltaY)))
+            ]);
+          }
+          break;
+        case 'line':
+          const lineWidth = Math.abs((element.x_end || 0) - (element.x_start || 0));
+          const lineHeight = Math.abs((element.y_end || 0) - (element.y_start || 0));
+          element.x_start = Math.round(Math.max(0, Math.min(canvas.width - lineWidth, newX)));
+          element.y_start = Math.round(Math.max(0, Math.min(canvas.height - lineHeight, newY)));
+          element.x_end = element.x_start + lineWidth;
+          element.y_end = element.y_start + lineHeight;
+          break;
+        case 'icon_sequence':
+          element.x = Math.round(Math.max(0, Math.min(canvas.width, newX)));
+          element.y = Math.round(Math.max(0, Math.min(canvas.height, newY)));
+          break;
+        case 'dlimg':
+          element.x = Math.round(Math.max(0, Math.min(canvas.width - (element.xsize || 100), newX)));
+          element.y = Math.round(Math.max(0, Math.min(canvas.height - (element.ysize || 100), newY)));
+          break;
+        case 'plot':
+          const plotWidth = Math.abs((element.x_end || canvas.width) - (element.x_start || 0));
+          const plotHeight = Math.abs((element.y_end || canvas.height) - (element.y_start || 0));
+          element.x_start = Math.round(Math.max(0, Math.min(canvas.width - plotWidth, newX)));
+          element.y_start = Math.round(Math.max(0, Math.min(canvas.height - plotHeight, newY)));
+          element.x_end = element.x_start + plotWidth;
+          element.y_end = element.y_start + plotHeight;
+          break;
+      }
+    }
+
+    function resizeElement(x, y) {
+      if (dragElementIndex < 0 || !resizeHandle || !initialElementState) return;
+      const element = elements[dragElementIndex];
+      const initial = initialElementState;
+      const deltaX = x - dragStartX;
+      const deltaY = y - dragStartY;
+
+      switch(element.type) {
+        case 'rectangle':
+        case 'rectangle_pattern':
+        case 'progress_bar':
+          let newXStart = initial.x_start || 0;
+          let newYStart = initial.y_start || 0;
+          let newXEnd = initial.x_end || 0;
+          let newYEnd = initial.y_end || 0;
+
+          if (resizeHandle.includes('w')) newXStart += deltaX;
+          if (resizeHandle.includes('e')) newXEnd += deltaX;
+          if (resizeHandle.includes('n')) newYStart += deltaY;
+          if (resizeHandle.includes('s')) newYEnd += deltaY;
+
+          newXStart = Math.round(Math.max(0, Math.min(canvas.width, newXStart)));
+          newXEnd = Math.round(Math.max(0, Math.min(canvas.width, newXEnd)));
+          newYStart = Math.round(Math.max(0, Math.min(canvas.height, newYStart)));
+          newYEnd = Math.round(Math.max(0, Math.min(canvas.height, newYEnd)));
+
+          if (Math.abs(newXEnd - newXStart) < 10) {
+            if (resizeHandle.includes('w')) newXStart = newXEnd - 10;
+            else newXEnd = newXStart + 10;
+          }
+          if (Math.abs(newYEnd - newYStart) < 10) {
+            if (resizeHandle.includes('n')) newYStart = newYEnd - 10;
+            else newYEnd = newYStart + 10;
+          }
+
+          element.x_start = Math.round(newXStart);
+          element.x_end = Math.round(newXEnd);
+          element.y_start = Math.round(newYStart);
+          element.y_end = Math.round(newYEnd);
+          break;
+        case 'circle':
+        case 'arc':
+          const centerX = initial.x || 0;
+          const centerY = initial.y || 0;
+          const newRadius = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          const maxRadius = Math.min(
+            Math.min(centerX, canvas.width - centerX),
+            Math.min(centerY, canvas.height - centerY)
+          );
+          element.radius = Math.round(Math.max(5, Math.min(maxRadius, newRadius)));
+          break;
+        case 'ellipse':
+          let ellXStart = initial.x_start || 0;
+          let ellYStart = initial.y_start || 0;
+          let ellXEnd = initial.x_end || 0;
+          let ellYEnd = initial.y_end || 0;
+
+          if (resizeHandle.includes('w')) ellXStart += deltaX;
+          if (resizeHandle.includes('e')) ellXEnd += deltaX;
+          if (resizeHandle.includes('n')) ellYStart += deltaY;
+          if (resizeHandle.includes('s')) ellYEnd += deltaY;
+
+          ellXStart = Math.round(Math.max(0, Math.min(canvas.width, ellXStart)));
+          ellXEnd = Math.round(Math.max(0, Math.min(canvas.width, ellXEnd)));
+          ellYStart = Math.round(Math.max(0, Math.min(canvas.height, ellYStart)));
+          ellYEnd = Math.round(Math.max(0, Math.min(canvas.height, ellYEnd)));
+
+          if (Math.abs(ellXEnd - ellXStart) < 10) {
+            if (resizeHandle.includes('w')) ellXStart = ellXEnd - 10;
+            else ellXEnd = ellXStart + 10;
+          }
+          if (Math.abs(ellYEnd - ellYStart) < 10) {
+            if (resizeHandle.includes('n')) ellYStart = ellYEnd - 10;
+            else ellYEnd = ellYStart + 10;
+          }
+
+          element.x_start = Math.round(ellXStart);
+          element.x_end = Math.round(ellXEnd);
+          element.y_start = Math.round(ellYStart);
+          element.y_end = Math.round(ellYEnd);
+          break;
+        case 'dlimg':
+          let newX = initial.x || 0;
+          let newY = initial.y || 0;
+          let newWidth = initial.xsize || 100;
+          let newHeight = initial.ysize || 100;
+
+          if (resizeHandle.includes('w')) {
+            newX += deltaX;
+            newWidth -= deltaX;
+          }
+          if (resizeHandle.includes('e')) {
+            newWidth += deltaX;
+          }
+          if (resizeHandle.includes('n')) {
+            newY += deltaY;
+            newHeight -= deltaY;
+          }
+          if (resizeHandle.includes('s')) {
+            newHeight += deltaY;
+          }
+
+          if (newX < 0) {
+            newWidth += newX;
+            newX = 0;
+          }
+          if (newY < 0) {
+            newHeight += newY;
+            newY = 0;
+          }
+          if (newX + newWidth > canvas.width) newWidth = canvas.width - newX;
+          if (newY + newHeight > canvas.height) newHeight = canvas.height - newY;
+
+          element.x = Math.round(Math.max(0, newX));
+          element.y = Math.round(Math.max(0, newY));
+          element.xsize = Math.round(Math.max(10, newWidth));
+          element.ysize = Math.round(Math.max(10, newHeight));
+          break;
+        case 'qrcode':
+          const qrSize = (initial.boxsize || 2) * 25 + (initial.border || 2) * 2;
+          const qrX = initial.x || 0;
+          const qrY = initial.y || 0;
+          let newQrX = qrX;
+          let newQrY = qrY;
+          let newQrSize = qrSize;
+
+          if (resizeHandle.includes('w')) {
+            newQrX += deltaX;
+            newQrSize -= deltaX;
+          }
+          if (resizeHandle.includes('e')) {
+            newQrSize += deltaX;
+          }
+          if (resizeHandle.includes('n')) {
+            newQrY += deltaY;
+            newQrSize -= deltaY;
+          }
+          if (resizeHandle.includes('s')) {
+            newQrSize += deltaY;
+          }
+
+          if (newQrX < 0) {
+            newQrSize += newQrX;
+            newQrX = 0;
+          }
+          if (newQrY < 0) {
+            newQrSize += newQrY;
+            newQrY = 0;
+          }
+          if (newQrX + newQrSize > canvas.width) newQrSize = canvas.width - newQrX;
+          if (newQrY + newQrSize > canvas.height) newQrSize = canvas.height - newQrY;
+
+          element.x = Math.round(Math.max(0, newQrX));
+          element.y = Math.round(Math.max(0, newQrY));
+
+          const border = element.border || 2;
+          element.boxsize = Math.round(Math.max(1, Math.floor((newQrSize - border * 2) / 25)));
+          break;
+        case 'icon':
+
+          if (resizeHandle === 'se') {
+            const iconX = initial.x || 0;
+            const iconY = initial.y || 0;
+            const initialSize = initial.size || 24;
+
+            const newSize = Math.max(8, Math.min(200, initialSize + deltaX));
+            element.size = Math.round(newSize);
+
+            element.x = Math.round(iconX);
+            element.y = Math.round(iconY);
+          }
+          break;
+        case 'text':
+
+          if (resizeHandle === 'se') {
+            const textX = initial.x || 0;
+            const textY = initial.y || 0;
+            const initialSize = initial.size || 20;
+
+            const newSize = Math.max(8, Math.min(200, initialSize + deltaX));
+            element.size = Math.round(newSize);
+            element.x = Math.round(textX);
+            element.y = Math.round(textY);
+          }
+          break;
+      }
+    }
+
+    function applyDisplayConfig() {
+      const width = parseInt(document.getElementById('displayWidth').value) || 800;
+      const height = parseInt(document.getElementById('displayHeight').value) || 480;
+      const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+
+      const clampedWidth = Math.max(1, Math.min(2000, width));
+      const clampedHeight = Math.max(1, Math.min(2000, height));
+
+      if (width !== clampedWidth) {
+        document.getElementById('displayWidth').value = clampedWidth;
+      }
+      if (height !== clampedHeight) {
+        document.getElementById('displayHeight').value = clampedHeight;
+      }
+
+      displayConfig.width = clampedWidth;
+      displayConfig.height = clampedHeight;
+      displayConfig.colorScheme = colorScheme;
+
+      canvas.width = displayConfig.width;
+      canvas.height = displayConfig.height;
+
+      document.getElementById('presetSelect').value = '';
+      currentPreset = null;
+
+      renderPreview();
+      updateYAML();
+      saveToLocalStorage();
+    }
+
+    async function loadPreset(e) {
+      const index = parseInt(e.target.value);
+      if (isNaN(index)) return;
+
+      const preset = presets[index];
+      try {
+        if (!designerSimplePresetsCache) {
+          const response = await fetch('../firmware/toolbox/simple-config-presets.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          designerSimplePresetsCache = await response.json();
+        }
+        const layout = getDisplayLayoutFromSimplePresetsDb(designerSimplePresetsCache, preset.displayId);
+        if (!layout) {
+          alert('Preset display not found in simple config');
+          return;
+        }
+        displayConfig.width = layout.width;
+        displayConfig.height = layout.height;
+        displayConfig.colorScheme = layout.colorScheme;
+
+        document.getElementById('displayWidth').value = displayConfig.width;
+        document.getElementById('displayHeight').value = displayConfig.height;
+        document.getElementById('colorSchemeSelect').value = displayConfig.colorScheme;
+
+        canvas.width = displayConfig.width;
+        canvas.height = displayConfig.height;
+
+        currentPreset = preset;
+        renderPreview();
+        updateYAML();
+        saveToLocalStorage();
+      } catch (error) {
+        alert('Error loading preset: ' + error.message);
+      }
+    }
+
+    function addElement(type) {
+      if (!type) {
+        return;
+      }
+
+      const element = createDefaultElement(type);
+      elements.push(element);
+      updateElementList();
+      selectElement(elements.length - 1);
+      renderPreview();
+      updateYAML();
+      saveToLocalStorage();
+    }
+
+    function initElementTypeGrid() {
+      const grid = document.getElementById('elementTypeGrid');
+      if (!grid) return;
+
+      elementTypes.forEach(({ type, label, icon }) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'element-type-button';
+        button.onclick = () => addElement(type);
+        button.setAttribute('aria-label', `Add ${label} element`);
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'element-type-icon';
+        iconSpan.textContent = '□';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'element-type-label';
+        labelSpan.textContent = label;
+
+        button.appendChild(iconSpan);
+        button.appendChild(labelSpan);
+        grid.appendChild(button);
+
+        iconLoadPromise.then(() => {
+          const codepoint = getIconCodepoint(icon);
+          if (codepoint) {
+            iconSpan.textContent = String.fromCodePoint(parseInt(codepoint, 16));
+          } else {
+            iconSpan.textContent = '?';
+          }
+        }).catch(() => {
+          iconSpan.textContent = '?';
+        });
+      });
+    }
+
+    function createDefaultElement(type) {
+      const base = { type, visible: true };
+
+      switch(type) {
+        case 'text':
+          return { ...base, value: 'Hello World', x: 10, y: 10, size: 20, color: 'black', font: 'ppb.ttf' };
+        case 'multiline':
+          return { ...base, value: 'Line 1|Line 2', delimiter: '|', x: 10, y: 10, size: 20, color: 'black' };
+        case 'line':
+          return { ...base, x_start: 10, x_end: 100, y_start: 10, y_end: 10, width: 1, fill: 'black' };
+        case 'rectangle':
+          return { ...base, x_start: 10, x_end: 100, y_start: 10, y_end: 50, fill: null, outline: 'black', width: 1 };
+        case 'rectangle_pattern':
+          return { ...base, x_start: 5, x_size: 35, x_offset: 10, y_start: 10, y_size: 18, y_offset: 2, x_repeat: 1, y_repeat: 4, fill: 'white', outline: 'red', width: 1 };
+        case 'polygon':
+          return { ...base, points: [[10, 10], [50, 10], [50, 50], [10, 50]], fill: 'red', outline: 'black', width: 1 };
+        case 'circle':
+          return { ...base, x: 50, y: 50, radius: 20, fill: null, outline: 'black', width: 1 };
+        case 'ellipse':
+          return { ...base, x_start: 50, x_end: 100, y_start: 50, y_end: 100, fill: null, outline: 'black', width: 1 };
+        case 'arc':
+          return { ...base, x: 100, y: 75, radius: 50, start_angle: 0, end_angle: 90, fill: null, outline: 'black', width: 1 };
+        case 'icon':
+          return { ...base, value: 'mdi:home', x: 60, y: 120, size: 120, fill: 'black' };
+        case 'icon_sequence':
+          return { ...base, x: 10, y: 10, icons: ['mdi:home', 'mdi:arrow-right', 'mdi:office-building'], size: 24, direction: 'right', spacing: 6, fill: 'black' };
+        case 'dlimg':
+          return { ...base, url: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Test.svg', x: 10, y: 10, xsize: 120, ysize: 120, rotate: 0 };
+        case 'qrcode':
+          return { ...base, data: 'https://opendisplay.org', x: 140, y: 50, boxsize: 2, border: 2, color: 'black', bgcolor: 'white' };
+        case 'plot':
+          return { ...base, x_start: 10, y_start: 20, x_end: 199, y_end: 119, duration: 36000, data: [{ entity: 'sensor.temperature', color: 'black', width: 1 }] };
+        case 'progress_bar':
+          return { ...base, x_start: 10, y_start: 10, x_end: 280, y_end: 30, progress: 42, direction: 'right', fill: 'red', outline: 'black', width: 1, background: 'white' };
+        case 'debug_grid':
+          return { ...base, spacing: 20, line_color: 'black', dashed: true };
+        default:
+          return base;
+      }
+    }
+
+    function updateElementList() {
+      const list = document.getElementById('elementList');
+      list.innerHTML = '';
+
+      elements.forEach((element, index) => {
+        const item = document.createElement('div');
+        item.className = 'element-item' + (index === selectedElementIndex ? ' selected' : '');
+        item.innerHTML = `
+          <div class="element-info">
+            <div class="element-type">${element.type}</div>
+            <div style="font-size: 0.8rem; color: var(--muted-foreground);">${getElementDescription(element)}</div>
+          </div>
+          <div class="element-actions">
+            <button type="button" class="secondary" onclick="selectElement(${index})">Edit</button>
+            <button type="button" class="secondary" onclick="deleteElementAt(${index})" style="background: #00bfff; color: white;">Delete</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function getElementDescription(element) {
+      switch(element.type) {
+        case 'text': return `"${element.value}" at (${element.x}, ${element.y})`;
+        case 'multiline': return `"${element.value}" at (${element.x}, ${element.y})`;
+        case 'line': return `(${element.x_start}, ${element.y_start}) to (${element.x_end}, ${element.y_end})`;
+        case 'rectangle': return `(${element.x_start}, ${element.y_start}) to (${element.x_end}, ${element.y_end})`;
+        case 'icon': return `${element.value} at (${element.x}, ${element.y})`;
+        case 'qrcode': return `QR: "${element.data.substring(0, 20)}..."`;
+        default: return JSON.stringify(element).substring(0, 50) + '...';
+      }
+    }
+
+    function selectElement(index) {
+      selectedElementIndex = index;
+      const element = elements[index];
+
+      document.getElementById('elementEditor').classList.remove('hidden');
+      renderElementEditor(element);
+      updateElementList();
+
+      renderPreview();
+    }
+
+    function renderElementEditor(element) {
+      const content = document.getElementById('elementEditorContent');
+      content.innerHTML = '';
+
+      addEditorField(content, 'type', 'Type', 'text', element.type, true);
+      addEditorField(content, 'visible', 'Visible', 'checkbox', element.visible);
+
+      switch(element.type) {
+        case 'text':
+          addEditorField(content, 'value', 'Text', 'text', element.value);
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'y', 'Y', 'number', element.y);
+          addEditorField(content, 'size', 'Size', 'number', element.size);
+          addEditorField(content, 'color', 'Color', 'text', element.color);
+          addEditorField(content, 'font', 'Font', 'text', element.font || 'ppb.ttf');
+          break;
+        case 'multiline':
+          addEditorField(content, 'value', 'Text (with delimiter)', 'text', element.value);
+          addEditorField(content, 'delimiter', 'Delimiter', 'text', element.delimiter);
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'offset_y', 'Y Offset', 'number', element.offset_y || 50);
+          addEditorField(content, 'size', 'Size', 'number', element.size);
+          addEditorField(content, 'color', 'Color', 'text', element.color);
+          break;
+        case 'line':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'x_end', 'X End', 'number', element.x_end);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'y_end', 'Y End', 'number', element.y_end);
+          addEditorField(content, 'width', 'Width', 'number', element.width);
+          addEditorField(content, 'fill', 'Color', 'text', element.fill);
+          break;
+        case 'rectangle':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'x_end', 'X End', 'number', element.x_end);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'y_end', 'Y End', 'number', element.y_end);
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width);
+          break;
+        case 'icon':
+          addIconAutocompleteField(content, 'value', 'Icon Name (mdi:...)', element.value);
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'y', 'Y', 'number', element.y);
+          addEditorField(content, 'size', 'Size', 'number', element.size);
+          addEditorField(content, 'fill', 'Color', 'text', element.fill);
+          break;
+        case 'qrcode':
+          addEditorField(content, 'data', 'QR Data', 'text', element.data);
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'y', 'Y', 'number', element.y);
+          addEditorField(content, 'boxsize', 'Box Size', 'number', element.boxsize);
+          addEditorField(content, 'border', 'Border', 'number', element.border);
+          addEditorField(content, 'color', 'Color', 'text', element.color);
+          addEditorField(content, 'bgcolor', 'Background Color', 'text', element.bgcolor);
+          break;
+        case 'dlimg':
+          addEditorField(content, 'url', 'Image URL', 'text', element.url);
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'y', 'Y', 'number', element.y);
+          addEditorField(content, 'xsize', 'Width', 'number', element.xsize);
+          addEditorField(content, 'ysize', 'Height', 'number', element.ysize);
+          break;
+        case 'progress_bar':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'x_end', 'X End', 'number', element.x_end);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'y_end', 'Y End', 'number', element.y_end);
+          addEditorField(content, 'progress', 'Progress (0-100)', 'number', element.progress);
+          addEditorField(content, 'direction', 'Direction', 'text', element.direction || 'right');
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill);
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'background', 'Background Color', 'text', element.background || 'white');
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'rectangle_pattern':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'x_size', 'X Size', 'number', element.x_size);
+          addEditorField(content, 'x_offset', 'X Offset', 'number', element.x_offset);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'y_size', 'Y Size', 'number', element.y_size);
+          addEditorField(content, 'y_offset', 'Y Offset', 'number', element.y_offset);
+          addEditorField(content, 'x_repeat', 'X Repeat', 'number', element.x_repeat);
+          addEditorField(content, 'y_repeat', 'Y Repeat', 'number', element.y_repeat);
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'polygon':
+          addEditorField(content, 'points', 'Points (JSON array)', 'text', JSON.stringify(element.points || []));
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'circle':
+          addEditorField(content, 'x', 'Center X', 'number', element.x);
+          addEditorField(content, 'y', 'Center Y', 'number', element.y);
+          addEditorField(content, 'radius', 'Radius', 'number', element.radius);
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'ellipse':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'x_end', 'X End', 'number', element.x_end);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'y_end', 'Y End', 'number', element.y_end);
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'arc':
+          addEditorField(content, 'x', 'Center X', 'number', element.x);
+          addEditorField(content, 'y', 'Center Y', 'number', element.y);
+          addEditorField(content, 'radius', 'Radius', 'number', element.radius);
+          addEditorField(content, 'start_angle', 'Start Angle', 'number', element.start_angle);
+          addEditorField(content, 'end_angle', 'End Angle', 'number', element.end_angle);
+          addEditorField(content, 'fill', 'Fill Color', 'text', element.fill || '');
+          addEditorField(content, 'outline', 'Outline Color', 'text', element.outline);
+          addEditorField(content, 'width', 'Border Width', 'number', element.width || 1);
+          break;
+        case 'icon_sequence':
+          addEditorField(content, 'x', 'X', 'number', element.x);
+          addEditorField(content, 'y', 'Y', 'number', element.y);
+          addEditorField(content, 'icons', 'Icons (comma separated)', 'text', (element.icons || []).join(', '));
+          addEditorField(content, 'size', 'Size', 'number', element.size);
+          addEditorField(content, 'direction', 'Direction', 'text', element.direction || 'right');
+          addEditorField(content, 'spacing', 'Spacing', 'number', element.spacing);
+          addEditorField(content, 'fill', 'Color', 'text', element.fill);
+          break;
+        case 'plot':
+          addEditorField(content, 'x_start', 'X Start', 'number', element.x_start);
+          addEditorField(content, 'y_start', 'Y Start', 'number', element.y_start);
+          addEditorField(content, 'x_end', 'X End', 'number', element.x_end);
+          addEditorField(content, 'y_end', 'Y End', 'number', element.y_end);
+          addEditorField(content, 'duration', 'Duration (seconds)', 'number', element.duration || 86400);
+          addEditorField(content, 'low', 'Min Y Value', 'number', element.low);
+          addEditorField(content, 'high', 'Max Y Value', 'number', element.high);
+          addEditorField(content, 'round_values', 'Round Values', 'checkbox', element.round_values || false);
+          addEditorField(content, 'size', 'Font Size', 'number', element.size || 10);
+          addEditorField(content, 'data', 'Data Entities (JSON)', 'text', JSON.stringify(element.data || []));
+
+          const yLegend = element.ylegend || {};
+          addEditorField(content, 'ylegend_width', 'Y-Legend Width (-1=auto)', 'number', yLegend.width !== undefined ? yLegend.width : -1);
+          addEditorField(content, 'ylegend_color', 'Y-Legend Color', 'text', yLegend.color || 'black');
+          addEditorField(content, 'ylegend_position', 'Y-Legend Position', 'text', yLegend.position || 'left');
+          addEditorField(content, 'ylegend_size', 'Y-Legend Font Size', 'number', yLegend.size || 10);
+
+          const yAxis = element.yaxis || {};
+          addEditorField(content, 'yaxis_width', 'Y-Axis Width', 'number', yAxis.width !== undefined ? yAxis.width : 1);
+          addEditorField(content, 'yaxis_color', 'Y-Axis Color', 'text', yAxis.color || 'black');
+          addEditorField(content, 'yaxis_tick_width', 'Y-Axis Tick Width', 'number', yAxis.tick_width !== undefined ? yAxis.tick_width : 2);
+          addEditorField(content, 'yaxis_tick_length', 'Y-Axis Tick Length', 'number', yAxis.tick_length !== undefined ? yAxis.tick_length : 4);
+          addEditorField(content, 'yaxis_tick_every', 'Y-Axis Tick Every', 'number', yAxis.tick_every !== undefined ? yAxis.tick_every : 1.0);
+          addEditorField(content, 'yaxis_grid', 'Y-Axis Grid', 'checkbox', yAxis.grid !== undefined ? yAxis.grid : true);
+          addEditorField(content, 'yaxis_grid_color', 'Y-Axis Grid Color', 'text', yAxis.grid_color || 'black');
+          addEditorField(content, 'yaxis_grid_style', 'Y-Axis Grid Style (dotted/dashed/lines)', 'text', yAxis.grid_style || 'dotted');
+
+          const xLegend = element.xlegend || {};
+          addEditorField(content, 'xlegend_format', 'X-Legend Format (%H:%M)', 'text', xLegend.format || '%H:%M');
+          addEditorField(content, 'xlegend_interval', 'X-Legend Interval (seconds)', 'number', xLegend.interval !== undefined ? xLegend.interval : 3600);
+          addEditorField(content, 'xlegend_snap_to_hours', 'X-Legend Snap to Hours', 'checkbox', xLegend.snap_to_hours !== undefined ? xLegend.snap_to_hours : true);
+          addEditorField(content, 'xlegend_size', 'X-Legend Font Size', 'number', xLegend.size || 10);
+          addEditorField(content, 'xlegend_position', 'X-Legend Position (top/bottom)', 'text', xLegend.position || 'bottom');
+          addEditorField(content, 'xlegend_color', 'X-Legend Color', 'text', xLegend.color || 'black');
+
+          const xAxis = element.xaxis || {};
+          addEditorField(content, 'xaxis_width', 'X-Axis Width', 'number', xAxis.width !== undefined ? xAxis.width : 1);
+          addEditorField(content, 'xaxis_color', 'X-Axis Color', 'text', xAxis.color || 'black');
+          addEditorField(content, 'xaxis_tick_width', 'X-Axis Tick Width', 'number', xAxis.tick_width !== undefined ? xAxis.tick_width : 2);
+          addEditorField(content, 'xaxis_tick_length', 'X-Axis Tick Length', 'number', xAxis.tick_length !== undefined ? xAxis.tick_length : 4);
+          addEditorField(content, 'xaxis_tick_every', 'X-Axis Tick Every', 'number', xAxis.tick_every !== undefined ? xAxis.tick_every : 1.0);
+          addEditorField(content, 'xaxis_grid', 'X-Axis Grid', 'checkbox', xAxis.grid !== undefined ? xAxis.grid : true);
+          addEditorField(content, 'xaxis_grid_color', 'X-Axis Grid Color', 'text', xAxis.grid_color || 'black');
+          addEditorField(content, 'xaxis_grid_style', 'X-Axis Grid Style (dotted/dashed/lines)', 'text', xAxis.grid_style || 'dotted');
+          break;
+        case 'debug_grid':
+          addEditorField(content, 'spacing', 'Spacing', 'number', element.spacing || 20);
+          addEditorField(content, 'line_color', 'Line Color', 'text', element.line_color || 'black');
+          addEditorField(content, 'dashed', 'Dashed', 'checkbox', element.dashed !== false);
+          addEditorField(content, 'show_labels', 'Show Labels', 'checkbox', element.show_labels !== false);
+          addEditorField(content, 'label_step', 'Label Step', 'number', element.label_step);
+          addEditorField(content, 'label_color', 'Label Color', 'text', element.label_color || 'black');
+          addEditorField(content, 'label_font_size', 'Label Font Size', 'number', element.label_font_size || 12);
+          break;
+        default:
+
+          Object.keys(element).forEach(key => {
+            if (key !== 'type') {
+              addEditorField(content, key, key, typeof element[key] === 'number' ? 'number' : 'text', element[key]);
+            }
+          });
+      }
+    }
+
+    function addEditorField(container, name, label, type, value, readonly = false) {
+      const row = document.createElement('div');
+      row.className = 'field-row';
+
+      const labelEl = document.createElement('label');
+      labelEl.textContent = label;
+      labelEl.setAttribute('for', name);
+
+      let input;
+      if (type === 'checkbox') {
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = name;
+        input.checked = value;
+        if (readonly) input.disabled = true;
+      } else {
+        input = document.createElement('input');
+        input.type = type;
+        input.id = name;
+        input.value = value !== null && value !== undefined ? value : '';
+        if (readonly) input.readOnly = true;
+      }
+
+      if (!readonly && selectedElementIndex >= 0) {
+        input.addEventListener('change', () => {
+          saveElement();
+        });
+
+        if (input.type === 'number' || input.type === 'text') {
+          input.addEventListener('input', () => {
+            saveElement();
+          });
+        }
+      }
+
+      row.appendChild(labelEl);
+      row.appendChild(input);
+      container.appendChild(row);
+    }
+
+    function addIconAutocompleteField(container, name, label, value) {
+      const row = document.createElement('div');
+      row.className = 'field-row';
+      row.style.position = 'relative';
+
+      const labelEl = document.createElement('label');
+      labelEl.textContent = label;
+      labelEl.setAttribute('for', name);
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = name;
+      input.value = value !== null && value !== undefined ? value : '';
+      input.autocomplete = 'off';
+      input.style.position = 'relative';
+      input.style.zIndex = '1';
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'icon-autocomplete-dropdown';
+      dropdown.style.display = 'none';
+      dropdown.style.position = 'absolute';
+      dropdown.style.top = '100%';
+      dropdown.style.left = '0';
+      dropdown.style.right = '0';
+      dropdown.style.maxHeight = '200px';
+      dropdown.style.overflowY = 'auto';
+      dropdown.style.backgroundColor = 'var(--card-background)';
+      dropdown.style.border = '1px solid var(--border-color)';
+      dropdown.style.borderRadius = '4px';
+      dropdown.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+      dropdown.style.zIndex = '1000';
+      dropdown.style.marginTop = '2px';
+
+      let suggestions = [];
+      let selectedIndex = -1;
+
+      function searchIcons(query) {
+        if (!iconMetadata || !Array.isArray(iconMetadata) || !query) {
+          return [];
+        }
+
+        const searchTerm = query.toLowerCase().replace(/^mdi:/, '');
+        const results = [];
+        const maxResults = 20;
+
+        for (const icon of iconMetadata) {
+          if (results.length >= maxResults) break;
+
+          const iconName = icon.name.toLowerCase();
+          const hasMatch = iconName.includes(searchTerm) ||
+                          (icon.aliases && Array.isArray(icon.aliases) &&
+                           icon.aliases.some(alias => alias.toLowerCase().includes(searchTerm)));
+
+          if (hasMatch) {
+            results.push({
+              name: icon.name,
+              displayName: `mdi:${icon.name}`,
+              aliases: icon.aliases || []
+            });
+          }
+        }
+
+        return results;
+      }
+
+      function showSuggestions(query) {
+        suggestions = searchIcons(query);
+        selectedIndex = -1;
+
+        if (suggestions.length === 0) {
+          dropdown.style.display = 'none';
+          return;
+        }
+
+        dropdown.innerHTML = '';
+        suggestions.forEach((suggestion, index) => {
+          const item = document.createElement('div');
+          item.className = 'icon-autocomplete-item';
+          item.style.padding = '8px 12px';
+          item.style.cursor = 'pointer';
+          item.style.borderBottom = '1px solid var(--border-color)';
+          item.textContent = suggestion.displayName;
+
+          item.addEventListener('mouseenter', () => {
+            selectedIndex = index;
+            updateSelection();
+          });
+
+          item.addEventListener('click', () => {
+            input.value = suggestion.displayName;
+            dropdown.style.display = 'none';
+            input.focus();
+
+            if (selectedElementIndex >= 0) {
+              saveElement();
+            }
+          });
+
+          dropdown.appendChild(item);
+        });
+
+        dropdown.style.display = 'block';
+        updateSelection();
+      }
+
+      function updateSelection() {
+        const items = dropdown.querySelectorAll('.icon-autocomplete-item');
+        items.forEach((item, index) => {
+          if (index === selectedIndex) {
+            item.style.backgroundColor = 'var(--accent)';
+            item.style.color = 'white';
+          } else {
+            item.style.backgroundColor = 'transparent';
+            item.style.color = 'var(--foreground)';
+          }
+        });
+      }
+
+      input.addEventListener('input', (e) => {
+        const query = e.target.value;
+        if (query.length > 0) {
+          showSuggestions(query);
+        } else {
+          dropdown.style.display = 'none';
+        }
+
+        if (selectedElementIndex >= 0) {
+          saveElement();
+        }
+      });
+
+      input.addEventListener('change', () => {
+        if (selectedElementIndex >= 0) {
+          saveElement();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (dropdown.style.display === 'none') return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
+          updateSelection();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIndex = Math.max(selectedIndex - 1, -1);
+          updateSelection();
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+          e.preventDefault();
+          input.value = suggestions[selectedIndex].displayName;
+          dropdown.style.display = 'none';
+
+          if (selectedElementIndex >= 0) {
+            saveElement();
+          }
+        } else if (e.key === 'Escape') {
+          dropdown.style.display = 'none';
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!row.contains(e.target)) {
+          dropdown.style.display = 'none';
+        }
+      });
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      wrapper.style.flex = '1';
+      wrapper.appendChild(input);
+      wrapper.appendChild(dropdown);
+
+      row.appendChild(labelEl);
+      row.appendChild(wrapper);
+      container.appendChild(row);
+    }
+
+    function saveElement() {
+      if (selectedElementIndex < 0) return;
+
+      const element = elements[selectedElementIndex];
+      const content = document.getElementById('elementEditorContent');
+      const inputs = content.querySelectorAll('input');
+
+      if (element.type === 'plot') {
+        element.ylegend = element.ylegend || {};
+        element.yaxis = element.yaxis || {};
+        element.xlegend = element.xlegend || {};
+        element.xaxis = element.xaxis || {};
+
+        inputs.forEach(input => {
+          const name = input.id;
+          if (name.startsWith('ylegend_')) {
+            const key = name.replace('ylegend_', '');
+            if (input.type === 'checkbox') {
+              element.ylegend[key] = input.checked;
+            } else if (input.type === 'number') {
+              const val = parseFloat(input.value);
+              if (!isNaN(val)) {
+                element.ylegend[key] = val;
+              }
+            } else if (input.value.trim()) {
+              element.ylegend[key] = input.value.trim();
+            }
+          } else if (name.startsWith('yaxis_')) {
+            const key = name.replace('yaxis_', '');
+            if (input.type === 'checkbox') {
+              element.yaxis[key] = input.checked;
+            } else if (input.type === 'number') {
+              const val = parseFloat(input.value);
+              if (!isNaN(val)) {
+                element.yaxis[key] = val;
+              }
+            } else if (input.value.trim()) {
+              element.yaxis[key] = input.value.trim();
+            }
+          } else if (name.startsWith('xlegend_')) {
+            const key = name.replace('xlegend_', '');
+            if (input.type === 'checkbox') {
+              element.xlegend[key] = input.checked;
+            } else if (input.type === 'number') {
+              const val = parseFloat(input.value);
+              if (!isNaN(val)) {
+                element.xlegend[key] = val;
+              }
+            } else if (input.value.trim()) {
+              element.xlegend[key] = input.value.trim();
+            }
+          } else if (name.startsWith('xaxis_')) {
+            const key = name.replace('xaxis_', '');
+            if (input.type === 'checkbox') {
+              element.xaxis[key] = input.checked;
+            } else if (input.type === 'number') {
+              const val = parseFloat(input.value);
+              if (!isNaN(val)) {
+                element.xaxis[key] = val;
+              }
+            } else if (input.value.trim()) {
+              element.xaxis[key] = input.value.trim();
+            }
+          }
+        });
+
+        inputs.forEach(input => {
+          const name = input.id;
+          if (name === 'type' || name.startsWith('ylegend_') || name.startsWith('yaxis_') || name.startsWith('xlegend_') || name.startsWith('xaxis_')) {
+            return;
+          }
+
+          if (input.type === 'checkbox') {
+            element[name] = input.checked;
+          } else if (input.type === 'number') {
+            const val = parseFloat(input.value);
+            if (!isNaN(val)) element[name] = val;
+          } else {
+            let value = input.value.trim();
+
+            if (name === 'value' && element.type === 'icon' && value && !value.startsWith('mdi:')) {
+              value = 'mdi:' + value;
+            }
+
+            if (name === 'points' || name === 'data') {
+              try {
+                element[name] = JSON.parse(value);
+              } catch (e) {
+                alert(`Invalid JSON for ${name}`);
+                return;
+              }
+            } else if (name === 'icons') {
+
+              element[name] = value.split(',').map(s => {
+                const trimmed = s.trim();
+                return trimmed && !trimmed.startsWith('mdi:') ? 'mdi:' + trimmed : trimmed;
+              }).filter(s => s);
+            } else {
+              element[name] = value || null;
+            }
+          }
+        });
+      } else {
+
+      inputs.forEach(input => {
+        const name = input.id;
+        if (name === 'type') return;
+
+        if (input.type === 'checkbox') {
+          element[name] = input.checked;
+        } else if (input.type === 'number') {
+          const val = parseFloat(input.value);
+          if (!isNaN(val)) element[name] = val;
+        } else {
+            let value = input.value.trim();
+
+            if (name === 'value' && element.type === 'icon' && value && !value.startsWith('mdi:')) {
+              value = 'mdi:' + value;
+            }
+
+          if (name === 'points' || name === 'data') {
+            try {
+              element[name] = JSON.parse(value);
+            } catch (e) {
+              alert(`Invalid JSON for ${name}`);
+              return;
+            }
+          } else if (name === 'icons') {
+
+              element[name] = value.split(',').map(s => {
+                const trimmed = s.trim();
+                return trimmed && !trimmed.startsWith('mdi:') ? 'mdi:' + trimmed : trimmed;
+              }).filter(s => s);
+          } else {
+            element[name] = value || null;
+          }
+        }
+      });
+      }
+
+      if (element.type === 'plot') {
+        ['ylegend', 'yaxis', 'xlegend', 'xaxis'].forEach(nestedKey => {
+          if (element[nestedKey] && Object.keys(element[nestedKey]).length === 0) {
+            delete element[nestedKey];
+          }
+        });
+      }
+
+      renderPreview();
+      updateYAML();
+      updateElementList();
+      saveToLocalStorage();
+    }
+
+    function cancelEdit() {
+      selectedElementIndex = -1;
+      document.getElementById('elementEditor').classList.add('hidden');
+      updateElementList();
+    }
+
+    function deleteElement() {
+      if (selectedElementIndex >= 0) {
+        deleteElementAt(selectedElementIndex);
+      }
+    }
+
+    function deleteElementAt(index) {
+      elements.splice(index, 1);
+      selectedElementIndex = -1;
+      document.getElementById('elementEditor').classList.add('hidden');
+      updateElementList();
+      renderPreview();
+      updateYAML();
+      saveToLocalStorage();
+    }
+
+    function drawCoordinateLabels() {
+      const container = document.querySelector('.canvas-container');
+      const wrapper = document.getElementById('canvasWrapper');
+      if (!container || !wrapper || !canvas) return;
+
+      const existingLabels = container.querySelectorAll('.coordinate-label');
+      existingLabels.forEach(label => label.remove());
+
+      const canvasRect = canvas.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      if (canvasRect.width === 0 || canvasRect.height === 0) return;
+
+      const scaleX = canvasRect.width > 0 ? canvas.width / canvasRect.width : 1;
+      const scaleY = canvasRect.height > 0 ? canvas.height / canvasRect.height : 1;
+
+      const xSpacing = Math.max(50, Math.floor(canvas.width / 20));
+      const ySpacing = Math.max(50, Math.floor(canvas.height / 20));
+
+      const canvasOffsetX = canvasRect.left - containerRect.left;
+      const canvasOffsetY = canvasRect.top - containerRect.top;
+
+      for (let x = 0; x <= canvas.width; x += xSpacing) {
+        const label = document.createElement('div');
+        label.className = 'coordinate-label';
+        label.textContent = String(x);
+        label.style.position = 'absolute';
+        label.style.left = (canvasOffsetX + (x / scaleX)) + 'px';
+        label.style.top = '5px';
+        label.style.transform = 'translateX(-50%)';
+        container.appendChild(label);
+      }
+
+      for (let x = 0; x <= canvas.width; x += xSpacing) {
+        const label = document.createElement('div');
+        label.className = 'coordinate-label';
+        label.textContent = String(x);
+        label.style.position = 'absolute';
+        label.style.left = (canvasOffsetX + (x / scaleX)) + 'px';
+        label.style.bottom = '5px';
+        label.style.top = 'auto';
+        label.style.transform = 'translateX(-50%)';
+        container.appendChild(label);
+      }
+
+      for (let y = 0; y <= canvas.height; y += ySpacing) {
+        const label = document.createElement('div');
+        label.className = 'coordinate-label';
+        label.textContent = String(y);
+        label.style.position = 'absolute';
+        label.style.left = '5px';
+        label.style.top = (canvasOffsetY + (y / scaleY)) + 'px';
+        label.style.transform = 'translateY(-50%)';
+        label.style.textAlign = 'right';
+        container.appendChild(label);
+      }
+
+      for (let y = 0; y <= canvas.height; y += ySpacing) {
+        const label = document.createElement('div');
+        label.className = 'coordinate-label';
+        label.textContent = String(y);
+        label.style.position = 'absolute';
+        label.style.right = '5px';
+        label.style.left = 'auto';
+        label.style.top = (canvasOffsetY + (y / scaleY)) + 'px';
+        label.style.transform = 'translateY(-50%)';
+        label.style.textAlign = 'left';
+        container.appendChild(label);
+      }
+    }
+
+    function renderPreview() {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      elements.forEach((element, index) => {
+        if (!element.visible) return;
+        renderElement(element);
+      });
+
+      if (!showFullColor) {
+        applyColorSchemeReduction();
+      }
+
+      if (selectedElementIndex >= 0 && selectedElementIndex < elements.length) {
+        const selectedElement = elements[selectedElementIndex];
+        if (selectedElement && selectedElement.visible !== false) {
+          drawSelectionOutline(selectedElement);
+        }
+      }
+
+      const showCoords = document.getElementById('showCoordinates');
+      if (showCoords && showCoords.checked) {
+        setTimeout(drawCoordinateLabels, 10);
+      } else {
+        const container = document.querySelector('.canvas-container');
+        if (container) {
+          const existingLabels = container.querySelectorAll('.coordinate-label');
+          existingLabels.forEach(label => label.remove());
+        }
+      }
+    }
+
+    function drawSelectionOutline(element) {
+
+      ctx.save();
+
+      ctx.strokeStyle = '#00bfff';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.lineDashOffset = 0;
+
+      switch(element.type) {
+        case 'rectangle':
+        case 'rectangle_pattern':
+        case 'progress_bar':
+          const minX = Math.min(element.x_start || 0, element.x_end || 0);
+          const maxX = Math.max(element.x_start || 0, element.x_end || 0);
+          const minY = Math.min(element.y_start || 0, element.y_end || 0);
+          const maxY = Math.max(element.y_start || 0, element.y_end || 0);
+          ctx.strokeRect(minX - 2, minY - 2, maxX - minX + 4, maxY - minY + 4);
+          drawResizeHandles(minX, minY, maxX, maxY);
+          break;
+        case 'circle':
+        case 'arc':
+          const radius = element.radius || 20;
+          ctx.beginPath();
+          ctx.arc(element.x || 0, element.y || 0, radius + 2, 0, 2 * Math.PI);
+          ctx.stroke();
+
+          const handleX = (element.x || 0) + radius;
+          const handleY = element.y || 0;
+          drawResizeHandle(handleX, handleY);
+          break;
+        case 'ellipse':
+          const ellMinX = Math.min(element.x_start || 0, element.x_end || 0);
+          const ellMaxX = Math.max(element.x_start || 0, element.x_end || 0);
+          const ellMinY = Math.min(element.y_start || 0, element.y_end || 0);
+          const ellMaxY = Math.max(element.y_start || 0, element.y_end || 0);
+          ctx.strokeRect(ellMinX - 2, ellMinY - 2, ellMaxX - ellMinX + 4, ellMaxY - ellMinY + 4);
+          drawResizeHandles(ellMinX, ellMinY, ellMaxX, ellMaxY);
+          break;
+        case 'dlimg':
+          const imgX = element.x || 0;
+          const imgY = element.y || 0;
+          const imgW = element.xsize || 100;
+          const imgH = element.ysize || 100;
+          ctx.strokeRect(imgX - 2, imgY - 2, imgW + 4, imgH + 4);
+          drawResizeHandles(imgX, imgY, imgX + imgW, imgY + imgH);
+          break;
+        case 'qrcode':
+          const qrSize = (element.boxsize || 2) * 25 + (element.border || 2) * 2;
+          const qrX = element.x || 0;
+          const qrY = element.y || 0;
+          ctx.strokeRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 4);
+          drawResizeHandles(qrX, qrY, qrX + qrSize, qrY + qrSize);
+          break;
+        case 'text':
+
+          const textSize = element.size || 20;
+          const textX = element.x || 0;
+          const textY = element.y || 0;
+          ctx.font = `${textSize}px Arial`;
+          ctx.textBaseline = 'top';
+          const textMetrics = ctx.measureText(element.value || '');
+          const textWidth = textMetrics.width;
+          const textHeight = textSize;
+
+          const padding = 2;
+          ctx.strokeRect(textX - padding, textY - padding, textWidth + padding * 2, textHeight + padding * 2);
+
+          drawResizeHandle(textX + textWidth + padding, textY + textHeight + padding);
+          break;
+        case 'icon':
+
+          const iconSize = element.size || 24;
+          const iconX = element.x || 0;
+          const iconY = element.y || 0;
+
+          ctx.strokeRect(iconX - 2, iconY - 2, iconSize + 4, iconSize + 4);
+
+          drawResizeHandle(iconX + iconSize + 2, iconY + iconSize + 2);
+          break;
+        case 'icon_sequence':
+
+          const seqSize = element.size || 24;
+          const seqX = element.x || 0;
+          const seqY = element.y || 0;
+          const icons = element.icons || [];
+          const direction = element.direction || 'right';
+          const spacing = element.spacing || (seqSize / 4);
+          let seqWidth = seqSize;
+          let seqHeight = seqSize;
+          if (direction === 'right' || direction === 'left') {
+            seqWidth = icons.length * (seqSize + spacing) - spacing;
+          } else {
+            seqHeight = icons.length * (seqSize + spacing) - spacing;
+          }
+
+          ctx.strokeRect(seqX - 2, seqY - 2, seqWidth + 4, seqHeight + 4);
+
+          drawResizeHandles(seqX, seqY, seqX + seqWidth, seqY + seqHeight);
+          break;
+        case 'multiline':
+
+          const lines = (element.value || '').split(element.delimiter || '|');
+          const lineSize = element.size || 20;
+          const lineX = element.x || 0;
+          const lineY = element.y || 0;
+          const offsetY = element.offset_y || 50;
+          ctx.font = `${lineSize}px Arial`;
+          ctx.textBaseline = 'top';
+          const multilineWidth = lines.length > 0 ? Math.max(...lines.map(line => ctx.measureText(line).width)) : 100;
+          const multilineHeight = lines.length * lineSize + (lines.length - 1) * (offsetY - lineSize);
+
+          ctx.strokeRect(lineX - 2, lineY - 2, multilineWidth + 4, multilineHeight + 4);
+
+          drawResizeHandles(lineX, lineY, lineX + multilineWidth, lineY + multilineHeight);
+          break;
+        case 'line':
+
+          const lineMinX = Math.min(element.x_start || 0, element.x_end || 0);
+          const lineMaxX = Math.max(element.x_start || 0, element.x_end || 0);
+          const lineMinY = Math.min(element.y_start || 0, element.y_end || 0);
+          const lineMaxY = Math.max(element.y_start || 0, element.y_end || 0);
+          ctx.strokeRect(lineMinX - 2, lineMinY - 2, lineMaxX - lineMinX + 4, lineMaxY - lineMinY + 4);
+
+          drawResizeHandle(element.x_start || 0, element.y_start || 0);
+          drawResizeHandle(element.x_end || 0, element.y_end || 0);
+          break;
+        case 'polygon':
+
+          const points = element.points || [];
+          if (points.length > 0) {
+            const polyMinX = Math.min(...points.map(p => p[0]));
+            const polyMaxX = Math.max(...points.map(p => p[0]));
+            const polyMinY = Math.min(...points.map(p => p[1]));
+            const polyMaxY = Math.max(...points.map(p => p[1]));
+            ctx.strokeRect(polyMinX - 2, polyMinY - 2, polyMaxX - polyMinX + 4, polyMaxY - polyMinY + 4);
+
+            drawResizeHandles(polyMinX, polyMinY, polyMaxX, polyMaxY);
+          }
+          break;
+        case 'plot':
+          const plotMinX = element.x_start || 0;
+          const plotMaxX = element.x_end || canvas.width;
+          const plotMinY = element.y_start || 0;
+          const plotMaxY = element.y_end || canvas.height;
+          ctx.strokeRect(plotMinX - 2, plotMinY - 2, plotMaxX - plotMinX + 4, plotMaxY - plotMinY + 4);
+          drawResizeHandles(plotMinX, plotMinY, plotMaxX, plotMaxY);
+          break;
+        default:
+
+          break;
+      }
+
+      ctx.restore();
+    }
+
+    function drawResizeHandles(minX, minY, maxX, maxY) {
+      const handles = [
+        [minX, minY], [maxX, minY], [minX, maxY], [maxX, maxY],
+        [(minX + maxX) / 2, minY], [(minX + maxX) / 2, maxY],
+        [minX, (minY + maxY) / 2], [maxX, (minY + maxY) / 2]
+      ];
+      handles.forEach(([x, y]) => drawResizeHandle(x, y));
+    }
+
+    function drawResizeHandle(x, y) {
+      ctx.fillStyle = '#00bfff';
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+      ctx.fillRect(x - 4, y - 4, 8, 8);
+      ctx.strokeRect(x - 4, y - 4, 8, 8);
+    }
+
+    function renderElement(element) {
+      switch(element.type) {
+        case 'text':
+          renderText(element);
+          break;
+        case 'multiline':
+          renderMultiline(element);
+          break;
+        case 'line':
+          renderLine(element);
+          break;
+        case 'rectangle':
+          renderRectangle(element);
+          break;
+        case 'rectangle_pattern':
+          renderRectanglePattern(element);
+          break;
+        case 'polygon':
+          renderPolygon(element);
+          break;
+        case 'circle':
+          renderCircle(element);
+          break;
+        case 'ellipse':
+          renderEllipse(element);
+          break;
+        case 'arc':
+          renderArc(element);
+          break;
+        case 'icon':
+          renderIcon(element);
+          break;
+        case 'icon_sequence':
+          renderIconSequence(element);
+          break;
+        case 'qrcode':
+          renderQRCode(element);
+          break;
+        case 'dlimg':
+          renderImage(element);
+          break;
+        case 'plot':
+          renderPlot(element);
+          break;
+        case 'progress_bar':
+          renderProgressBar(element);
+          break;
+        case 'debug_grid':
+          renderDebugGrid(element);
+          break;
+      }
+    }
+
+    function renderText(element) {
+      ctx.fillStyle = element.color || 'black';
+      ctx.font = `${element.size || 20}px Arial`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      ctx.fillText(element.value || '', element.x || 0, element.y || 0);
+    }
+
+    function renderMultiline(element) {
+      const lines = (element.value || '').split(element.delimiter || '|');
+      ctx.fillStyle = element.color || 'black';
+      ctx.font = `${element.size || 20}px Arial`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      let y = element.y || 0;
+      lines.forEach(line => {
+        ctx.fillText(line, element.x || 0, y);
+        y += (element.offset_y || 50);
+      });
+    }
+
+    function renderLine(element) {
+      ctx.strokeStyle = element.fill || 'black';
+      ctx.lineWidth = element.width || 1;
+      ctx.beginPath();
+      ctx.moveTo(element.x_start || 0, element.y_start || 0);
+      ctx.lineTo(element.x_end || 0, element.y_end || 0);
+      ctx.stroke();
+    }
+
+    function renderRectangle(element) {
+      const x = Math.min(element.x_start || 0, element.x_end || 0);
+      const y = Math.min(element.y_start || 0, element.y_end || 0);
+      const w = Math.abs((element.x_end || 0) - (element.x_start || 0));
+      const h = Math.abs((element.y_end || 0) - (element.y_start || 0));
+
+      if (element.fill) {
+        ctx.fillStyle = element.fill;
+        ctx.fillRect(x, y, w, h);
+      }
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.strokeRect(x, y, w, h);
+      }
+    }
+
+    let iconFont = null;
+    let iconMetadata = null;
+    const iconLoadPromise = loadIconFont();
+
+    async function loadIconFont() {
+      try {
+
+        const metaResponse = await fetch('./icons/materialdesignicons-webfont_meta.json');
+        if (!metaResponse.ok) {
+          throw new Error(`Failed to load metadata: ${metaResponse.status} ${metaResponse.statusText}`);
+        }
+        iconMetadata = await metaResponse.json();
+
+        const font = new FontFace('MaterialDesignIcons', 'url(./icons/materialdesignicons-webfont.ttf)');
+        await font.load();
+        document.fonts.add(font);
+        iconFont = font;
+      } catch (e) {
+
+      }
+    }
+
+    function getIconCodepoint(iconName) {
+      if (!iconMetadata || !Array.isArray(iconMetadata)) return null;
+
+      if (iconName.startsWith('mdi:')) {
+        iconName = iconName.substring(4);
+      }
+
+      for (const icon of iconMetadata) {
+        if (icon.name === iconName) {
+          return icon.codepoint;
+        }
+      }
+
+      for (const icon of iconMetadata) {
+        if (icon.aliases && Array.isArray(icon.aliases) && icon.aliases.includes(iconName)) {
+          return icon.codepoint;
+        }
+      }
+
+      return null;
+    }
+
+    function renderIcon(element) {
+      const iconName = element.value || '';
+      const size = element.size || 24;
+      const x = Math.round(element.x || 0);
+      const y = Math.round(element.y || 0);
+      const color = element.fill || 'black';
+
+      if (!iconName) return;
+
+      if (!iconFont || !iconMetadata) {
+
+        ctx.fillStyle = color;
+        ctx.font = `${size}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('□', x, y);
+        return;
+      }
+
+      const codepoint = getIconCodepoint(iconName);
+      if (!codepoint) {
+
+        ctx.fillStyle = color;
+        ctx.font = `${size}px Arial`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('?', x, y);
+        return;
+      }
+
+      const codePoint = parseInt(codepoint, 16);
+      const char = String.fromCodePoint(codePoint);
+
+      ctx.fillStyle = color;
+      ctx.font = `${size}px MaterialDesignIcons`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      ctx.fillText(char, x, y);
+    }
+
+    function renderQRCode(element) {
+      const boxsize = element.boxsize || 2;
+      const border = element.border || 2;
+      const moduleSize = boxsize;
+      const data = element.data || '';
+
+      if (!data) return;
+
+      const qrMatrix = generateQRCode(data);
+      if (!qrMatrix) return;
+
+      const qrSize = qrMatrix.length;
+      const totalSize = (qrSize + border * 2) * moduleSize;
+
+      const x = Math.round(element.x || 0);
+      const y = Math.round(element.y || 0);
+
+      ctx.fillStyle = element.bgcolor || 'white';
+      ctx.fillRect(x, y, totalSize, totalSize);
+
+      ctx.fillStyle = element.color || 'black';
+      for (let row = 0; row < qrSize; row++) {
+        for (let col = 0; col < qrSize; col++) {
+          if (qrMatrix[row][col]) {
+            const px = x + (col + border) * moduleSize;
+            const py = y + (row + border) * moduleSize;
+            ctx.fillRect(px, py, moduleSize, moduleSize);
+          }
+        }
+      }
+    }
+
+    function generateQRCode(data) {
+
+      const dataLength = data.length;
+      let version = 1;
+      if (dataLength > 25) version = 2;
+      if (dataLength > 47) version = 3;
+      if (dataLength > 77) version = 4;
+      if (dataLength > 114) version = 5;
+      if (dataLength > 154) version = 6;
+      if (dataLength > 195) version = 7;
+      if (dataLength > 224) version = 8;
+      if (dataLength > 279) version = 9;
+      if (dataLength > 335) version = 10;
+
+      const size = 21 + (version - 1) * 4;
+      const matrix = Array(size).fill(null).map(() => Array(size).fill(false));
+
+      addFinderPattern(matrix, 0, 0);
+      addFinderPattern(matrix, size - 7, 0);
+      addFinderPattern(matrix, 0, size - 7);
+
+      if (version >= 2) {
+        addAlignmentPattern(matrix, size - 7, size - 7);
+      }
+
+      for (let i = 8; i < size - 8; i++) {
+        matrix[6][i] = (i % 2 === 0);
+        matrix[i][6] = (i % 2 === 0);
+      }
+
+      matrix[8][size - 8] = true;
+
+      const encoded = encodeQRData(data);
+      if (!encoded) return null;
+
+      placeDataBits(matrix, encoded, version);
+
+      applyMask(matrix, 0);
+
+      return matrix;
+    }
+
+    function addFinderPattern(matrix, x, y) {
+      const pattern = [
+        [1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1],
+        [1,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1]
+      ];
+      for (let row = 0; row < 7; row++) {
+        for (let col = 0; col < 7; col++) {
+          if (matrix[y + row] && matrix[y + row][x + col] !== undefined) {
+            matrix[y + row][x + col] = pattern[row][col] === 1;
+          }
+        }
+      }
+    }
+
+    function addAlignmentPattern(matrix, x, y) {
+      const pattern = [
+        [1,1,1,1,1],
+        [1,0,0,0,1],
+        [1,0,1,0,1],
+        [1,0,0,0,1],
+        [1,1,1,1,1]
+      ];
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+          if (matrix[y + row] && matrix[y + row][x + col] !== undefined) {
+            matrix[y + row][x + col] = pattern[row][col] === 1;
+          }
+        }
+      }
+    }
+
+    function encodeQRData(data) {
+
+      let bits = '0100';
+
+      const length = data.length;
+      bits += length.toString(2).padStart(8, '0');
+
+      for (let i = 0; i < data.length; i++) {
+        bits += data.charCodeAt(i).toString(2).padStart(8, '0');
+      }
+
+      bits += '0000';
+
+      while (bits.length % 8 !== 0) {
+        bits += '0';
+      }
+
+      const capacity = 152;
+      while (bits.length < capacity * 8) {
+        bits += (bits.length % 16 === 0) ? '11101100' : '00010001';
+      }
+
+      return bits.substring(0, capacity * 8);
+    }
+
+    function placeDataBits(matrix, dataBits, version) {
+      const size = matrix.length;
+      let bitIndex = 0;
+      let direction = -1;
+      let col = size - 1;
+      let row = size - 1;
+
+      while (col > 0 && bitIndex < dataBits.length) {
+
+        if (col === 6) col--;
+        if (col < 0) break;
+
+        for (let i = 0; i < size && bitIndex < dataBits.length; i++) {
+
+          if (isReservedArea(row, col, size)) {
+            row += direction;
+            continue;
+          }
+
+          if (bitIndex < dataBits.length) {
+            matrix[row][col] = dataBits[bitIndex] === '1';
+            bitIndex++;
+          }
+
+          row += direction;
+        }
+
+        direction = -direction;
+        row += direction;
+        col -= 2;
+
+        if (col === 6) col--;
+      }
+    }
+
+    function isReservedArea(row, col, size) {
+
+      if ((row < 7 && col < 7) ||
+          (row < 7 && col >= size - 7) ||
+          (row >= size - 7 && col < 7)) {
+        return true;
+      }
+
+      if (row === 6 || col === 6) {
+        return true;
+      }
+
+      if (row < 9 && col < 9) return true;
+      if (row < 9 && col >= size - 8) return true;
+      if (row >= size - 8 && col < 9) return true;
+
+      return false;
+    }
+
+    function applyMask(matrix, maskPattern) {
+      const size = matrix.length;
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+
+          if (isReservedArea(row, col, size)) continue;
+
+          let shouldFlip = false;
+          switch(maskPattern) {
+            case 0:
+              shouldFlip = (row + col) % 2 === 0;
+              break;
+            case 1:
+              shouldFlip = row % 2 === 0;
+              break;
+            case 2:
+              shouldFlip = col % 3 === 0;
+              break;
+            case 3:
+              shouldFlip = (row + col) % 3 === 0;
+              break;
+            case 4:
+              shouldFlip = (Math.floor(row / 2) + Math.floor(col / 3)) % 2 === 0;
+              break;
+            case 5:
+              shouldFlip = ((row * col) % 2 + (row * col) % 3) === 0;
+              break;
+            case 6:
+              shouldFlip = ((row * col) % 2 + (row * col) % 3) % 2 === 0;
+              break;
+            case 7:
+              shouldFlip = ((row + col) % 2 + (row * col) % 3) % 2 === 0;
+              break;
+          }
+
+          if (shouldFlip) {
+            matrix[row][col] = !matrix[row][col];
+          }
+        }
+      }
+    }
+
+    const imageCache = new Map();
+
+    function renderImage(element) {
+      const url = element.url;
+      if (!url) return;
+
+      if (imageCache.has(url)) {
+        const img = imageCache.get(url);
+        if (img.complete) {
+          const x = element.x || 0;
+          const y = element.y || 0;
+          const targetWidth = element.xsize || 100;
+          const targetHeight = element.ysize || 100;
+
+          ctx.save();
+          if (element.rotate) {
+            ctx.translate(x + targetWidth/2, y + targetHeight/2);
+            ctx.rotate((element.rotate * Math.PI) / 180);
+            ctx.translate(-targetWidth/2, -targetHeight/2);
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          } else {
+            ctx.drawImage(img, x, y, targetWidth, targetHeight);
+          }
+          ctx.restore();
+        }
+      } else {
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          imageCache.set(url, img);
+          renderPreview();
+        };
+        img.onerror = () => {
+
+          ctx.strokeStyle = 'gray';
+          ctx.strokeRect(element.x || 0, element.y || 0, element.xsize || 100, element.ysize || 100);
+          ctx.fillStyle = 'lightgray';
+          ctx.fillText('Image Error', (element.x || 0) + 10, (element.y || 0) + 20);
+        };
+        img.src = url;
+
+        ctx.strokeStyle = 'gray';
+        ctx.strokeRect(element.x || 0, element.y || 0, element.xsize || 100, element.ysize || 100);
+        ctx.fillStyle = 'lightgray';
+        ctx.fillText('Loading...', (element.x || 0) + 10, (element.y || 0) + 20);
+      }
+    }
+
+    function renderRectanglePattern(element) {
+      const xStart = element.x_start || 0;
+      const yStart = element.y_start || 0;
+      const xSize = element.x_size || 35;
+      const ySize = element.y_size || 18;
+      const xOffset = element.x_offset || 10;
+      const yOffset = element.y_offset || 2;
+      const xRepeat = element.x_repeat || 1;
+      const yRepeat = element.y_repeat || 4;
+
+      for (let xr = 0; xr < xRepeat; xr++) {
+        for (let yr = 0; yr < yRepeat; yr++) {
+          const x = xStart + (xr * (xSize + xOffset));
+          const y = yStart + (yr * (ySize + yOffset));
+
+          if (element.fill) {
+            ctx.fillStyle = element.fill;
+            ctx.fillRect(x, y, xSize, ySize);
+          }
+          if (element.outline) {
+            ctx.strokeStyle = element.outline;
+            ctx.lineWidth = element.width || 1;
+            ctx.strokeRect(x, y, xSize, ySize);
+          }
+        }
+      }
+    }
+
+    function renderPolygon(element) {
+      const points = element.points || [];
+      if (points.length < 2) return;
+
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.closePath();
+
+      if (element.fill && element.fill !== 'none') {
+        ctx.fillStyle = element.fill;
+        ctx.fill();
+      }
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.stroke();
+      }
+    }
+
+    function renderCircle(element) {
+      const x = element.x || 0;
+      const y = element.y || 0;
+      const radius = element.radius || 20;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+
+      if (element.fill && element.fill !== 'null') {
+        ctx.fillStyle = element.fill;
+        ctx.fill();
+      }
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.stroke();
+      }
+    }
+
+    function renderEllipse(element) {
+      const xStart = element.x_start || 0;
+      const yStart = element.y_start || 0;
+      const xEnd = element.x_end || 0;
+      const yEnd = element.y_end || 0;
+      const centerX = (xStart + xEnd) / 2;
+      const centerY = (yStart + yEnd) / 2;
+      const radiusX = Math.abs(xEnd - xStart) / 2;
+      const radiusY = Math.abs(yEnd - yStart) / 2;
+
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+
+      if (element.fill && element.fill !== 'null') {
+        ctx.fillStyle = element.fill;
+        ctx.fill();
+      }
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.stroke();
+      }
+    }
+
+    function renderArc(element) {
+      const x = element.x || 0;
+      const y = element.y || 0;
+      const radius = element.radius || 50;
+      const startAngle = ((element.start_angle || 0) * Math.PI) / 180;
+      const endAngle = ((element.end_angle || 90) * Math.PI) / 180;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.arc(x, y, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      if (element.fill && element.fill !== 'none') {
+        ctx.fillStyle = element.fill;
+        ctx.fill();
+      }
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.stroke();
+      }
+    }
+
+    function renderIconSequence(element) {
+      const icons = element.icons || [];
+      const x = Math.round(element.x || 0);
+      const y = Math.round(element.y || 0);
+      const size = element.size || 24;
+      const direction = element.direction || 'right';
+      const spacing = element.spacing || (size / 4);
+      const color = element.fill || 'black';
+
+      icons.forEach((iconName, index) => {
+        let iconX = x;
+        let iconY = y;
+
+        switch(direction) {
+          case 'right':
+            iconX = x + (index * (size + spacing));
+            break;
+          case 'left':
+            iconX = x - (index * (size + spacing));
+            break;
+          case 'down':
+            iconY = y + (index * (size + spacing));
+            break;
+          case 'up':
+            iconY = y - (index * (size + spacing));
+            break;
+        }
+
+        if (!iconFont || !iconMetadata) {
+
+          ctx.fillStyle = color;
+        ctx.font = `${size}px Arial`;
+          ctx.fillText('□', iconX, iconY);
+          return;
+        }
+
+        const codepoint = getIconCodepoint(iconName);
+        if (!codepoint) {
+          ctx.fillStyle = color;
+          ctx.font = `${size}px Arial`;
+          ctx.fillText('?', iconX, iconY);
+          return;
+        }
+
+        const codePoint = parseInt(codepoint, 16);
+        const char = String.fromCodePoint(codePoint);
+        ctx.fillStyle = color;
+        ctx.font = `${size}px MaterialDesignIcons`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+
+        ctx.fillText(char, iconX, iconY);
+      });
+    }
+
+    function renderPlot(element) {
+      const xStart = element.x_start || 0;
+      const yStart = element.y_start || 0;
+      const xEnd = element.x_end || canvas.width;
+      const yEnd = element.y_end || canvas.height;
+      const duration = element.duration || 86400;
+      const fontSize = element.size || 10;
+      const roundValues = element.round_values || false;
+
+      const yLegend = element.ylegend || {};
+      const yLegendWidth = yLegend.width !== undefined ? yLegend.width : -1;
+      const yLegendColor = yLegend.color || 'black';
+      const yLegendPosition = yLegend.position || 'left';
+      const yLegendSize = yLegend.size || fontSize;
+
+      const yAxis = element.yaxis || {};
+      const yAxisWidth = yAxis.width !== undefined ? yAxis.width : 1;
+      const yAxisColor = yAxis.color || 'black';
+      const yAxisTickWidth = yAxis.tick_width !== undefined ? yAxis.tick_width : 2;
+      const yAxisTickLength = yAxis.tick_length !== undefined ? yAxis.tick_length : 4;
+
+      let yAxisTickEvery = yAxis.tick_every;
+      const yAxisGrid = yAxis.grid !== undefined ? yAxis.grid : true;
+      const yAxisGridColor = yAxis.grid_color || 'black';
+      const yAxisGridStyle = yAxis.grid_style || 'dotted';
+
+      const xLegend = element.xlegend || {};
+      const xLegendFormat = xLegend.format || '%H:%M';
+
+      const defaultXInterval = Math.max(3600, Math.floor(duration / 5));
+      const xLegendInterval = xLegend.interval !== undefined ? xLegend.interval : defaultXInterval;
+      const xLegendSnapToHours = xLegend.snap_to_hours !== undefined ? xLegend.snap_to_hours : true;
+      const xLegendSize = xLegend.size || fontSize;
+      const xLegendPosition = xLegend.position || 'bottom';
+      const xLegendColor = xLegend.color || 'black';
+
+      const xAxis = element.xaxis || {};
+      const xAxisWidth = xAxis.width !== undefined ? xAxis.width : 1;
+      const xAxisColor = xAxis.color || 'black';
+      const xAxisTickWidth = xAxis.tick_width !== undefined ? xAxis.tick_width : 2;
+      const xAxisTickLength = xAxis.tick_length !== undefined ? xAxis.tick_length : 4;
+      const xAxisTickEvery = xAxis.tick_every !== undefined ? xAxis.tick_every : 1.0;
+      const xAxisGrid = xAxis.grid !== undefined ? xAxis.grid : true;
+      const xAxisGridColor = xAxis.grid_color || 'black';
+      const xAxisGridStyle = xAxis.grid_style || 'dotted';
+
+      const now = Date.now() / 1000;
+      const data = element.data || [{ entity: 'sensor.temperature', color: 'black', width: 1 }];
+      const allPoints = [];
+
+      data.forEach((series, seriesIndex) => {
+        const points = [];
+        const pointCount = 50;
+        for (let i = 0; i < pointCount; i++) {
+          const time = now - (duration * (1 - i / pointCount));
+          const value = 20 + 10 * Math.sin(i / pointCount * Math.PI * 2 + seriesIndex);
+          points.push({ time, value });
+          allPoints.push(value);
+        }
+        series.points = points;
+      });
+
+      let minV = element.low !== undefined ? element.low : (allPoints.length > 0 ? Math.min(...allPoints) : 0);
+      let maxV = element.high !== undefined ? element.high : (allPoints.length > 0 ? Math.max(...allPoints) : 100);
+
+      if (roundValues) {
+        minV = Math.floor(minV);
+        maxV = Math.ceil(maxV);
+      }
+
+      if (maxV === minV) {
+        minV -= 1;
+      }
+      const spread = maxV - minV;
+
+      if (yAxisTickEvery === undefined) {
+        yAxisTickEvery = Math.max(1.0, spread / 5);
+      }
+
+      let actualYLegendWidth = yLegendWidth;
+      if (yLegendWidth === -1 && yLegend) {
+        ctx.font = `${yLegendSize}px Arial`;
+        const maxText = Math.max(
+          ctx.measureText(String(roundValues ? Math.ceil(maxV) : maxV.toFixed(2))).width,
+          ctx.measureText(String(roundValues ? Math.floor(minV) : minV.toFixed(2))).width
+        );
+        actualYLegendWidth = Math.ceil(maxText) + 4;
+      } else if (yLegendWidth === -1) {
+        actualYLegendWidth = 0;
+      }
+
+      let xLegendHeight = 0;
+      if (xLegend) {
+        ctx.font = `${xLegendSize}px Arial`;
+        xLegendHeight = xLegendSize + xAxisTickLength + 4;
+      }
+
+      const diagX = xStart + (yLegendPosition === 'left' ? actualYLegendWidth : 0);
+      const diagY = yStart + (xLegendPosition === 'top' ? xLegendHeight : 0);
+      const diagWidth = (xEnd - xStart) - (yLegendPosition === 'left' || yLegendPosition === 'right' ? actualYLegendWidth : 0);
+      const diagHeight = (yEnd - yStart) - xLegendHeight;
+
+      if (yLegend && actualYLegendWidth > 0) {
+        ctx.fillStyle = yLegendColor;
+        ctx.font = `${yLegendSize}px Arial`;
+        ctx.textAlign = yLegendPosition === 'left' ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+
+        if (yAxisTickEvery > 0) {
+          let curr = minV;
+          while (curr <= maxV) {
+            const currY = Math.round(diagY + (1 - ((curr - minV) / spread)) * (diagHeight - 1));
+            let formattedValue = curr;
+            if (roundValues && typeof curr === 'number') {
+              formattedValue = Number.isInteger(curr) ? curr : Math.round(curr);
+            } else if (typeof curr === 'number' && !Number.isInteger(curr)) {
+              formattedValue = parseFloat(curr.toFixed(2));
+            }
+            const x = yLegendPosition === 'left' ? xStart : xEnd;
+            ctx.fillText(String(formattedValue), x, currY);
+            curr += yAxisTickEvery;
+          }
+
+          if (Math.abs((maxV - minV) % yAxisTickEvery) > 0.0001) {
+            const maxY = Math.round(diagY + (1 - ((maxV - minV) / spread)) * (diagHeight - 1));
+            let formattedMax = maxV;
+            if (roundValues && typeof maxV === 'number') {
+              formattedMax = Number.isInteger(maxV) ? maxV : Math.ceil(maxV);
+            } else if (typeof maxV === 'number' && !Number.isInteger(maxV)) {
+              formattedMax = parseFloat(maxV.toFixed(2));
+            }
+            const x = yLegendPosition === 'left' ? xStart : xEnd;
+            ctx.fillText(String(formattedMax), x, maxY);
+          }
+          } else {
+
+          const topY = diagY;
+          const bottomY = diagY + diagHeight - 1;
+          let formattedMax = maxV;
+          let formattedMin = minV;
+          if (roundValues) {
+            formattedMax = Math.ceil(maxV);
+            formattedMin = Math.floor(minV);
+          }
+          const x = yLegendPosition === 'left' ? xStart : xEnd;
+          ctx.textBaseline = 'top';
+          ctx.fillText(String(formattedMax), x, topY);
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(String(formattedMin), x, bottomY);
+        }
+      }
+
+      if (yAxis) {
+
+        if (yAxisWidth > 0) {
+          ctx.fillStyle = yAxisColor;
+          ctx.fillRect(diagX, diagY, yAxisWidth, diagHeight);
+        }
+
+        if (yAxisTickEvery > 0) {
+          let curr = minV;
+          while (curr <= maxV) {
+            const currY = Math.round(diagY + (1 - ((curr - minV) / spread)) * (diagHeight - 1));
+
+            if (yAxisTickLength > 0) {
+              ctx.fillStyle = yAxisColor;
+              ctx.fillRect(diagX, currY - Math.floor(yAxisTickWidth / 2), yAxisTickLength, yAxisTickWidth);
+            }
+
+            if (yAxisGrid) {
+              ctx.strokeStyle = yAxisGridColor;
+              ctx.lineWidth = 1;
+              if (yAxisGridStyle === 'lines') {
+                ctx.setLineDash([]);
+                ctx.beginPath();
+                ctx.moveTo(diagX, currY);
+                ctx.lineTo(diagX + diagWidth, currY);
+        ctx.stroke();
+              } else if (yAxisGridStyle === 'dashed') {
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(diagX, currY);
+                ctx.lineTo(diagX + diagWidth, currY);
+                ctx.stroke();
+              } else if (yAxisGridStyle === 'dotted') {
+                ctx.setLineDash([2, 2]);
+                ctx.beginPath();
+                ctx.moveTo(diagX, currY);
+                ctx.lineTo(diagX + diagWidth, currY);
+                ctx.stroke();
+              }
+            }
+
+            curr += yAxisTickEvery;
+          }
+        }
+      }
+
+      if (xAxis) {
+        const xAxisY = diagY + diagHeight;
+
+        if (xAxisWidth > 0) {
+          ctx.fillStyle = xAxisColor;
+          ctx.fillRect(diagX, xAxisY, diagWidth, xAxisWidth);
+        }
+
+        const tickCount = Math.floor(diagWidth / (xAxisTickEvery * 10));
+        for (let i = 0; i <= tickCount; i++) {
+          const x = diagX + (i / tickCount) * diagWidth;
+
+          if (xAxisTickLength > 0) {
+            ctx.fillStyle = xAxisColor;
+            ctx.fillRect(x - Math.floor(xAxisTickWidth / 2), xAxisY, xAxisTickWidth, xAxisTickLength);
+          }
+
+          if (xAxisGrid) {
+            ctx.strokeStyle = xAxisGridColor;
+      ctx.lineWidth = 1;
+            if (xAxisGridStyle === 'lines') {
+              ctx.setLineDash([]);
+      ctx.beginPath();
+              ctx.moveTo(x, diagY);
+              ctx.lineTo(x, diagY + diagHeight);
+              ctx.stroke();
+            } else if (xAxisGridStyle === 'dashed') {
+              ctx.setLineDash([5, 3]);
+              ctx.beginPath();
+              ctx.moveTo(x, diagY);
+              ctx.lineTo(x, diagY + diagHeight);
+              ctx.stroke();
+            } else if (xAxisGridStyle === 'dotted') {
+              ctx.setLineDash([2, 2]);
+              ctx.beginPath();
+              ctx.moveTo(x, diagY);
+              ctx.lineTo(x, diagY + diagHeight);
+      ctx.stroke();
+            }
+          }
+        }
+      }
+
+      if (xLegend) {
+        ctx.fillStyle = xLegendColor;
+        ctx.font = `${xLegendSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = xLegendPosition === 'bottom' ? 'top' : 'bottom';
+
+        const labelCount = Math.floor(duration / xLegendInterval);
+        for (let i = 0; i <= labelCount; i++) {
+          const timeOffset = duration * (i / labelCount);
+          const labelTime = new Date((now - (duration - timeOffset)) * 1000);
+          const x = diagX + (i / labelCount) * diagWidth;
+
+          let timeStr = '';
+          if (xLegendFormat.includes('%H')) {
+            timeStr = String(labelTime.getHours()).padStart(2, '0');
+          }
+          if (xLegendFormat.includes('%M')) {
+            timeStr += ':' + String(labelTime.getMinutes()).padStart(2, '0');
+          }
+
+          const y = xLegendPosition === 'bottom' ? diagY + diagHeight + xAxisTickLength : diagY - xAxisTickLength;
+          ctx.fillText(timeStr || labelTime.toLocaleTimeString(), x, y);
+        }
+      }
+
+      ctx.setLineDash([]);
+      data.forEach((series) => {
+        const points = series.points || [];
+        if (points.length === 0) return;
+
+        const lineColor = series.color || 'black';
+        const lineWidth = series.width || 1;
+        const smooth = series.smooth || false;
+        const showPoints = series.show_points || false;
+        const pointSize = series.point_size || 3;
+        const pointColor = series.point_color || lineColor;
+        const lineStyle = series.line_style || 'linear';
+        const valueScale = series.value_scale || 1.0;
+
+        ctx.strokeStyle = lineColor;
+        ctx.fillStyle = pointColor;
+        ctx.lineWidth = lineWidth;
+
+        const canvasPoints = points.map(point => {
+          const x = diagX + ((point.time - (now - duration)) / duration) * diagWidth;
+          const scaledValue = (point.value - minV) / spread * valueScale + minV;
+          const normalizedValue = (scaledValue - minV) / spread;
+          const y = diagY + (1 - normalizedValue) * diagHeight;
+          return { x, y, value: point.value };
+        });
+
+        if (lineStyle === 'step') {
+
+          ctx.beginPath();
+          for (let i = 0; i < canvasPoints.length; i++) {
+            const p = canvasPoints[i];
+            if (i === 0) {
+              ctx.moveTo(p.x, p.y);
+            } else {
+              const prev = canvasPoints[i - 1];
+              ctx.lineTo(p.x, prev.y);
+              ctx.lineTo(p.x, p.y);
+            }
+          }
+          ctx.stroke();
+        } else if (smooth && canvasPoints.length > 2) {
+
+          ctx.beginPath();
+          ctx.moveTo(canvasPoints[0].x, canvasPoints[0].y);
+          for (let i = 1; i < canvasPoints.length - 1; i++) {
+            const p0 = canvasPoints[i - 1];
+            const p1 = canvasPoints[i];
+            const p2 = canvasPoints[i + 1];
+            const cp1x = (p0.x + p1.x) / 2;
+            const cp1y = (p0.y + p1.y) / 2;
+            const cp2x = (p1.x + p2.x) / 2;
+            const cp2y = (p1.y + p2.y) / 2;
+            ctx.quadraticCurveTo(cp1x, cp1y, p1.x, p1.y);
+            ctx.quadraticCurveTo(cp2x, cp2y, p2.x, p2.y);
+          }
+          ctx.stroke();
+        } else {
+
+          ctx.beginPath();
+          canvasPoints.forEach((p, i) => {
+            if (i === 0) {
+              ctx.moveTo(p.x, p.y);
+            } else {
+              ctx.lineTo(p.x, p.y);
+            }
+          });
+          ctx.stroke();
+        }
+
+        if (showPoints) {
+          canvasPoints.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, pointSize, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+      });
+
+      ctx.setLineDash([]);
+    }
+
+    function renderDebugGrid(element) {
+      const spacing = element.spacing || 20;
+      const lineColor = element.line_color || 'black';
+      const dashed = element.dashed !== false;
+
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x < canvas.width; x += spacing) {
+        ctx.beginPath();
+        if (dashed) {
+          ctx.setLineDash([2, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < canvas.height; y += spacing) {
+        ctx.beginPath();
+        if (dashed) {
+          ctx.setLineDash([2, 4]);
+        } else {
+          ctx.setLineDash([]);
+        }
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      ctx.setLineDash([]);
+
+      if (element.show_labels !== false) {
+        ctx.fillStyle = element.label_color || 'black';
+        ctx.font = `${element.label_font_size || 12}px Arial`;
+        const labelStep = element.label_step || (spacing * 2);
+
+        for (let x = 0; x < canvas.width; x += labelStep) {
+          ctx.fillText(x.toString(), x + 2, 12);
+        }
+        for (let y = 0; y < canvas.height; y += labelStep) {
+          ctx.fillText(y.toString(), 2, y + 12);
+        }
+      }
+    }
+
+    function renderProgressBar(element) {
+      const x = Math.min(element.x_start || 0, element.x_end || 0);
+      const y = Math.min(element.y_start || 0, element.y_end || 0);
+      const w = Math.abs((element.x_end || 0) - (element.x_start || 0));
+      const h = Math.abs((element.y_end || 0) - (element.y_start || 0));
+      const progress = Math.max(0, Math.min(100, element.progress || 0));
+
+      if (element.background) {
+        ctx.fillStyle = element.background;
+        ctx.fillRect(x, y, w, h);
+      }
+
+      if (element.fill) {
+        ctx.fillStyle = element.fill;
+        ctx.fillRect(x, y, w * (progress / 100), h);
+      }
+
+      if (element.outline) {
+        ctx.strokeStyle = element.outline;
+        ctx.lineWidth = element.width || 1;
+        ctx.strokeRect(x, y, w, h);
+      }
+    }
+
+    function applyColorSchemeReduction() {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const colorScheme = displayConfig.colorScheme;
+
+      // Use library function if available, otherwise fallback to local implementation
+      let colorLib = bleLib;
+      if (!colorLib) {
+        // Create a minimal instance just for utility functions (no connection needed)
+        colorLib = new OpenDisplayBLE({ deviceNamePrefix: '' });
+      }
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        const nearest = colorLib.findNearestColor(r, g, b, colorScheme);
+        data[i] = nearest[0];
+        data[i + 1] = nearest[1];
+        data[i + 2] = nearest[2];
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function updateYAML() {
+      const yaml = elements.map(element => {
+        const obj = { type: element.type };
+        Object.keys(element).forEach(key => {
+          if (key !== 'type') {
+
+            if (typeof element[key] === 'object' && !Array.isArray(element[key]) && element[key] !== null) {
+              const nestedKeys = Object.keys(element[key]).filter(k => {
+                const val = element[key][k];
+                return val !== null && val !== undefined && val !== '';
+              });
+              if (nestedKeys.length > 0) {
+
+                const filteredNested = {};
+                nestedKeys.forEach(k => {
+                  filteredNested[k] = element[key][k];
+                });
+                obj[key] = filteredNested;
+              }
+            } else if (element[key] !== null && element[key] !== undefined && element[key] !== '') {
+            obj[key] = element[key];
+            }
+          }
+        });
+        return obj;
+      });
+
+      let yamlText = yaml.map(obj => {
+        const lines = [`- type: ${obj.type}`];
+        Object.keys(obj).forEach(key => {
+          if (key !== 'type') {
+            const val = obj[key];
+            if (typeof val === 'string') {
+              lines.push(`  ${key}: "${val}"`);
+            } else if (Array.isArray(val)) {
+              if (key === 'points') {
+                lines.push(`  ${key}: [${val.map(p => `[${p[0]}, ${p[1]}]`).join(', ')}]`);
+              } else if (key === 'icons') {
+                lines.push(`  ${key}:`);
+                val.forEach(icon => lines.push(`    - ${icon}`));
+              } else if (key === 'data') {
+                lines.push(`  ${key}:`);
+                val.forEach(item => {
+                  lines.push(`    - entity: ${item.entity}`);
+                  if (item.color) lines.push(`      color: ${item.color}`);
+                  if (item.width) lines.push(`      width: ${item.width}`);
+                  if (item.smooth !== undefined) lines.push(`      smooth: ${item.smooth}`);
+                  if (item.show_points !== undefined) lines.push(`      show_points: ${item.show_points}`);
+                  if (item.point_size !== undefined) lines.push(`      point_size: ${item.point_size}`);
+                  if (item.point_color) lines.push(`      point_color: ${item.point_color}`);
+                  if (item.line_style) lines.push(`      line_style: ${item.line_style}`);
+                  if (item.value_scale !== undefined) lines.push(`      value_scale: ${item.value_scale}`);
+                  if (item.span_gaps !== undefined) {
+                    if (typeof item.span_gaps === 'boolean') {
+                      lines.push(`      span_gaps: ${item.span_gaps}`);
+                    } else {
+                      lines.push(`      span_gaps: ${item.span_gaps}`);
+                    }
+                  }
+                });
+              } else {
+                lines.push(`  ${key}: [${val.join(', ')}]`);
+              }
+            } else if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+
+              lines.push(`  ${key}:`);
+              Object.keys(val).forEach(nestedKey => {
+                const nestedVal = val[nestedKey];
+                if (nestedVal !== null && nestedVal !== undefined && nestedVal !== '') {
+                  if (typeof nestedVal === 'string') {
+                    lines.push(`    ${nestedKey}: "${nestedVal}"`);
+                  } else if (typeof nestedVal === 'boolean') {
+                    lines.push(`    ${nestedKey}: ${nestedVal}`);
+                  } else {
+                    lines.push(`    ${nestedKey}: ${nestedVal}`);
+                  }
+                }
+              });
+            } else {
+              lines.push(`  ${key}: ${val}`);
+            }
+          }
+        });
+        return lines.join('\n');
+      }).join('\n\n');
+
+      document.getElementById('yamlOutput').value = yamlText || '# No elements added yet';
+    }
+
+    function copyYAML() {
+      const yaml = document.getElementById('yamlOutput');
+      yaml.select();
+      document.execCommand('copy');
+      alert('OpenDisplay Language copied to clipboard!');
+    }
+
+    function downloadYAML() {
+      const yaml = document.getElementById('yamlOutput').value;
+      const blob = new Blob([yaml], { type: 'text/yaml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'display-design.yaml';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadImage() {
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'display-preview.png';
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
+
+    function base64urlEncode(str) {
+      const base64 = btoa(unescape(encodeURIComponent(str)));
+      return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+
+    function base64urlDecode(str) {
+      let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      try {
+        return decodeURIComponent(escape(atob(base64)));
+      } catch (e) {
+        throw new Error('Invalid base64url string');
+      }
+    }
+
+    async function compressString(str) {
+      if (typeof CompressionStream !== 'undefined') {
+        try {
+          const stream = new CompressionStream('deflate');
+          const writer = stream.writable.getWriter();
+          const reader = stream.readable.getReader();
+
+          const encoder = new TextEncoder();
+          const data = encoder.encode(str);
+          writer.write(data);
+          writer.close();
+
+          const chunks = [];
+          let done = false;
+          while (!done) {
+            const { value, done: doneReading } = await reader.read();
+            done = doneReading;
+            if (value) {
+              chunks.push(value);
+            }
+          }
+
+          const compressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+          let offset = 0;
+          for (const chunk of chunks) {
+            compressed.set(chunk, offset);
+            offset += chunk.length;
+          }
+
+          const base64 = btoa(String.fromCharCode(...compressed));
+          return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        } catch (e) {
+          return base64urlEncode(str);
+        }
+      } else {
+
+        return base64urlEncode(str);
+      }
+    }
+
+    async function decompressString(compressedStr) {
+      if (typeof DecompressionStream !== 'undefined') {
+        try {
+
+          let base64 = compressedStr.replace(/-/g, '+').replace(/_/g, '/');
+          while (base64.length % 4) {
+            base64 += '=';
+          }
+          const binaryString = atob(base64);
+          const compressed = new Uint8Array(binaryString.split('').map(c => c.charCodeAt(0)));
+
+          const stream = new DecompressionStream('deflate');
+          const writer = stream.writable.getWriter();
+          const reader = stream.readable.getReader();
+
+          writer.write(compressed);
+          writer.close();
+
+          const chunks = [];
+          let done = false;
+          while (!done) {
+            const { value, done: doneReading } = await reader.read();
+            done = doneReading;
+            if (value) {
+              chunks.push(value);
+            }
+          }
+
+          const decompressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+          let offset = 0;
+          for (const chunk of chunks) {
+            decompressed.set(chunk, offset);
+            offset += chunk.length;
+          }
+
+          const decoder = new TextDecoder();
+          return decoder.decode(decompressed);
+        } catch (e) {
+          return base64urlDecode(compressedStr);
+        }
+      } else {
+
+        return base64urlDecode(compressedStr);
+      }
+    }
+
+    async function shareDesign() {
+      try {
+        const state = {
+          displayConfig: displayConfig,
+          elements: elements,
+          showFullColor: showFullColor
+        };
+
+        const jsonString = JSON.stringify(state);
+        const compressed = await compressString(jsonString);
+
+        const url = new URL(window.location);
+        url.searchParams.set('design', compressed);
+        window.history.pushState({}, '', url);
+
+        try {
+          await navigator.clipboard.writeText(url.toString());
+          alert('Design URL copied to clipboard! Share this link to let others load your design.');
+        } catch (e) {
+
+          alert('Design URL updated in address bar. Copy it manually to share.');
+        }
+      } catch (e) {
+        alert('Failed to generate shareable URL: ' + e.message);
+      }
+    }
+
+    async function loadDesignFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const designParam = urlParams.get('design');
+
+      if (!designParam) {
+        return;
+      }
+
+      try {
+        const decompressed = await decompressString(designParam);
+        const state = JSON.parse(decompressed);
+
+        if (state.displayConfig) {
+          displayConfig = state.displayConfig;
+          canvas.width = displayConfig.width;
+          canvas.height = displayConfig.height;
+          document.getElementById('displayWidth').value = displayConfig.width;
+          document.getElementById('displayHeight').value = displayConfig.height;
+          document.getElementById('colorSchemeSelect').value = displayConfig.colorScheme || 0;
+        }
+
+        if (state.elements && Array.isArray(state.elements) && state.elements.length > 0) {
+          elements = state.elements;
+          selectedElementIndex = -1;
+          updateElementList();
+        }
+
+        if (state.showFullColor !== undefined) {
+          showFullColor = state.showFullColor;
+          document.getElementById('fullColorToggle').checked = showFullColor;
+        }
+
+        renderPreview();
+        updateYAML();
+
+        const url = new URL(window.location);
+        url.searchParams.delete('design');
+        window.history.replaceState({}, '', url);
+      } catch (e) {
+        alert('Failed to load design from URL: ' + e.message);
+      }
+    }
+
+    function addBLELog(message, type = 'info') {
+      const logDisplay = document.getElementById('bleLog');
+      if (!logDisplay) return;
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDisplay.appendChild(logEntry);
+      logDisplay.scrollTop = logDisplay.scrollHeight;
+      while (logDisplay.children.length > 50) {
+        logDisplay.removeChild(logDisplay.firstChild);
+      }
+    }
+
+    function setBLEStatus(message, isConnected = false) {
+      const statusText = document.getElementById('bleStatusText');
+      if (!statusText) return;
+      statusText.textContent = message;
+      statusText.style.color = isConnected ? '#3fb950' : '#00bfff';
+    }
+
+    function connectBLE() {
+      const connectButton = document.getElementById('bleConnectButton');
+      if (bleLib && bleLib.isConnected) {
+        addBLELog("Disconnecting...", 'info');
+        setBLEStatus("Disconnecting...", false);
+        connectButton.textContent = 'Connect';
+        bleLib.disconnect();
+      } else {
+        const deviceFilter = document.getElementById('bleDeviceFilter').value.trim();
+        if (!deviceFilter) {
+          addBLELog("Error: Device filter needed.", 'error');
+          setBLEStatus("Error: No device filter", false);
+          return;
+        }
+        
+        bleLib = new OpenDisplayBLE({
+          deviceNamePrefix: deviceFilter,
+          maxReconnectAttempts: 5,
+          reconnectDelay: 2000,
+          onConnect: () => {
+            addBLELog("BLE Connection established successfully!", 'success');
+            setBLEStatus("Connected", true);
+            connectButton.textContent = 'Disconnect';
+            document.getElementById('blePanel').style.display = 'block';
+            // Auto-load config after connection
+            loadConfigFromBLE();
+          },
+          onDisconnect: () => {
+            addBLELog('Device disconnected.', 'info');
+            setBLEStatus("Disconnected", false);
+            connectButton.textContent = 'Connect';
+          },
+          onError: (error) => {
+            addBLELog(`Error: ${error.message}`, 'error');
+            setBLEStatus(`Error: ${error.message}`, false);
+            connectButton.textContent = 'Connect';
+          },
+          onNotification: (bytes, hexString, event) => {
+            addBLELog("BLE< " + hexString, 'info');
+          },
+          onLog: (message, type) => {
+            addBLELog(message, type);
+          },
+          onStatusChange: (message, isConnected) => {
+            setBLEStatus(message, isConnected);
+          }
+        });
+        
+        connectButton.textContent = 'Connecting...';
+        bleLib.connect(deviceFilter).catch(error => {
+          connectButton.textContent = 'Connect';
+          if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+            addBLELog("No device selected/found.", 'error');
+            setBLEStatus("No device selected", false);
+          } else {
+            addBLELog(`Connection error: ${error.message}`, 'error');
+            setBLEStatus(`Error: ${error.message}`, false);
+          }
+        });
+      }
+    }
+
+    function loadConfigFromBLE() {
+      if (!bleLib || !bleLib.isConnected) {
+        addBLELog("Cannot read config: Not connected.", 'error');
+        return;
+      }
+      addBLELog("Reading config from device...", 'info');
+      setBLEStatus("Reading config...", false);
+      
+      bleLib.readConfig((configBytes, error) => {
+        if (error) {
+          addBLELog("Config read failed: " + error.message, 'error');
+          setBLEStatus("Config read failed", false);
+          return;
+        }
+        addBLELog(`Config read: ${configBytes ? configBytes.length : 0} bytes`, 'info');
+        if (!configBytes || configBytes.length === 0) {
+          addBLELog("Config read received empty data", 'error');
+          setBLEStatus("Config read failed", false);
+          return;
+        }
+        
+        try {
+          // Parse config using library
+          const parsedConfig = bleLib.parseConfigBytes(configBytes);
+          
+          // Extract display config from parsed config
+          const displayCfg = bleLib.extractDisplayConfig(parsedConfig);
+          
+          if (!displayCfg) {
+            addBLELog("No display config found in device config", 'warning');
+            setBLEStatus("No display config found", false);
+            return;
+          }
+          
+          // Apply display config to UI
+          displayConfig.width = displayCfg.pixelWidth;
+          displayConfig.height = displayCfg.pixelHeight;
+          displayConfig.colorScheme = displayCfg.colorScheme;
+          
+          document.getElementById('displayWidth').value = displayCfg.pixelWidth;
+          document.getElementById('displayHeight').value = displayCfg.pixelHeight;
+          document.getElementById('colorSchemeSelect').value = displayCfg.colorScheme;
+          
+          canvas.width = displayCfg.pixelWidth;
+          canvas.height = displayCfg.pixelHeight;
+          
+          applyDisplayConfig();
+          addBLELog(`Loaded: ${displayCfg.pixelWidth}x${displayCfg.pixelHeight}, color scheme ${displayCfg.colorScheme}`, 'success');
+          setBLEStatus("Config loaded", false);
+        } catch (error) {
+          addBLELog("Error parsing config: " + error.message, 'error');
+          setBLEStatus("Error loading config", false);
+        }
+      }, (received, total) => {
+        addBLELog(`Progress: ${received}/${total} bytes`, 'info');
+      });
+    }
+
+    function sendCanvasToDisplay() {
+      if (!bleLib || !bleLib.isConnected) {
+        addBLELog("Cannot send to display: Not connected.", 'error');
+        return;
+      }
+      
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        addBLELog("Cannot send: Canvas not ready.", 'error');
+        return;
+      }
+      
+      const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+      
+      addBLELog(`Sending canvas to display: ${canvas.width}x${canvas.height}, color scheme ${colorScheme}...`, 'info');
+      setBLEStatus("Sending to display...", false);
+      
+      try {
+        bleLib.sendCanvasToDisplay(canvas, colorScheme, {
+          rotation: 0,
+          useFastRefresh: false,
+          onProgress: (current, total) => {
+            const progress = Math.floor((current / total) * 100);
+            if (current % 10 === 0 || current === total) {
+              setBLEStatus(`Uploading: ${progress}%`, false);
+            }
+          },
+          onStatusChange: (message) => {
+            setBLEStatus(message, false);
+          },
+          onComplete: (success, error) => {
+            if (success) {
+              addBLELog("Canvas sent to display successfully!", 'success');
+              setBLEStatus("Sent successfully!", false);
+            } else {
+              addBLELog("Error sending to display: " + (error ? error.message : 'Unknown error'), 'error');
+              setBLEStatus("Send failed", false);
+            }
+          }
+        });
+      } catch (error) {
+        addBLELog("Error: " + error.message, 'error');
+        setBLEStatus("Error: " + error.message, false);
+      }
+    }
+  </script>
+</body>
+</html>

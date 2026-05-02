@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="https://opendisplay.org/firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Packet Config Builder</title>
+  <script>
+    // Redirect to toolbox while preserving URL parameters
+    (function() {
+      const currentUrl = new URL(window.location);
+      const toolboxUrl = new URL('../toolbox/index.html', window.location);
+      
+      // Copy all search parameters to the toolbox URL
+      currentUrl.searchParams.forEach((value, key) => {
+        toolboxUrl.searchParams.set(key, value);
+      });
+      
+      // Redirect to toolbox
+      window.location.replace(toolboxUrl.toString());
+    })();
+  </script>
+</head>
+<body>
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="https://opendisplay.org/index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="https://opendisplay.org/firmware/index.html">Firmware</a><span class="breadcrumb-separator">/</span>
+      <span>Config Builder</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Config Builder</h1>
+  <div class="col panel">
+    <p>Redirecting to the Toolbox...</p>
+    <p>If you are not redirected automatically, <a id="redirectLink" href="../toolbox/index.html">click here</a>.</p>
+  </div>
+  <script>
+    // Update redirect link with parameters
+    (function() {
+      const currentUrl = new URL(window.location);
+      const toolboxUrl = new URL('../toolbox/index.html', window.location);
+      
+      // Copy all search parameters to the toolbox URL
+      currentUrl.searchParams.forEach((value, key) => {
+        toolboxUrl.searchParams.set(key, value);
+      });
+      
+      const redirectLink = document.getElementById('redirectLink');
+      if (redirectLink) {
+        redirectLink.href = toolboxUrl.toString();
+      }
+    })();
+  </script>
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="https://opendisplay.org/index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+</body>
+</html>

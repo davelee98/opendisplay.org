@@ -1,0 +1,3300 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Toolbox</title>
+<style>
+/* Page-specific styles */
+label{font-weight:600;font-size:1.1rem;color:var(--foreground);margin-bottom:16px;display:block}
+textarea,input,select,button{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+}
+textarea{
+  width:100%;height:220px;background:var(--card-background);border:1px solid var(--border-color);border-radius:8px;
+  padding:12px;color:var(--foreground);font-size:14px;line-height:1.5;resize:vertical
+}
+textarea:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,191,255,.1)
+}
+button{
+  background:var(--accent);
+  border:none;border-radius:8px;padding:10px 16px;margin:4px 6px 4px 0;
+  color:var(--accent-button);font-weight:500;cursor:pointer;transition:.2s;font-size:14px
+}
+button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,191,255,.3)}
+button:active{transform:none}
+button.incomplete{
+  opacity:0.5;cursor:pointer;background:#6b7280
+}
+button.incomplete:hover{
+  background:#6b7280;transform:none;box-shadow:none
+}
+.status-display,.packet-length-indicator,.bytes-counter{
+  background:var(--card-background);border:1px solid var(--border-color);border-radius:6px;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+}
+.bytes{
+  color:var(--foreground);padding:16px;white-space:pre-wrap;font-size:13px;line-height:1.4;
+  max-height:300px;overflow-y:auto;background:var(--card-background);border:1px solid var(--border-color);border-radius:8px
+}
+.field-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.small{font-size:.85rem;color:#8b949e;margin-top:8px}
+.chip{
+  border-radius:20px;background:var(--accent);
+  color:var(--accent-button);padding:4px 12px;margin-right:8px;font-size:12px;font-weight:500
+}
+.danger{color:#f85149}
+.bit-flags{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bit-flag{
+  display:flex;flex-direction:column;align-items:center;font-size:11px;flex:1;min-width:48px
+}
+.bit-flag input[type=checkbox]{
+  transform:scale(1.4);accent-color:var(--accent);background:var(--card-background)!important;
+  border:1px solid var(--border-color)!important;width:20px;height:20px;
+  appearance:none;cursor:pointer
+}
+.bit-flag input[type=checkbox]:checked{
+  background:var(--accent)!important;border-color:var(--accent)!important;position:relative
+}
+.bit-flag input[type=checkbox]:checked::after{
+  content:"✓";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);color:var(--accent-button);font-size:10px;font-weight:700
+}
+.bit-flag input[type=checkbox]:focus{
+  outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(0,191,255,.2)
+}
+.bit-flag input[type=checkbox]:hover{border-color:#555!important}
+.bit-label{font-size:10px;text-align:center;color:var(--muted-foreground);margin-top:4px}
+input[type=text],input[type=number],select,
+.field-row input:not([type=checkbox]):not([type=radio]),.packet-card input:not([type=checkbox]):not([type=radio]),input[style*="flex"]{
+  background:var(--card-background)!important;border:1px solid var(--border-color)!important;border-radius:6px!important;
+  padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace!important;
+  min-height:40px!important;transition:.2s;appearance:none
+}
+.encryption-option{
+  margin-top:12px;
+  padding:12px 14px;
+  background:var(--card-background);
+  border:1px solid var(--border-color);
+  border-radius:8px;
+  color-scheme:light;
+}
+.encryption-option-label{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  cursor:pointer;
+  font-weight:500;
+  font-size:0.95rem;
+  line-height:1.45;
+  margin:0;
+  color:var(--foreground);
+}
+.encryption-option-label input[type=checkbox]{
+  margin:3px 0 0 0;
+  width:18px;
+  height:18px;
+  min-width:18px;
+  min-height:18px;
+  flex-shrink:0;
+  accent-color:var(--accent);
+  cursor:pointer;
+  vertical-align:top;
+}
+@media (prefers-color-scheme:dark){
+  .encryption-option{
+    color-scheme:dark;
+  }
+}
+input:focus:not([type=checkbox]):not([type=radio]),select:focus{
+  outline:none!important;border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px rgba(0,191,255,.1)!important;background:var(--card-background)!important
+}
+input:hover:not([type=checkbox]):not([type=radio]),select:hover{border-color:var(--accent)!important;background:var(--card-background)!important}
+input[type=checkbox]:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+input::placeholder{color:#8b949e!important}
+select{
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'/%3e%3c/svg%3e")!important;
+  background-repeat:no-repeat!important;background-position:right 8px center!important;
+  background-size:16px!important;padding-right:32px!important
+}
+select option{background:#ffffff!important;color:#1a1a1a!important;padding:8px 12px!important}
+input[type=file]{background:#ffffff!important;border:1px solid #e5e7eb!important;
+  border-radius:6px!important;padding:8px 12px!important;color:#1a1a1a!important;font-size:14px!important
+}
+#versionInfo{color:#00bfff;font-weight:500}
+#crcNote,#parseResult{color:#8b949e;font-style:italic}
+.ble-controls{display:flex;flex-direction:column;gap:16px}
+.ble-input-group,.ble-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ble-input-group label{font-size:.9rem;margin:0;min-width:120px}
+.ble-input-group input[type=text]{flex:1;min-width:200px}
+.remember-group{display:flex;align-items:center;gap:6px}
+.remember-group label{font-size:.85rem;margin:0}
+.ble-actions button{flex:1;min-width:120px}
+.status-display{padding:12px;min-height:100px}
+.status-text{font-weight:600;color:#f85149;margin-bottom:8px}
+.status-text.connected{color:#3fb950}
+.log-display{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-size:12px;color:#8b949e;max-height:200px;overflow-y:auto;white-space:pre-wrap
+}
+.log-entry{margin-bottom:2px}
+.log-entry.error{color:#f85149}
+.log-entry.success{color:#3fb950}
+.log-entry.info{color:#58a6ff}
+.packet-length-indicator,.bytes-counter{
+  padding:8px 12px;margin:8px 0;font-size:12px;color:#8b949e
+}
+.packet-length-info,.bytes-stats{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:4px
+}
+.packet-size,.bytes-count,.packet-size-inline{color:#00bfff;font-weight:600}
+.packet-size-inline{font-size:1rem;margin-left:8px}
+.usage-bar-container{
+  width:100%;height:8px;background:#f3f4f6;border-radius:4px;
+  overflow:hidden;margin:4px 0
+}
+.usage-bar{
+  height:100%;transition:width .3s,background-color .3s;border-radius:4px
+}
+.usage-bar.good{background:#3fb950}
+.usage-bar.warning{background:#d29922}
+.usage-bar.danger{background:#f85149}
+.usage-bar.over-limit{background:#da3633;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.usage-text{font-size:11px;color:#8b949e;text-align:right}
+.usage-warning{color:#f85149}
+.usage-good{color:#3fb950}
+.usage-warning-text{color:#d29922;font-weight:600}
+.usage-danger-text{color:#f85149;font-weight:600}
+.usage-over-limit{color:#da3633;font-weight:700;animation:pulse 1s infinite}
+.warning-message{
+  background:#da3633;color:#fff;padding:8px 12px;border-radius:6px;
+  margin-top:8px;font-weight:600;text-align:center;animation:pulse 1s infinite
+}
+/* Tooltip styles */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-button);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.2s;
+  user-select: none;
+}
+.tooltip-icon:hover {
+  background: var(--accent-hover);
+  transform: scale(1.1);
+}
+.tooltip-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-background);
+  color: var(--foreground);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: normal;
+  width: 280px;
+  max-width: calc(100vw - 40px);
+  font-size: 13px;
+  line-height: 1.5;
+  z-index: 1000;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+@media (max-width: 768px) {
+  .tooltip-content {
+    width: 240px;
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+}
+.tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--card-background);
+}
+.tooltip-wrapper:hover .tooltip-content,
+.tooltip-wrapper:focus-within .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+.tooltip-content strong {
+  color: var(--accent);
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.tooltip-content ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+}
+.tooltip-content li {
+  margin: 4px 0;
+}
+.preset-option:hover{
+  border-color:var(--accent);
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,191,255,.3)
+}
+.preset-option:active{transform:none}
+.preset-option.selected{
+  background:var(--accent);
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,191,255,.2),0 4px 12px rgba(0,191,255,.3);
+  transform:translateY(-1px)
+}
+.preset-option.selected label{color:var(--accent-button)}
+@media (max-width: 768px) {
+  #presetGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  #presetGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.packet-card{
+  background:var(--card-background);border:1px solid var(--border-color);border-radius:8px;
+  padding:16px;margin:8px 0;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:.2s
+}
+.packet-card:hover{border-color:var(--accent);box-shadow:0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06)}
+.packet-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-bottom:12px;border-bottom:1px solid var(--border-color);margin-bottom:16px
+}
+.packet-title{display:flex;align-items:center;gap:8px}
+.packet-id{
+  background:var(--accent);
+  color:var(--accent-button);padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600
+}
+.packet-actions{display:flex;gap:8px;align-items:center}
+.auto-install-panel{
+  background:var(--card-background);border:2px solid var(--accent);border-radius:12px;padding:24px;
+  box-shadow:0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);margin-top:20px;display:none
+}
+.auto-install-panel.show{display:block}
+.auto-install-panel h3{
+  color:var(--foreground);font-size:1.3rem;font-weight:600;margin-top:0;margin-bottom:12px
+}
+.auto-install-panel p{
+  color:var(--muted-foreground);margin-bottom:16px;line-height:1.6
+}
+.auto-install-actions{
+  display:flex;gap:12px;flex-wrap:wrap
+}
+.auto-install-actions button{
+  width:100%;margin:0
+}
+#openBleTesterBtn{
+  display:none
+}
+a {
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: #00bfff;
+  text-decoration: underline;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+.modal.show {
+  display: flex;
+}
+.modal-content {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+.modal-content h3 {
+  margin-top: 0;
+  color: var(--foreground);
+  font-size: 1.5rem;
+}
+.modal-content p {
+  color: var(--muted-foreground);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+.modal-buttons .btn {
+  width: 100%;
+  margin: 0;
+}
+.close {
+  color: var(--muted-foreground);
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+}
+.close:hover {
+  color: var(--foreground);
+}
+</style>
+  <script src="https://opendisplay.org/js/js-yaml.min.js"></script>
+  <!-- nRF Web Tools with Android support -->
+  <script src="jszip.min.js"></script>
+  <!-- Web Serial Polyfill for Android support (must be loaded before ESP Web Tools and nRF Web Tools) -->
+  <script type="module">
+    // Load polyfill and apply it properly on Android
+    (async function() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      
+      // Only use polyfill on Android with WebUSB support
+      if (isAndroid && navigator.usb) {
+        try {
+          const { serial } = await import('https://opendisplay.org/firmware/toolbox/serial.js');
+          
+          // Try to replace navigator.serial - on Android it might exist but not work
+          try {
+            // First try simple assignment
+            navigator.serial = serial;
+          } catch (e) {
+            // If that fails, try Object.defineProperty
+            try {
+              Object.defineProperty(navigator, 'serial', {
+                value: serial,
+                writable: true,
+                configurable: true
+              });
+            } catch (e2) {
+              // If that also fails, create a proxy/wrapper
+              const originalSerial = navigator.serial;
+              navigator.serial = new Proxy(serial, {
+                get(target, prop) {
+                  // For requestPort, always use polyfill version
+                  if (prop === 'requestPort') {
+                    return target.requestPort.bind(target);
+                  }
+                  // For other properties, try polyfill first, fallback to original
+                  if (prop in target) {
+                    return target[prop];
+                  }
+                  if (originalSerial && prop in originalSerial) {
+                    return originalSerial[prop];
+                  }
+                  return undefined;
+                }
+              });
+            }
+          }
+          
+          console.log('Applied web-serial-polyfill for Android');
+        } catch (e) {
+          console.error('Failed to load web-serial-polyfill:', e);
+        }
+      }
+      window.__webSerialPolyfillReady = true;
+      window.dispatchEvent(new Event('webSerialPolyfillReady'));
+    })();
+  </script>
+  <script>
+    // Wait for polyfill to be ready before loading ESP Web Tools and nRF Web Tools
+    (function() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      
+      function loadScripts() {
+        // Load ESP Web Tools
+        if (document.querySelector('script[src*="install-button.js"]') === null) {
+          const espScript = document.createElement('script');
+          espScript.type = 'module';
+          espScript.src = 'https://opendisplay.org/firmware/toolbox/js/install-button.js';
+          document.head.appendChild(espScript);
+        }
+        
+        // Load nRF Web Tools
+        if (document.querySelector('script[src="nrf_web_tools.js"]') === null) {
+          const nrfScript = document.createElement('script');
+          nrfScript.src = 'nrf_web_tools.js';
+          document.head.appendChild(nrfScript);
+        }
+      }
+      
+      if (isAndroid && navigator.usb) {
+        // On Android with WebUSB, wait for polyfill
+        window.addEventListener('webSerialPolyfillReady', loadScripts, { once: true });
+        // Fallback timeout
+        setTimeout(function() {
+          if (document.querySelector('script[src*="install-button.js"]') === null || 
+              document.querySelector('script[src="nrf_web_tools.js"]') === null) {
+            console.warn('Polyfill took too long to load, proceeding anyway');
+            loadScripts();
+          }
+        }, 2000);
+      } else {
+        // Desktop or no WebUSB, load immediately
+        loadScripts();
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="https://opendisplay.org/index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="https://opendisplay.org/firmware/index.html">Firmware</a><span class="breadcrumb-separator">/</span>
+      <span>Toolbox</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Toolbox</h1>
+  <div class="col panel" id="bleConnectionPanel" style="display: none;">
+    <label>
+      BLE Connection
+      <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-content">
+          <strong>Bluetooth Low Energy Connection</strong>
+          Connect to your OpenDisplay device wirelessly via Bluetooth. Use the device filter to find your specific device, then connect to read or write configurations. Make sure Bluetooth is enabled on your computer and the device is powered on.
+        </span>
+      </span>
+    </label>
+    <div class="ble-controls">
+      <div class="ble-input-group" id="deviceFilterGroup">
+        <label for="namePrefix">
+          OD Device Filter:
+          <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-content">
+              <strong>Device Filter</strong>
+              Enter the name prefix of your OpenDisplay device (e.g., "OD"). This helps filter BLE devices during scanning. You can enter multiple prefixes separated by commas.
+            </span>
+          </span>
+        </label>
+        <input type="text" id="namePrefix" value="OD" placeholder="OD (comma separated)" />
+      </div>
+      <div class="ble-input-group" id="progressBarGroup" style="display: none;">
+        <label>Progress:</label>
+        <div style="flex: 1; background: var(--card-background); border: 1px solid var(--border-color); border-radius: 8px; height: 24px; overflow: hidden; position: relative;">
+          <div id="progressBar" style="width: 0%; height: 100%; background: var(--accent); transition: width 0.3s ease;"></div>
+          <div id="progressText" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; color: var(--foreground); font-weight: 500;">0%</div>
+        </div>
+      </div>
+      <div class="ble-actions" id="bleConnectionButtons">
+        <button id="connectbutton" type="button" onclick="preConnect();" title="Connect to your OpenDisplay device via Bluetooth Low Energy">Connect</button>
+        <button type="button" onclick="readConfig();" title="Read the current configuration from the connected device">Read Toolbox</button>
+        <button type="button" onclick="writeConfig();" title="Write the current configuration to the connected device">Write Toolbox</button>
+        <button type="button" onclick="reboot();" title="Reboot the connected device">Reboot</button>
+      </div>
+      <div class="ble-actions" id="bleConfigButtons">
+        <button type="button" id="importJsonBtn">Import JSON</button>
+        <button type="button" id="exportJsonBtn">Export JSON</button>
+        <button type="button" id="shareConfigBtn">Share Toolbox (URL)</button>
+      </div>
+      <div class="status-display" id="statusDisplay" style="display: none;">
+        <div id="statusText" class="status-text">Not Connected</div>
+        <div id="logDisplay" class="log-display"></div>
+      </div>
+    </div>
+    <div id="autoInstallPanel" class="auto-install-panel">
+      <h3>Toolbox Loaded Successfully</h3>
+      <p>Your configuration has been loaded. You can now automatically install it to your device.</p>
+      <div class="auto-install-actions" id="autoInstallButtons">
+        <button type="button" id="autoInstallBtn" onclick="startAutoInstall();">Auto Install to Device</button>
+        <button type="button" id="openBleTesterBtn" onclick="openBleTester();">Open BLE Tester</button>
+      </div>
+    </div>
+  </div>
+    <div class="col panel" id="simpleConfigPanel" style="display: none;">
+      <div class="ble-controls">
+      <div style="background: #d29922; color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; line-height: 1.5;">
+        <strong>⚠️ Important:</strong> First, install the firmware on your device using the "Install Firmware" button below. Then configure your device using the "Configure Device" button.
+      </div>
+      <div class="ble-input-group">
+        <label for="driverBoardSelect">
+          Driver Board:
+          <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-content">
+              <strong>Driver Board</strong>
+              Select the hardware driver board you're using. This determines the microcontroller (NRF52840, ESP32-S3, etc.) and pin configurations. The display dropdown will automatically filter to show only compatible displays.
+            </span>
+          </span>
+        </label>
+        <select id="driverBoardSelect" style="flex: 1; min-width: 200px;">
+          <option value="">-- Select driver board --</option>
+        </select>
+      </div>
+      <div class="ble-input-group">
+        <label for="displaySelect">
+          Display:
+          <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-content">
+              <strong>E-Paper Display</strong>
+              Select your e-paper display model. Only displays compatible with your selected driver board's connector pins will be shown. The display determines resolution, color scheme, and update characteristics.
+            </span>
+          </span>
+        </label>
+        <select id="displaySelect" style="flex: 1; min-width: 200px;" disabled>
+          <option value="">-- Select display --</option>
+        </select>
+      </div>
+      <div class="ble-input-group">
+        <label for="powerSelect">
+          Power:
+          <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-content">
+              <strong>Power Configuration</strong>
+              Select how your device is powered:
+              <ul>
+                <li><strong>USB Power:</strong> Connected to USB, no battery management</li>
+                <li><strong>Battery 2000mAh:</strong> Lithium battery with capacity monitoring</li>
+                <li><strong>Battery 4000mAh:</strong> Larger battery with capacity monitoring</li>
+                <li><strong>Solar Power:</strong> Solar panel with battery backup</li>
+              </ul>
+              Battery options will merge with your driver board's default power settings.
+            </span>
+          </span>
+        </label>
+        <select id="powerSelect" style="flex: 1; min-width: 200px;">
+          <option value="">-- Select power option --</option>
+        </select>
+      </div>
+      <div class="encryption-option">
+        <label class="encryption-option-label" for="initRandomEncryptionCb">
+          <input type="checkbox" id="initRandomEncryptionCb" />
+          <span>Activate encryption</span>
+        </label>
+      </div>
+      <div id="installButtonContainer" style="margin-top: 12px; display: none; width: 100%;">
+        <esp-web-install-button id="firmwareInstallButton" style="display: none; width: 100%;">
+          <button slot="activate" id="installFirmwareBtn" style="width: 100%; margin: 0;">Install Firmware</button>
+        </esp-web-install-button>
+        <button type="button" id="installNrfBtn" style="display: none; width: 100%; margin: 0;">Install Firmware</button>
+      </div>
+      <div class="ble-actions" style="margin-top: 12px;">
+        <button type="button" id="simpleAutoInstallBtn" style="width: 100%;" title="Automatically connect to your device and configure it with the selected settings. Make sure your device is powered on and in range.">Configure Device</button>
+      </div>
+      <div class="ble-actions" style="margin-top: 12px;">
+        <button type="button" id="switchToFullModeBtn" style="width: 100%; background: #6b7280; color: #fff; opacity: 0.7;" title="Switch to advanced mode where you can edit individual BLE packets and fine-tune all configuration parameters">Switch to Full Mode</button>
+      </div>
+      <div class="ble-actions" style="margin-top: 12px;">
+        <button type="button" id="shareSimpleConfigBtn" style="width: 100%; background: #6b7280; color: #fff; opacity: 1;" title="Share this simple configuration (driver board, display, and/or battery) via a link">Share Simple Config</button>
+      </div>
+    </div>
+  </div>
+  <div class="col panel" id="premadeConfigPanel">
+    <label>
+      Premade Configurations
+      <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-content">
+          <strong>Premade Configurations</strong>
+          Click on a preset image to quickly configure your device. These presets automatically select the correct driver board, display, and power settings for popular hardware combinations. After selecting a preset, you can still modify the configuration if needed.
+        </span>
+      </span>
+    </label>
+    <div id="presetGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
+      <div class="preset-option" data-preset="reterminal-e1001" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1001.jpg" alt="reTerminal E1001" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1001</label>
+      </div>
+      <div class="preset-option" data-preset="reterminal-e1002" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1002.jpg" alt="reTerminal E1002" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1002</label>
+      </div>
+      <div class="preset-option" data-preset="reterminal-e1003" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1003.jpg" alt="reTerminal E1003" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1003</label>
+      </div>
+      <div class="preset-option" data-preset="esp32-s3-wspp" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/WSPPS3.jpg" alt="Waveshare ESP32-S3-PhotoPainter" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Waveshare ESP32-S3-PhotoPainter</label>
+      </div>
+      <div class="preset-option" data-preset="xiao-75-c3" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/75.jpg" alt="Seeed XIAO 7.5" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed XIAO 7.5"</label>
+      </div>
+      <div class="preset-option" data-preset="xiao-75-s3-og" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/75og.jpg" alt="Seeed 7.5 diy" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed 7.5" diy</label>
+      </div>
+    </div>
+  </div>
+  <div class="col panel" id="builderUIPanel" style="display: none;">
+    <div id="builderUI">(Load YAML to start)</div>
+  </div>
+    <div class="col panel" id="finishedBytesPanel" style="display: none;">
+      <label>Finished package bytes</label>
+     <div class="ble-actions">
+        <button type="button" id="buildBtn">Build Packet</button>
+      </div>
+      <div id="bytesView" class="bytes">No package built yet.</div>
+      <div class="small" id="crcNote"></div>
+    </div>
+  <div class="col panel" id="yamlConfigPanel" style="display: none;">
+    <label>
+      YAML Configuration <span id="versionInfo" class="small"></span>
+      <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-content">
+          <strong>YAML Configuration Schema</strong>
+          This is the protocol schema definition in YAML format. It defines all available packet types, fields, and their properties. The schema is automatically loaded from the server. You can edit it here to customize the protocol definition, then reload to apply changes.
+        </span>
+      </span>
+    </label>
+    <textarea id="yamlInput" placeholder="Loading config.yaml..."></textarea>
+    <div class="ble-actions">
+      <button type="button" id="loadYamlBtn">Reload from config.yaml</button>
+      <button type="button" id="resetBtn">Reset UI</button>
+      <button type="button" id="downloadYamlBtn">Download YAML</button>
+    </div>
+  </div>
+<script src="https://opendisplay.org/js/pako.js"></script>
+<script src="https://opendisplay.org/js/ble-common.js"></script>
+<script>
+let bleLib = null;
+let lastAutoInstallRedirectKeyHex = null;
+function addLog(message, type = 'info') {
+  const statusDisplay = document.getElementById('statusDisplay');
+  const logDisplay = document.getElementById('logDisplay');
+  if (statusDisplay) {
+    statusDisplay.style.display = 'block';
+  }
+  const logEntry = document.createElement('div');
+  logEntry.className = `log-entry ${type}`;
+  logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  logDisplay.appendChild(logEntry);
+  logDisplay.scrollTop = logDisplay.scrollHeight;
+  while (logDisplay.children.length > 50) {
+    logDisplay.removeChild(logDisplay.firstChild);
+  }
+}
+function setStatus(message, isConnected = false) {
+  const statusDisplay = document.getElementById('statusDisplay');
+  const statusText = document.getElementById('statusText');
+  if (statusDisplay && message !== 'Not Connected') {
+    statusDisplay.style.display = 'block';
+  }
+  statusText.textContent = message;
+  statusText.className = isConnected ? 'status-text connected' : 'status-text';
+}
+function preConnect() {
+  if (bleLib && bleLib.isConnected) {
+    addLog("Disconnecting...");
+    setStatus("Disconnecting...");
+    document.getElementById("connectbutton").innerHTML = 'Connect';
+    bleLib.disconnect();
+  } else {
+    const namePrefix = document.getElementById('namePrefix').value.trim();
+    if (!namePrefix) {
+      addLog("Error: Device filter needed.", 'error');
+      setStatus("Error: No device filter");
+      return;
+    }
+    bleLib = new OpenDisplayBLE({
+      deviceNamePrefix: namePrefix,
+      maxReconnectAttempts: 3,
+      reconnectDelay: 2000,
+      onConnect: async () => {
+        addLog("BLE Connection established successfully!", 'success');
+        setStatus("Connected", true);
+        document.getElementById("connectbutton").innerHTML = 'Disconnect';
+        await ensureAuthenticatedOnConnect();
+      },
+      onDisconnect: () => {
+        addLog('Device disconnected.');
+        setStatus("Disconnected");
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+      },
+      onError: (error) => {
+        addLog(`Error: ${error.name} - ${error.message}`, 'error');
+        setStatus(`Error: ${error.message}`);
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+      },
+      onNotification: handleNotification,
+      onLog: (message, type) => {
+        addLog(message, type);
+      },
+      onStatusChange: (message, isConnected) => {
+        setStatus(message, isConnected);
+      }
+    });
+    bleLib.connect(namePrefix).catch(error => {
+      if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+        addLog("No device selected/found.");
+        setStatus("No device selected");
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+      } else {
+        addLog(`Error: ${error.name} - ${error.message}`, 'error');
+        setStatus(`Error: ${error.message}`);
+        document.getElementById("connectbutton").innerHTML = 'Connect';
+      }
+    });
+  }
+}
+function handleNotification(bytes, hexString, event) {
+  addLog("BLE< " + hexString, 'info');
+}
+function readConfig() {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot read config: Not connected.", 'error');
+    return;
+  }
+  // Use library's built-in config read handler (no need to set up local state)
+  const run = () => new Promise((resolve, reject) => {
+    bleLib.readConfig((configBytes, error) => {
+      if (error) { reject(error); return; }
+      resolve(configBytes);
+    }, (received, total) => {
+      addLog(`Progress: ${received}/${total} bytes`, 'info');
+    });
+  });
+
+  (async () => {
+    try {
+      const configBytes = await run();
+      addLog(`Config read callback received ${configBytes ? configBytes.length : 0} bytes`, 'info');
+      if (!configBytes || configBytes.length === 0) {
+        addLog("Config read callback received empty data", 'error');
+        return;
+      }
+      try {
+        parseRawBytes(configBytes);
+        addLog("Config successfully loaded into UI", 'success');
+      } catch (parseErr) {
+        addLog("Error parsing config: " + parseErr.message, 'error');
+      }
+    } catch (error) {
+      if (isAuthError(error)) {
+        addLog("Authentication required. Prompting for encryption key...", 'info');
+        try {
+          await ensureAuthenticatedOnDemand();
+          const configBytes = await run();
+          addLog(`Config read callback received ${configBytes ? configBytes.length : 0} bytes`, 'info');
+          parseRawBytes(configBytes);
+          addLog("Config successfully loaded into UI", 'success');
+        } catch (authErr) {
+          addLog("Authentication failed: " + (authErr && authErr.message ? authErr.message : authErr), 'error');
+        }
+        return;
+      }
+      addLog("Config read failed: " + error.message, 'error');
+    }
+  })();
+}
+async function writeConfig() {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot write config: Not connected.", 'error');
+    return;
+  }
+  // If in simple config mode, ensure config is merged before building
+  if (simpleConfigMode && simpleConfigSelections.driverBoard && 
+      simpleConfigSelections.display && simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  const packetBytes = collectPacketBytes();
+  if (!packetBytes) {
+    addLog("Cannot write config: No packet built.", 'error');
+    return;
+  }
+  addLog("Writing config to device...", 'info');
+  try {
+    await bleLib.writeConfig(new Uint8Array(packetBytes));
+    addLog("Config written successfully", 'success');
+  } catch (error) {
+    if (isAuthError(error)) {
+      addLog("Authentication required. Prompting for encryption key...", 'info');
+      try {
+        await ensureAuthenticatedOnDemand();
+        await bleLib.writeConfig(new Uint8Array(packetBytes));
+        addLog("Config written successfully", 'success');
+        return;
+      } catch (authErr) {
+        addLog("Authentication failed: " + (authErr && authErr.message ? authErr.message : authErr), 'error');
+        return;
+      }
+    }
+    addLog("Error writing config: " + error.message, 'error');
+  }
+}
+async function reboot() {
+  if (!bleLib || !bleLib.isConnected) {
+    addLog("Cannot reboot: Not connected.", 'error');
+    return;
+  }
+  addLog("Rebooting device...", 'info');
+  try {
+    await bleLib.reboot();
+    addLog("Reboot command sent", 'success');
+  } catch (error) {
+    addLog("Error rebooting: " + error.message, 'error');
+  }
+}
+
+function redirectToDisplayTesterAfterAutoInstall() {
+  const np = document.getElementById('namePrefix');
+  const inputFallback = (np && np.value.trim()) ? np.value.trim() : 'OD';
+  let filter = inputFallback;
+  if (bleLib && bleLib.device && typeof bleLib.device.name === 'string') {
+    const dn = bleLib.device.name.trim();
+    if (dn.length > 0) {
+      filter = dn;
+    }
+  }
+  const params = new URLSearchParams();
+  params.set('filter', filter);
+  if (lastAutoInstallRedirectKeyHex) {
+    params.set('key', lastAutoInstallRedirectKeyHex);
+  }
+  addLog('Opening display tester…', 'info');
+  window.location.href = '../display/index.html?' + params.toString();
+}
+function bytesToHex(buffer) {
+  const bytes = new Uint8Array(buffer);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+}
+function base64urlEncode(bytes) {
+  const base64 = btoa(String.fromCharCode(...bytes));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+function base64urlDecode(str) {
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  const binaryString = atob(base64);
+  return new Uint8Array(binaryString.split('').map(c => c.charCodeAt(0)));
+}
+function calculatePacketLength(inst) {
+  if (!schema || !inst) return 0;
+  const def = schema.packet_types[inst.pid];
+  if (!def) return 0;
+  let length = 2;
+  for (const f of def.fields) {
+    const fsize = parseSizeToken(f.size);
+    if (fsize) {
+      length += fsize;
+    } else {
+      const raw = inst.fields[f.name];
+      if (raw !== undefined && raw !== null && raw !== '') {
+        if (typeof raw === 'string' && raw.startsWith('0x')) {
+          length += (raw.length - 2) / 2;
+        } else if (typeof raw === 'string') {
+          length += new TextEncoder().encode(raw).length;
+        } else if (typeof raw === 'number') {
+          length += 1;
+        } else {
+          length += 1;
+        }
+      }
+    }
+  }
+  return length;
+}
+function updateInlinePacketSize(inst) {
+  const card = document.getElementById(`inst-${inst.uid}`);
+  if (!card) return;
+  const packetLength = calculatePacketLength(inst);
+  const hdr = card.querySelector('.packet-header');
+  if (hdr) {
+    let sizeElement = hdr.querySelector('.packet-size-inline');
+    if (sizeElement) {
+      sizeElement.textContent = `${packetLength} bytes`;
+    } else {
+      const titleElement = hdr.querySelector('.packet-title');
+      if (titleElement) {
+        const sizeSpan = document.createElement('span');
+        sizeSpan.className = 'packet-size-inline';
+        sizeSpan.textContent = `${packetLength} bytes`;
+        titleElement.appendChild(sizeSpan);
+      }
+    }
+  }
+}
+function updateConditionalEnum(sel, fieldDef, inst, dependencyValue) {
+  while(sel.children.length > 1) {
+    sel.removeChild(sel.lastChild);
+  }
+  if(fieldDef.conditional_enum && fieldDef.conditional_enum.values) {
+    let normalizedDepValue = dependencyValue;
+    if(dependencyValue === null || dependencyValue === undefined || dependencyValue === '') {
+      return;
+    }
+    if(typeof dependencyValue === 'string') {
+      dependencyValue = dependencyValue.trim();
+      if(dependencyValue.startsWith('0x') || dependencyValue.startsWith('0X')) {
+        normalizedDepValue = '0x' + dependencyValue.substring(2).toUpperCase().padStart(4, '0');
+      } else {
+        const num = parseInt(dependencyValue, 16) || parseInt(dependencyValue, 10);
+        if(!isNaN(num)) {
+          normalizedDepValue = '0x' + num.toString(16).toUpperCase().padStart(4, '0');
+        } else {
+          console.warn('Could not parse dependency value:', dependencyValue);
+          return;
+        }
+      }
+    } else if(typeof dependencyValue === 'number') {
+      normalizedDepValue = '0x' + dependencyValue.toString(16).toUpperCase().padStart(4, '0');
+    }
+    let enumValues = null;
+    let numericValue = null;
+    if(normalizedDepValue.startsWith('0x')) {
+      numericValue = parseInt(normalizedDepValue, 16);
+    } else if(typeof normalizedDepValue === 'string') {
+      numericValue = parseInt(normalizedDepValue, 16) || parseInt(normalizedDepValue, 10);
+    } else {
+      numericValue = normalizedDepValue;
+    }
+    let originalNumeric = null;
+    if(typeof dependencyValue === 'string' && dependencyValue.startsWith('0x')) {
+      originalNumeric = parseInt(dependencyValue, 16);
+    } else if(typeof dependencyValue === 'number') {
+      originalNumeric = dependencyValue;
+    } else if(typeof dependencyValue === 'string') {
+      originalNumeric = parseInt(dependencyValue, 16) || parseInt(dependencyValue, 10);
+    }
+    const possibleKeys = [];
+    if(!isNaN(numericValue)) {
+      possibleKeys.push(numericValue);                    // number: 2
+      possibleKeys.push(numericValue.toString());          // string: '2'
+      possibleKeys.push(normalizedDepValue);              // hex string: '0x0002'
+    }
+    if(!isNaN(originalNumeric) && originalNumeric !== numericValue) {
+      possibleKeys.push(originalNumeric);                 // original as number
+      possibleKeys.push(originalNumeric.toString());       // original as string
+    }
+    possibleKeys.push(dependencyValue);                    // original value as-is: '0x2'
+    if(numericValue !== null && !isNaN(numericValue)) {
+      possibleKeys.push('0x' + numericValue.toString(16).toUpperCase()); // short hex: '0x2'
+      possibleKeys.push('0x' + numericValue.toString(16).toUpperCase().padStart(4, '0')); // padded hex: '0x0002'
+    }
+    for(const key of possibleKeys) {
+      if(fieldDef.conditional_enum.values[key] !== undefined) {
+        enumValues = fieldDef.conditional_enum.values[key];
+        console.log(`Found enum values using key:`, key, 'type:', typeof key);
+        break;
+      }
+    }
+    if(enumValues) {
+      console.log(`Populating dropdown with ${Object.keys(enumValues).length} options from enumValues:`, enumValues);
+      for(const eKey of Object.keys(enumValues)) {
+        const enumDef = enumValues[eKey];
+        const o = document.createElement('option');
+        o.value = eKey;
+        o.textContent = `${eKey} — ${enumDef.name}${enumDef.description ? ` (${enumDef.description})` : ''}`;
+        sel.appendChild(o);
+      }
+      console.log(`Dropdown now has ${sel.options.length} options:`, Array.from(sel.options).map(opt => ({value: opt.value, text: opt.textContent})));
+    } else {
+      console.warn('No enum values found for dependency value:', normalizedDepValue, 
+                   'Original value:', dependencyValue,
+                   'Numeric value:', numericValue,
+                   'Tried keys:', possibleKeys,
+                   'Available keys:', Object.keys(fieldDef.conditional_enum.values),
+                   'Available key types:', Object.keys(fieldDef.conditional_enum.values).map(k => typeof k));
+    }
+  }
+  const currentValue = inst.fields[fieldDef.name];
+  console.log(`Setting dropdown value. Current value in instance:`, currentValue, 'type:', typeof currentValue);
+  if(currentValue) {
+    let normalizedCurrentValue = currentValue;
+    if(typeof currentValue === 'string' && currentValue.startsWith('0x')) {
+      const num = parseInt(currentValue, 16);
+      if(!isNaN(num)) {
+        normalizedCurrentValue = num.toString();
+      }
+    } else if(typeof currentValue === 'number') {
+      normalizedCurrentValue = currentValue.toString();
+    }
+    const matchingOption = Array.from(sel.options).find(opt => {
+      if(opt.value === normalizedCurrentValue || opt.value === currentValue) {
+        return true;
+      }
+      const currentNum = typeof currentValue === 'string' && currentValue.startsWith('0x') 
+        ? parseInt(currentValue, 16) 
+        : parseInt(currentValue, 10);
+      if(!isNaN(currentNum)) {
+        return opt.value === currentNum.toString() || opt.value === currentNum;
+      }
+      return false;
+    });
+    
+    if(matchingOption) {
+      console.log(`Setting dropdown value to:`, matchingOption.value, '(normalized from:', currentValue, ')');
+      sel.value = matchingOption.value;
+      inst.fields[fieldDef.name] = matchingOption.value; // Update instance to normalized value
+      console.log(`Dropdown value after setting:`, sel.value);
+    } else {
+      console.log(`Current value ${currentValue} (normalized: ${normalizedCurrentValue}) not found in options, clearing`);
+      inst.fields[fieldDef.name] = '';
+      sel.value = '';
+    }
+  } else {
+    console.log(`No current value to set, leaving as empty`);
+  }
+}
+function updateAddButtonVisibility(pid) {
+  const addBtn = document.getElementById(`addBtn-${pid}`);
+  if (!addBtn) return;
+  const def = schema.packet_types[pid];
+  const existingInstances = instances.packets.filter(p => p.pid === pid);
+  if (!def.repeatable && existingInstances.length > 0) {
+    addBtn.style.display = 'none';
+  } else {
+    addBtn.style.display = 'inline-block';
+  }
+}
+function updateTotalBytesDisplay() {
+  // If in simple config mode, merge config first
+  if (simpleConfigMode && simpleConfigSelections.driverBoard && 
+      simpleConfigSelections.display && simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  const totalBytes = collectPacketBytes();
+  if (!totalBytes) return;
+  const totalLength = totalBytes.length;
+  const maxLength = 4096;
+  const percentage = (totalLength / maxLength) * 100;
+  const bytesView = document.getElementById('bytesView');
+  const existingCounter = document.getElementById('bytesCounter');
+  if (existingCounter) {
+    existingCounter.remove();
+  }
+  let barClass = 'good';
+  let textClass = 'usage-good';
+  let warningMessage = '';
+  if (percentage > 100) {
+    barClass = 'over-limit';
+    textClass = 'usage-over-limit';
+    warningMessage = `<div class="warning-message">⚠️ PACKET EXCEEDS 4kB LIMIT! Current: ${totalLength} bytes (${percentage.toFixed(1)}%)</div>`;
+  } else if (percentage > 90) {
+    barClass = 'danger';
+    textClass = 'usage-danger-text';
+  } else if (percentage > 70) {
+    barClass = 'warning';
+    textClass = 'usage-warning-text';
+  }
+  const counter = document.createElement('div');
+  counter.id = 'bytesCounter';
+  counter.className = 'bytes-counter';
+  counter.innerHTML = `
+    <div class="bytes-stats">
+      <span>Total Size:</span>
+      <span class="bytes-count">${totalLength} bytes</span>
+    </div>
+    <div class="usage-bar-container">
+      <div class="usage-bar ${barClass}" style="width: ${Math.min(percentage, 100)}%"></div>
+    </div>
+    <div class="usage-text ${textClass}">
+      ${percentage.toFixed(1)}% of 4kB limit
+    </div>
+    ${warningMessage}
+  `;
+  bytesView.parentNode.insertBefore(counter, bytesView);
+}
+function hexPad(n, len=2){return n.toString(16).toUpperCase().padStart(len,'0');}
+function numToBytesLE(num, size){ const out=[]; for(let i=0;i<size;i++){ out.push(num & 0xFF); num = num >> 8; } return out; }
+function numToBytesBE(num, size){ const out=[]; for(let i=size-1;i>=0;i--){ out.push((num >> (i*8)) & 0xFF); } return out; }
+function parseSizeToken(sizeTok){ 
+  if(!sizeTok) return null; 
+  sizeTok = (''+sizeTok).trim();
+  if(sizeTok.match(/^\d+$/)){ 
+    return parseInt(sizeTok,10); 
+  }
+  if(sizeTok.match(/^(\d+) bytes?$/i)){ 
+    return parseInt(RegExp.$1,10); 
+  } 
+  if(sizeTok.match(/^variable$/i) || sizeTok.match(/^unspecified$/i)) return null; 
+  return null; 
+}
+function crc16ccitt(buf) {
+  // If bleLib is available, use it; otherwise calculate CRC16-CCITT directly
+  if (bleLib && bleLib.crc16ccitt) {
+    return bleLib.crc16ccitt(buf);
+  }
+  // Standalone CRC16-CCITT implementation
+  let crc = 0xFFFF;
+  for (let i = 0; i < buf.length; i++) {
+    crc ^= (buf[i] << 8);
+    for (let j = 0; j < 8; j++) {
+      if (crc & 0x8000) {
+        crc = (crc << 1) ^ 0x1021;
+      } else {
+        crc = crc << 1;
+      }
+      crc &= 0xFFFF;
+    }
+  }
+  return crc;
+}
+function crc16ccittOpenDisplayOuter(body) {
+  const b = body instanceof Uint8Array ? body : new Uint8Array(body);
+  if (b.length < 2) return crc16ccitt(b);
+  const tmp = new Uint8Array(b.length);
+  tmp[0] = 0;
+  tmp[1] = 0;
+  tmp.set(b.subarray(2), 2);
+  return crc16ccitt(tmp);
+}
+let schema = null;
+let instances = {};
+let simpleConfigMode = true;
+let simpleConfigSelections = { driverBoard: null, display: null, power: null };
+
+// Simple config presets database - loaded from JSON file
+let simpleConfigPresets = null;
+
+// Load simple config presets from JSON file
+async function loadSimpleConfigPresets() {
+  try {
+    const response = await fetch('simple-config-presets.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    simpleConfigPresets = await response.json();
+    return simpleConfigPresets;
+  } catch (error) {
+    console.error('Error loading simple config presets:', error);
+    alert('Failed to load configuration presets. Please refresh the page.');
+    throw error;
+  }
+}
+
+function clearBuilder(){
+document.getElementById('builderUI').innerHTML='(Load YAML to start)'; schema=null; instances={}; 
+}
+function renderBuilder(){ 
+  const container = document.getElementById('builderUI'); container.innerHTML=''; instances = {packets:[]};
+  const top = document.createElement('div');
+  top.className='';
+  const versRow = document.createElement('div'); versRow.className='field-row';
+  const vlabel = document.createElement('label'); vlabel.textContent='Protocol version'; versRow.appendChild(vlabel);
+  const vinput = document.createElement('input'); vinput.type='number'; vinput.value = schema.version || 1; vinput.min=0; vinput.style.width='80px'; versRow.appendChild(vinput);
+  container.appendChild(versRow);
+  const pktList = document.createElement('div'); pktList.id='pktList';
+  for(const k of Object.keys(schema.packet_types)){
+    const pid = k; const def = schema.packet_types[k]; const box = document.createElement('div'); box.className='panel';
+    const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between';
+    const title = document.createElement('div'); title.innerHTML = `<span class="chip">${pid}</span><strong>${def.name}</strong> <span class="small">${def.description||''}</span>`;
+    h.appendChild(title);
+    const actions = document.createElement('div');
+    const addBtn = document.createElement('button'); addBtn.textContent='Add'; addBtn.onclick = ()=> addPacketInstance(pid);
+    addBtn.id = `addBtn-${pid}`;
+    actions.appendChild(addBtn);
+    if(def.required){ const req = document.createElement('span'); req.className='small'; req.style.marginLeft='12px'; req.textContent='Required'; actions.appendChild(req); }
+    if(def.repeatable){ const rep = document.createElement('span'); rep.className='small'; rep.style.marginLeft='12px'; rep.textContent='Repeatable'; actions.appendChild(rep); }
+    h.appendChild(actions);
+    box.appendChild(h);
+    const instCont = document.createElement('div'); instCont.id = `instances-${pid}`;
+    box.appendChild(instCont);
+    pktList.appendChild(box);
+  }
+  container.appendChild(pktList);
+  for(const k of Object.keys(schema.packet_types)){ if(schema.packet_types[k].required) addPacketInstance(k); }
+  container.dataset.versionInputId = vinput;
+  function addPacketInstance(pid){ const def = schema.packet_types[pid]; const id = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    if(!instances.packets) instances.packets=[];
+    if(def.required && !def.repeatable) {
+      const existingRequired = instances.packets.find(p => p.pid === pid);
+      if(existingRequired) {
+        alert(`${def.name} is required and already exists. Only one instance allowed.`);
+        return;
+      }
+    }
+    const inst = {uid:id,pid:pid,fields:{}}
+    instances.packets.push(inst);
+    renderInstance(inst);
+    updateAddButtonVisibility(pid);
+  }
+  function renderInstance(inst){ const def = schema.packet_types[inst.pid]; const cont = document.getElementById('instances-'+inst.pid);
+    const card = document.createElement('div'); card.className='packet-card'; card.id='inst-'+inst.uid;
+    const hdr = document.createElement('div'); hdr.className='packet-header';
+    const titleDiv = document.createElement('div'); titleDiv.className='packet-title';
+    const packetLength = calculatePacketLength(inst);
+    titleDiv.innerHTML = `<strong>${def.name}</strong> <span class="packet-id">${inst.pid}</span> <span class="packet-size-inline">${packetLength} bytes</span>`;
+    hdr.appendChild(titleDiv);
+    if (!def.required) {
+      const actionsDiv = document.createElement('div'); actionsDiv.className='packet-actions';
+      const delBtn = document.createElement('button'); delBtn.textContent='Remove'; delBtn.onclick = ()=>{ instances.packets = instances.packets.filter(p=>p.uid!==inst.uid); cont.removeChild(card); updateAddButtonVisibility(inst.pid); };
+      actionsDiv.appendChild(delBtn);
+      hdr.appendChild(actionsDiv);
+    }
+    card.appendChild(hdr);
+    for(const f of def.fields){ 
+      // Hide reserved fields (but still include them in packet structure)
+      const isReserved = f.name.toLowerCase().startsWith('reserved');
+      const frow = document.createElement('div'); 
+      frow.className='field-row';
+      if (isReserved) {
+        frow.style.display = 'none';
+      }
+      const enumType = f.conditional_enum ? 'conditional enum' : (f.enum ? 'enum' : '');
+      const lname = document.createElement('div'); lname.style.width='200px'; lname.innerHTML = `<div><strong>${f.name}</strong> <span class="small">${f.description||''}</span></div><div class="small">${f.size||''}${enumType ? ' • ' + enumType : ''}${f.bits? ' • bitfield':''}</div>`;
+      frow.appendChild(lname);
+      frow.dataset.fieldName = f.name;  // Add data attribute for field identification
+      if(f.bits){
+        const bitContainer = document.createElement('div'); bitContainer.className='bit-flags'; bitContainer.style.flex='1';
+        const existing = inst.fields[f.name] != null ? (parseInt(inst.fields[f.name]) & 0xFF) : 0;
+        for(let i=7;i>=0;i--){
+          const bitIndex = i;
+          const bitWrapper = document.createElement('div'); bitWrapper.className='bit-flag';
+          const cb = document.createElement('input'); cb.type='checkbox'; cb.dataset.bit = bitIndex; cb.checked = !!(existing & (1<<bitIndex));
+          cb.onchange = ()=>{
+            let val = 0;
+            bitContainer.querySelectorAll('input[type=checkbox]').forEach(c=>{ if(c.checked) val |= (1 << (parseInt(c.dataset.bit))); });
+            inst.fields[f.name] = val;
+            updateInlinePacketSize(inst);
+          };
+          const bitDef = f.bits[bitIndex];
+          const bitName = bitDef && bitDef.name ? bitDef.name : `Bit ${bitIndex}`;
+          const bitDesc = bitDef && bitDef.description ? ` - ${bitDef.description}` : '';
+          const lbl = document.createElement('div'); lbl.className='bit-label'; lbl.textContent = `${bitName}${bitDesc}`;
+          bitWrapper.appendChild(cb); bitWrapper.appendChild(lbl); bitContainer.appendChild(bitWrapper);
+        }
+        frow.appendChild(bitContainer);
+      } else {
+        if(f.enum || f.conditional_enum){
+          const sel = document.createElement('select'); sel.style.flex='1'; const optEmpty = document.createElement('option'); optEmpty.value=''; optEmpty.textContent='-- select --'; sel.appendChild(optEmpty);
+          if(f.conditional_enum) {
+            const depFieldName = f.conditional_enum.depends_on;
+            const depField = def.fields.find(field => field.name === depFieldName);
+            if(depField) {
+              const getDepValue = () => {
+                const instValue = inst.fields[depFieldName];
+                if(instValue !== undefined && instValue !== null && instValue !== '') {
+                  return instValue;
+                }
+                const depFieldRow = cont.querySelector(`.field-row[data-field-name="${depFieldName}"]`);
+                if(depFieldRow) {
+                  const depInput = depFieldRow.querySelector('select, input');
+                  if(depInput && depInput.value) {
+                    return depInput.value;
+                  }
+                }
+                return '';
+              };
+              const updateHandler = () => {
+                const depValue = getDepValue();
+                console.log(`Updating conditional enum for ${f.name}, dependency ${depFieldName} value:`, depValue, 'type:', typeof depValue);
+                updateConditionalEnum(sel, f, inst, depValue);
+                updateInlinePacketSize(inst);
+              };
+              const setupDependency = () => {
+                const depFieldRow = cont.querySelector(`.field-row[data-field-name="${depFieldName}"]`);
+                if(depFieldRow) {
+                  const depInput = depFieldRow.querySelector('select, input');
+                  if(depInput) {
+                    depInput.addEventListener('change', updateHandler);
+                    updateHandler(); // Initial update
+                    return true;
+                  }
+                }
+                return false;
+              };
+              if(!setupDependency()) {
+                setTimeout(() => {
+                  if(!setupDependency()) {
+                    updateHandler();
+                  }
+                }, 10);
+              }
+            }
+          } else if(f.enum) {
+            for(const eKey of Object.keys(f.enum)){ 
+              const enumDef = f.enum[eKey];
+              const o = document.createElement('option'); 
+              o.value = eKey; 
+              o.textContent = `${eKey} — ${enumDef.name}${enumDef.description ? ` (${enumDef.description})` : ''}`; 
+              sel.appendChild(o); 
+            }
+            if(inst.fields[f.name]) {
+              const fieldValue = inst.fields[f.name];
+              const matchingOption = Array.from(sel.options).find(opt => {
+                if(opt.value === fieldValue) return true;
+                if(typeof fieldValue === 'string' && fieldValue.startsWith('0x')) {
+                  const num = parseInt(fieldValue, 16);
+                  return opt.value === num.toString() || opt.value === num;
+                }
+                return false;
+              });
+              if(matchingOption) {
+                sel.value = matchingOption.value;
+                if(matchingOption.value !== fieldValue) {
+                  inst.fields[f.name] = matchingOption.value;
+                }
+              } else {
+                sel.value = fieldValue; // Fallback to original value
+              }
+            }
+          }
+          sel.onchange = ()=>{ 
+            inst.fields[f.name] = sel.value; 
+            console.log(`Field ${f.name} changed to:`, sel.value, 'stored in instance:', inst.fields[f.name]);
+            updateInlinePacketSize(inst); 
+          }
+          frow.appendChild(sel);
+          if(f.conditional_enum && sel.value) {
+            inst.fields[f.name] = sel.value;
+          }
+        } else {
+          const input = document.createElement('input');
+          input.style.flex='1';
+          // Special handling for WiFi fields
+          if (f.name === 'ssid') {
+            input.type = 'text';
+            input.placeholder = 'WiFi SSID (fixed 32 bytes, null-terminated)';
+            input.maxLength = 32;
+          } else if (f.name === 'password') {
+            input.type = 'password';
+            input.placeholder = 'WiFi password (fixed 32 bytes, null-terminated)';
+            input.maxLength = 32;
+          } else {
+            input.type = 'text';
+            input.placeholder = 'value (decimal or 0xHEX)';
+          }
+          input.value = inst.fields[f.name] || '';
+          input.oninput = ()=>{ inst.fields[f.name] = input.value; updateInlinePacketSize(inst); }
+          frow.appendChild(input);
+        }
+      }
+      card.appendChild(frow);
+    }
+    cont.appendChild(card);
+  }
+  container._getVersion = ()=> parseInt(container.querySelector('input[type=number]').value||schema.version||1,10);
+}
+function collectPacketBytes(){ if(!schema) { alert('Load schema first'); return null; }
+  // If in simple config mode and all selections are made, merge them into instances
+  if (simpleConfigMode && simpleConfigSelections.driverBoard && 
+      simpleConfigSelections.display && simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  const container = document.getElementById('builderUI'); const version = container._getVersion ? container._getVersion() : schema.version||1;
+  const pktBytes = [];
+  if(!instances.packets || instances.packets.length===0){ if(confirm('No packets added. Build empty payload?')){} }
+  let seq=0;
+  for(const inst of instances.packets){ const def = schema.packet_types[inst.pid]; const packet=[];
+    packet.push(seq & 0xFF);
+    const pidNum = parseInt(inst.pid);
+    packet.push(pidNum & 0xFF);
+    for(const f of def.fields){ const fsize = parseSizeToken(f.size); let raw = inst.fields[f.name];
+      if(f.enum && raw && typeof raw === 'string' && raw.startsWith('0x')===false && raw!==''){
+      }
+      if(f.enum && (!raw || raw==='')){
+      }
+      if(fsize){
+        if(f.name === 'ssid' || f.name === 'password'){
+          const str = (raw || '').toString();
+          const encoder = new TextEncoder();
+          const bytes = encoder.encode(str);
+          for(let i=0;i<fsize;i++){
+            packet.push(i < bytes.length ? bytes[i] : 0);
+          }
+        } else if(f.name === 'encryption_key'){
+          // Special handling for encryption_key: parse as hex bytes
+          if(raw){
+            const bytes = parseValueToBytes(raw);
+            // Pad with zeros if too short, truncate if too long
+          for(let i=0;i<fsize;i++){
+            packet.push(i < bytes.length ? bytes[i] : 0);
+            }
+          } else {
+            // Default: all zeros (encryption disabled)
+            for(let i=0;i<fsize;i++) packet.push(0);
+          }
+        } else {
+          let val = (typeof raw === 'number') ? raw : parseValueToNumber(raw);
+          if(val==null){ // default 0
+            for(let i=0;i<fsize;i++) packet.push(0);
+          } else {
+            const b = numToBytesLE(val, fsize);
+            for(const bt of b) packet.push(bt);
+          }
+        }
+      } else {
+        if(!raw){ /* nothing */ }
+        else{
+          const bytes = parseValueToBytes(raw);
+          for(const bt of bytes) packet.push(bt);
+        }
+      }
+    }
+    for(const b of packet) pktBytes.push(b);
+    seq++;
+  }
+  const outer = [];
+  outer.push(0); outer.push(0);
+  outer.push(schema.version || 1);
+  for(const b of pktBytes) outer.push(b);
+  const crc = crc16ccitt(outer);
+  const totalLen = outer.length + 2;
+  const lenBytes = numToBytesLE(totalLen,2);
+  outer[0]=lenBytes[0]; outer[1]=lenBytes[1];
+  const crcBytes = numToBytesLE(crc,2);
+  outer.push(crcBytes[0]); outer.push(crcBytes[1]);
+  return outer;
+}
+function parseValueToNumber(raw){ if(raw==null) return null; raw = (''+raw).trim(); if(raw.length===0) return null; if(typeof raw === 'number') return raw; if(raw.startsWith && (raw.startsWith('0x')||raw.startsWith('0X'))) return parseInt(raw,16); if(raw.match && raw.match(/^[-+]?\d+$/)) return parseInt(raw,10); return null; }
+function parseValueToBytes(raw){ raw = (''+raw).trim(); if(raw.startsWith && (raw.startsWith('0x')||/[A-Fa-f0-9]{2}/.test(raw.replace(/\s+/g,'')))){ // hex
+  const s = raw.replace(/[^A-Fa-f0-9]/g,''); const out=[]; for(let i=0;i<s.length;i+=2){ const byte = parseInt(s.substr(i,2),16); if(!isNaN(byte)) out.push(byte);} return out;
+ } else if(raw.match && raw.match(/^\d+(\s+\d+)*$/)){
+  return raw.split(/\s+/).map(x=>parseInt(x,10)&0xFF);
+ } else {
+  const encoder = new TextEncoder(); return Array.from(encoder.encode(raw)); }
+}
+document.getElementById('loadYamlBtn').onclick = loadYamlFromFile;
+document.getElementById('resetBtn').onclick = clearBuilder;
+document.getElementById('downloadYamlBtn').onclick = ()=>{
+  const yamlText = document.getElementById('yamlInput').value;
+  const blob = new Blob([yamlText],{type:'text/yaml'}); 
+  const url = URL.createObjectURL(blob); 
+  const a=document.createElement('a'); 
+  a.href=url; 
+  a.download='ble_config.yaml'; 
+  document.body.appendChild(a); 
+  a.click(); 
+  a.remove(); 
+  URL.revokeObjectURL(url);
+};
+document.getElementById('buildBtn').onclick = ()=>{
+  try{
+    // If in simple config mode, check if all selections are made
+    if (simpleConfigMode) {
+      if (!simpleConfigSelections.driverBoard || !simpleConfigSelections.display || !simpleConfigSelections.power) {
+        alert('Please select driver board, display, and power options first.');
+        return;
+      }
+    }
+    const out = collectPacketBytes(); if(!out) return; 
+    document.getElementById('bytesView').textContent = bytesToHex(out);
+    updateTotalBytesDisplay();
+  }catch(e){ alert('Build error: '+e); }
+};
+document.getElementById('exportJsonBtn').onclick = ()=>{
+  // If in simple config mode, merge config first
+  if (simpleConfigMode && simpleConfigSelections.driverBoard && 
+      simpleConfigSelections.display && simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  if (!schema || !instances.packets) {
+    alert('No configuration to export. Please load a schema and add some packets.');
+    return;
+  }
+  const config = {
+    version: schema.version || 1,
+    minor_version: schema.minor_version || 0,
+    packets: instances.packets.map(inst => {
+      // Log each packet's fields for debugging
+      console.log(`Exporting packet ${inst.pid}:`, inst.fields);
+      return {
+        id: inst.pid,
+        name: schema.packet_types[inst.pid]?.name || 'Unknown',
+        fields: inst.fields
+      };
+    }),
+    exported_at: new Date().toISOString(),
+    exported_by: 'OpenDisplay Toolbox'
+  };
+  console.log('Exporting config:', config);
+  const jsonString = JSON.stringify(config, null, 2);
+  const blob = new Blob([jsonString], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'oep_config.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+document.getElementById('importJsonBtn').onclick = ()=>{
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const config = JSON.parse(e.target.result);
+        importJsonConfig(config);
+      } catch (error) {
+        alert('Error parsing JSON file: ' + error.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+};
+document.getElementById('shareConfigBtn').onclick = ()=>{
+  // If in simple config mode, check if all selections are made
+  if (simpleConfigMode) {
+    if (!simpleConfigSelections.driverBoard || !simpleConfigSelections.display || !simpleConfigSelections.power) {
+      alert('Please select driver board, display, and power options first.');
+      return;
+    }
+  }
+  if (!schema || !instances.packets) {
+    alert('No configuration to share. Please load a schema and add some packets.');
+    return;
+  }
+  const packetBytes = collectPacketBytes();
+  if (!packetBytes) {
+    alert('Failed to build packet. Please check your configuration.');
+    return;
+  }
+  const encoded = base64urlEncode(packetBytes);
+  const url = new URL(window.location);
+  url.searchParams.set('config', encoded);
+  window.history.pushState({}, '', url);
+  addLog('Config encoded in URL (binary format). Share this link!', 'success');
+  navigator.clipboard.writeText(url.toString()).then(() => {
+    addLog('URL copied to clipboard!', 'success');
+  }).catch(() => {
+    addLog('URL updated. Copy it manually from the address bar.', 'info');
+  });
+};
+// Preset mapping for image-based selection
+const presetMappings = {
+  'reterminal-e1001': {
+    driverBoard: 'reterminal-e1001',
+    display: 'ep75-800x480',
+    power: 'battery-2000'
+  },
+  'reterminal-e1002': {
+    driverBoard: 'reterminal-e1002',
+    display: 'ep73-spectra-800x480',
+    power: 'battery-2000'
+  },
+  'reterminal-e1003': {
+    driverBoard: 'reterminal-e1003',
+    display: 'seeed-ed103-1872x1404',
+    power: 'battery-3000'
+  },
+  'esp32-s3-wspp': {
+    driverBoard: 'esp32-s3-wspp',
+    display: 'ep73-spectra-800x480',
+    power: 'battery-2000'
+  },
+  'xiao-75-c3': {
+    driverBoard: 'xiao-75-c3',
+    display: 'ep75-800x480',
+    power: 'battery-2000'
+  },
+  'xiao-75-s3-og': {
+    driverBoard: 'ee04',
+    display: 'ep75-800x480',
+    power: 'battery-2000'
+  }
+};
+
+// Setup preset option click handlers
+function setupPresetOptions() {
+  document.querySelectorAll('.preset-option').forEach(option => {
+    option.addEventListener('click', function() {
+      const presetId = this.dataset.preset;
+      if (!presetId || !presetMappings[presetId]) return;
+      
+      const mapping = presetMappings[presetId];
+      
+      // Remove selected class from all options
+      document.querySelectorAll('.preset-option').forEach(opt => opt.classList.remove('selected'));
+      // Add selected class to clicked option
+      this.classList.add('selected');
+      
+      // Ensure schema is loaded
+      if (!schema) {
+        alert('Please wait for the schema to load first.');
+        return;
+      }
+      
+      // Show simple config panel if hidden and initialize it
+      const simpleConfigPanel = document.getElementById('simpleConfigPanel');
+      if (simpleConfigPanel.style.display === 'none' || !simpleConfigMode) {
+        simpleConfigMode = true;
+        initializeSimpleConfigMode();
+      }
+      
+      // Set driver board
+      const driverBoardSelect = document.getElementById('driverBoardSelect');
+      driverBoardSelect.value = mapping.driverBoard;
+      handleDriverBoardChange();
+      
+      // Set display (need to wait a bit for driver board to process)
+      setTimeout(() => {
+        const displaySelect = document.getElementById('displaySelect');
+        displaySelect.value = mapping.display;
+        handleDisplayChange();
+        
+        // Set power
+        setTimeout(() => {
+          const powerSelect = document.getElementById('powerSelect');
+          powerSelect.value = mapping.power;
+          handlePowerChange();
+        }, 100);
+      }, 100);
+    });
+  });
+}
+
+// Initialize preset options and device filter from URL after DOM is ready
+function onDomReady() {
+  setupPresetOptions();
+  setDeviceFilterFromUrl();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', onDomReady);
+} else {
+  onDomReady();
+}
+
+function importJsonConfig(config) {
+  if (!config.packets || !Array.isArray(config.packets)) {
+    alert('Invalid JSON configuration: missing or invalid packets array');
+    return;
+  }
+  if (!schema) {
+    alert('Please load a schema first before importing configuration');
+    return;
+  }
+  instances.packets = [];
+  for (const packetConfig of config.packets) {
+    if (!packetConfig.id || !schema.packet_types[packetConfig.id]) {
+      console.warn(`Skipping unknown packet type: ${packetConfig.id}`);
+      continue;
+    }
+    const inst = {
+      uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      pid: packetConfig.id,
+      fields: packetConfig.fields || {}
+    };
+    instances.packets.push(inst);
+  }
+  renderBuilderFromInstances();
+  const importedCount = config.packets.length;
+}
+function parseRawBytes(bytes){
+  if(!schema) { alert('Load schema first'); return; }
+  // BLE / chunk reassembly may pass a plain Array; TextDecoder needs a BufferSource (e.g. Uint8Array).
+  const view = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if(view.length<3) throw 'Data too short';
+  const len = view[0] | (view[1]<<8);
+  const version = view[2];
+  const expectedLen = len;
+  if(expectedLen !== view.length){ console.warn('Length mismatch: claimed',expectedLen,'actual',view.length); }
+  const crcGiven = view[view.length-2] | (view[view.length-1]<<8);
+  const body = view.slice(0, view.length-2);
+  const crcCheck = crc16ccittOpenDisplayOuter(body);
+  const result = {length:len,version:version,crcGiven:hexPad(crcGiven,4),crcCheck:hexPad(crcCheck,4),packets:[]};
+  let offset = 3;
+  let pktIndex = 0;
+  while(offset < view.length-2){ if(offset+2>view.length-2) break; const num = view[offset]; const id = view[offset+1]; offset +=2; const pdef = schema.packet_types['0x'+Number(id).toString(16).padStart(2,'0')] || schema.packet_types[id] || schema.packet_types[id.toString()]; const pkt={number:num,id:hexPad(id),fields:[]};
+      if(!pdef){
+         pkt.fields.push({name:'raw',value: bytesToHex(view.slice(offset, view.length-2))}); offset = view.length-2; result.packets.push(pkt); break;
+      }
+      let fixedLen = 0; let variableFields = [];
+      for(const f of pdef.fields){ const s = parseSizeToken(f.size); if(s) fixedLen += s; else variableFields.push(f); }
+      const remain = (view.length-2) - offset;
+      let takeForFixed = Math.min(fixedLen, remain);
+      let cur = offset; for(const f of pdef.fields){ const s = parseSizeToken(f.size); if(s){ if(cur + s > view.length-2){ // not enough bytes
+            const available = view.slice(cur, view.length-2); pkt.fields.push({name:f.name,raw:bytesToHex(available),note:'truncated'}); cur = view.length-2; }
+          else{
+            const valBytes = view.slice(cur, cur+s);
+            if (f.name === 'ssid' || f.name === 'password') {
+              const z = valBytes.indexOf(0);
+              const slice = z >= 0 ? valBytes.slice(0, z) : valBytes;
+              const text = new TextDecoder('utf-8', { fatal: false }).decode(slice);
+              pkt.fields.push({ name: f.name, raw: bytesToHex(valBytes), value: text, kind: 'utf8' });
+              cur += s;
+            } else if (f.name === 'encryption_key' || f.name === 'reserved' || s > 8) {
+              pkt.fields.push({ name: f.name, raw: bytesToHex(valBytes), hexPayload: true });
+              cur += s;
+            } else {
+              let val = 0; for(let i=0;i<s;i++) val |= (valBytes[i] << (8*i)); // LE
+              pkt.fields.push({ name: f.name, raw: bytesToHex(valBytes), value: val });
+              cur += s;
+            }
+          }
+      } else {
+          if(pdef.fields.indexOf(f) === pdef.fields.length-1){ const available = view.slice(cur, view.length-2); pkt.fields.push({name:f.name,raw:bytesToHex(available),value:available}); cur = view.length-2; }
+          else{ pkt.fields.push({name:f.name,raw:'',note:'variable field (non-last) — cannot parse reliably)'}); }
+      } }
+      offset = cur;
+      result.packets.push(pkt);
+      pktIndex++;
+  }
+  instances.packets = [];
+  console.log('Parse result:', result);
+  console.log('Parsed packets:', result.packets);
+  for(const p of result.packets){ 
+    const idNum = parseInt(p.id,16); 
+    const pidKey = '0x' + idNum.toString(16).padStart(2,'0').toUpperCase(); 
+    console.log(`Processing packet ${p.id} -> ${pidKey}`);
+    console.log('Available schema keys:', Object.keys(schema.packet_types));
+    console.log('Schema keys details:', Object.keys(schema.packet_types).map(k => `"${k}" (type: ${typeof k})`));
+    console.log(`Looking for key: "${pidKey}" (type: ${typeof pidKey})`);
+    let def = schema.packet_types[pidKey];
+    let actualKey = pidKey;
+    console.log(`Found definition for ${pidKey}:`, def);
+    if (!def) {
+      console.log('Trying alternative key formats...');
+      const alternatives = [
+        '0x' + idNum.toString(16).padStart(2,'0').toLowerCase(),
+        idNum.toString(),
+        '0x' + idNum.toString(16).padStart(2,'0'),
+        p.id,
+        '0x' + p.id
+      ];
+      for (const altKey of alternatives) {
+        console.log(`Trying key: "${altKey}"`);
+        def = schema.packet_types[altKey];
+        if (def) {
+          console.log(`Found definition with key: "${altKey}"`);
+          actualKey = altKey;
+          break;
+        }
+      }
+    }
+    if(!def) {
+      console.warn(`No schema definition found for packet ${pidKey} after trying all formats`);
+      continue;
+    }
+    const inst = {uid:Date.now().toString(36)+Math.random().toString(36).slice(2,6), pid: actualKey, fields:{}};
+    console.log(`Created instance for ${actualKey}:`, inst);
+    for(const f of p.fields){ 
+      console.log(`Processing field ${f.name}:`, f);
+      if (f.kind === 'utf8') {
+        inst.fields[f.name] = f.value;
+        console.log(`Set ${f.name} = (utf8)`);
+      } else if (f.hexPayload) {
+        inst.fields[f.name] = f.raw.replace(/ /g,'');
+        console.log(`Set ${f.name} = (hex)`);
+      } else if(f.value!=null && typeof f.value !== 'object') {
+        inst.fields[f.name] = '0x'+(Number(f.value).toString(16));
+        console.log(`Set ${f.name} = 0x${Number(f.value).toString(16)}`);
+      } else if(f.raw) {
+        inst.fields[f.name] = f.raw.replace(/ /g,'');
+        console.log(`Set ${f.name} = ${f.raw.replace(/ /g,'')}`);
+      }
+    }
+    console.log(`Final instance:`, inst);
+    instances.packets.push(inst);
+  }
+  renderBuilderFromInstances();
+  const parseResultEl = document.getElementById('parseResult');
+  if (parseResultEl) {
+    parseResultEl.textContent = `Parsed: length=${result.length}, version=${result.version}, crc_given=${result.crcGiven}, crc_calc=${result.crcCheck}`;
+  }
+}
+function renderBuilderFromInstances(){
+  const container = document.getElementById('builderUI'); if(!schema) return; container.innerHTML='';
+  console.log('renderBuilderFromInstances called with instances:', instances.packets);
+  const top = document.createElement('div');
+  const versRow = document.createElement('div'); versRow.className='field-row';
+  const vlabel = document.createElement('label'); vlabel.textContent='Protocol version'; versRow.appendChild(vlabel);
+  const vinput = document.createElement('input'); vinput.type='number'; vinput.value = schema.version || 1; vinput.min=0; vinput.style.width='80px'; versRow.appendChild(vinput);
+  container.appendChild(versRow);
+  const pktList = document.createElement('div');
+  for(const k of Object.keys(schema.packet_types)){
+    const pid = k; const def = schema.packet_types[k]; const box = document.createElement('div'); box.className='panel';
+    const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between';
+    const title = document.createElement('div'); title.innerHTML = `<span class="chip">${pid}</span><strong>${def.name}</strong> <span class="small">${def.description||''}</span>`;
+    h.appendChild(title);
+    const actions = document.createElement('div');
+    const addBtn = document.createElement('button'); addBtn.textContent='Add'; addBtn.onclick = ()=>{ addPacketInstance(pid); };
+    addBtn.id = `addBtn-${pid}`;
+    actions.appendChild(addBtn);
+    h.appendChild(actions);
+    box.appendChild(h);
+    const instCont = document.createElement('div'); instCont.id = `instances-${pid}`;
+    const instancesForPid = instances.packets.filter(p=>p.pid===pid);
+    console.log(`Rendering instances for ${pid}:`, instancesForPid);
+    console.log(`All instances:`, instances.packets.map(p => ({pid: p.pid, type: typeof p.pid})));
+    for(const inst of instancesForPid){
+      const card = document.createElement('div'); card.className='packet-card';
+      const hdr = document.createElement('div'); hdr.className='packet-header';
+      const titleDiv = document.createElement('div'); titleDiv.className='packet-title';
+      const packetLength = calculatePacketLength(inst);
+      titleDiv.innerHTML = `<strong>${def.name}</strong> <span class="packet-id">${inst.pid}</span> <span class="packet-size-inline">${packetLength} bytes</span>`;
+      hdr.appendChild(titleDiv);
+      if (!def.required) {
+        const actionsDiv = document.createElement('div'); actionsDiv.className='packet-actions';
+        const delBtn = document.createElement('button'); delBtn.textContent='Remove'; delBtn.onclick = ()=>{ instances.packets = instances.packets.filter(p=>p.uid!==inst.uid); instCont.removeChild(card); updateAddButtonVisibility(inst.pid); };
+        actionsDiv.appendChild(delBtn);
+        hdr.appendChild(actionsDiv);
+      }
+      card.appendChild(hdr);
+      for(const f of def.fields){ 
+        // Hide reserved fields (but still include them in packet structure)
+        const isReserved = f.name.toLowerCase().startsWith('reserved');
+        const frow = document.createElement('div'); 
+        frow.className='field-row';
+        if (isReserved) {
+          frow.style.display = 'none';
+        }
+        const enumType = f.conditional_enum ? 'conditional enum' : (f.enum ? 'enum' : '');
+        const lname = document.createElement('div'); lname.style.width='200px'; lname.innerHTML = `<div><strong>${f.name}</strong> <span class="small">${f.description||''}</span></div><div class="small">${f.size||''}${enumType ? ' • ' + enumType : ''}${f.bits? ' • bitfield':''}</div>`;
+        frow.appendChild(lname);
+        frow.dataset.fieldName = f.name;  // Add data attribute for field identification
+        if(f.bits){
+          const bitContainer = document.createElement('div'); bitContainer.className='bit-flags'; bitContainer.style.flex='1';
+          const existing = inst.fields[f.name] != null ? (parseInt(inst.fields[f.name]) & 0xFF) : 0;
+          for(let i=7;i>=0;i--){
+            const bitIndex = i;
+            const bitWrapper = document.createElement('div'); bitWrapper.className='bit-flag';
+            const cb = document.createElement('input'); cb.type='checkbox'; cb.dataset.bit = bitIndex; cb.checked = !!(existing & (1<<bitIndex));
+            cb.onchange = ()=>{
+              let val = 0;
+              bitContainer.querySelectorAll('input[type=checkbox]').forEach(c=>{ if(c.checked) val |= (1 << (parseInt(c.dataset.bit))); });
+              inst.fields[f.name] = val;
+              updateInlinePacketSize(inst);
+            };
+            const bitDef = f.bits[bitIndex];
+            const bitName = bitDef && bitDef.name ? bitDef.name : `Bit ${bitIndex}`;
+            const bitDesc = bitDef && bitDef.description ? ` - ${bitDef.description}` : '';
+            const lbl = document.createElement('div'); lbl.className='bit-label'; lbl.textContent = `${bitName}${bitDesc}`;
+            bitWrapper.appendChild(cb); bitWrapper.appendChild(lbl); bitContainer.appendChild(bitWrapper);
+          }
+          frow.appendChild(bitContainer);
+        } else if(f.enum || f.conditional_enum){ 
+          const sel = document.createElement('select'); 
+          sel.style.flex='1'; 
+          const optEmpty = document.createElement('option'); 
+          optEmpty.value=''; 
+          optEmpty.textContent='-- select --'; 
+          sel.appendChild(optEmpty);
+          if(f.conditional_enum) {
+            const depFieldName = f.conditional_enum.depends_on;
+            const depField = def.fields.find(field => field.name === depFieldName);
+            if(depField) {
+              const getDepValue = () => {
+                const instValue = inst.fields[depFieldName];
+                if(instValue !== undefined && instValue !== null && instValue !== '') {
+                  return instValue;
+                }
+                const depFieldRow = card.querySelector(`.field-row[data-field-name="${depFieldName}"]`);
+                if(depFieldRow) {
+                  const depInput = depFieldRow.querySelector('select, input');
+                  if(depInput && depInput.value) {
+                    return depInput.value;
+                  }
+                }
+                return '';
+              };
+              const updateHandler = () => {
+                const depValue = getDepValue();
+                console.log(`Updating conditional enum for ${f.name}, dependency ${depFieldName} value:`, depValue, 'type:', typeof depValue);
+                updateConditionalEnum(sel, f, inst, depValue);
+                updateInlinePacketSize(inst);
+              };
+              const setupDependency = () => {
+                const depFieldRow = card.querySelector(`.field-row[data-field-name="${depFieldName}"]`);
+                if(depFieldRow) {
+                  const depInput = depFieldRow.querySelector('select, input');
+                  if(depInput) {
+                    depInput.addEventListener('change', updateHandler);
+                    updateHandler(); // Initial update
+                    return true;
+                  }
+                }
+                return false;
+              };
+              if(!setupDependency()) {
+                setTimeout(() => {
+                  if(!setupDependency()) {
+                    updateHandler();
+                  }
+                }, 10);
+              }
+            }
+          } else if(f.enum) {
+            // Regular enum
+            for(const eKey of Object.keys(f.enum)){ 
+              const enumDef = f.enum[eKey];
+              const o = document.createElement('option'); 
+              o.value = eKey; 
+              o.textContent = `${eKey} — ${enumDef.name}${enumDef.description ? ` (${enumDef.description})` : ''}`; 
+              sel.appendChild(o); 
+            }
+            if(inst.fields[f.name]) {
+              const fieldValue = inst.fields[f.name];
+              const matchingOption = Array.from(sel.options).find(opt => {
+                if(opt.value === fieldValue) return true;
+                if(typeof fieldValue === 'string' && fieldValue.startsWith('0x')) {
+                  const num = parseInt(fieldValue, 16);
+                  return opt.value === num.toString() || opt.value === num;
+                }
+                return false;
+              });
+              if(matchingOption) {
+                sel.value = matchingOption.value;
+                if(matchingOption.value !== fieldValue) {
+                  inst.fields[f.name] = matchingOption.value;
+                }
+              } else {
+                sel.value = fieldValue; // Fallback to original value
+              }
+            }
+          }
+          sel.onchange = ()=> { inst.fields[f.name]=sel.value; updateInlinePacketSize(inst); }
+          frow.appendChild(sel);
+        } else { 
+          const input = document.createElement('input');
+          input.style.flex='1';
+          if (f.name === 'ssid') {
+            input.type = 'text';
+            input.placeholder = 'WiFi SSID (fixed 32 bytes, null-terminated)';
+            input.maxLength = 32;
+            input.value = inst.fields[f.name] || '';
+          } else if (f.name === 'password') {
+            input.type = 'password';
+            input.placeholder = 'WiFi password (fixed 32 bytes, null-terminated)';
+            input.maxLength = 32;
+            input.value = inst.fields[f.name] || '';
+          } else {
+            input.type = 'text';
+            input.placeholder = 'value (decimal or 0xHEX)';
+            input.value = (inst.fields[f.name] && inst.fields[f.name].toString().includes('x')) ? parseInt(inst.fields[f.name], 16) : (inst.fields[f.name] || '');
+          }
+          input.oninput = ()=> { inst.fields[f.name] = input.value; updateInlinePacketSize(inst); };
+          frow.appendChild(input);
+        }
+        card.appendChild(frow);
+      }
+      
+      instCont.appendChild(card);
+    }
+
+    box.appendChild(instCont);
+    pktList.appendChild(box);
+  }
+  container.appendChild(pktList);
+  container._getVersion = ()=> parseInt(container.querySelector('input[type=number]').value||schema.version||1,10);
+  for(const k of Object.keys(schema.packet_types)){
+    updateAddButtonVisibility(k);
+  }
+  function addPacketInstance(pid){ 
+    const def = schema.packet_types[pid];
+    if(def.required && !def.repeatable) {
+      const existingRequired = instances.packets.find(p => p.pid === pid);
+      if(existingRequired) {
+        alert(`${def.name} is required and already exists. Only one instance allowed.`);
+        return;
+      }
+    }
+    const id = Date.now().toString(36)+Math.random().toString(36).slice(2,6); 
+    const inst = {uid:id,pid:pid,fields:{}}; 
+    instances.packets.push(inst); 
+    renderBuilderFromInstances(); 
+  }
+}
+async function loadYamlFromFile() {
+  try {
+    // Load presets and YAML in parallel
+    const [presetsResponse, yamlResponse] = await Promise.all([
+      loadSimpleConfigPresets(),
+      fetch('https://opendisplay.org/firmware/toolbox/config.yaml')
+    ]);
+    
+    if (!yamlResponse.ok) {
+      throw new Error(`HTTP error! status: ${yamlResponse.status}`);
+    }
+    const yamlText = await yamlResponse.text();
+    document.getElementById('yamlInput').value = yamlText;
+    loadYamlFromText(yamlText);
+  } catch (error) {
+    console.error('Failed to load config:', error);
+    if (error.message && error.message.includes('simple-config-presets')) {
+      document.getElementById('yamlInput').placeholder = 'Failed to load configuration presets. Please refresh the page.';
+      alert('Failed to load configuration presets. Please refresh the page.');
+    } else {
+      document.getElementById('yamlInput').placeholder = 'Failed to load config.yaml. Please check the file exists and try again.';
+      alert('Failed to load config.yaml. Please check the file exists and try again.');
+    }
+    document.getElementById('yamlInput').value = '';
+  }
+}
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+function setDeviceFilterFromUrl() {
+  const filterParam = getUrlParameter('filter') || getUrlParameter('device') || getUrlParameter('prefix');
+  if (!filterParam) return false;
+  const input = document.getElementById('namePrefix');
+  if (input) {
+    input.value = filterParam.trim();
+    addLog('Device filter set from URL: ' + filterParam, 'info');
+    return true;
+  }
+  return false;
+}
+
+function parseEncryptionKeyFromUrl(hexStr) {
+  if (!hexStr || typeof hexStr !== 'string') return null;
+  const cleaned = hexStr.replace(/[^0-9A-Fa-f]/g, '');
+  if (cleaned.length !== 32) return null;
+  const out = new Uint8Array(16);
+  for (let i = 0; i < 16; i++) {
+    const n = parseInt(cleaned.substr(i * 2, 2), 16);
+    if (isNaN(n)) return null;
+    out[i] = n;
+  }
+  return out;
+}
+
+function getEncryptionKeyFromUrl() {
+  // Accept a few common parameter names for compatibility.
+  const candidates = [
+    'key',
+    'k',
+    'enc',
+    'encryption_key',
+    'encryptionKey',
+    'password',
+    'pw'
+  ];
+  for (const name of candidates) {
+    const v = getUrlParameter(name);
+    const key = parseEncryptionKeyFromUrl(v);
+    if (key) return key;
+  }
+  return null;
+}
+
+async function ensureAuthenticatedOnConnect() {
+  if (!bleLib || !bleLib.isConnected) return;
+  try {
+    // Only authenticate automatically if a key is provided in the URL.
+    // If encryption is required, we'll prompt on-demand when an operation fails.
+    const urlKey = getEncryptionKeyFromUrl();
+    if (!urlKey) return;
+    const needsAuth = await bleLib.setEncryptionKey(urlKey);
+    if (!needsAuth) return;
+    await bleLib.authenticate();
+    addLog('Authenticated (encryption enabled).', 'success');
+  } catch (e) {
+    // If user cancels prompt or auth fails, continue connected without auth.
+    addLog('Authentication skipped/failed: ' + (e && e.message ? e.message : e), 'warning');
+  }
+}
+
+function isAuthError(error) {
+  const msg = (error && error.message ? String(error.message) : String(error || '')).toLowerCase();
+  const name = (error && error.name ? String(error.name) : '').toLowerCase();
+  return (
+    name.includes('security') ||
+    msg.includes('auth') ||
+    msg.includes('encrypt') ||
+    msg.includes('encryption') ||
+    msg.includes('not authorized') ||
+    msg.includes('insufficient encryption') ||
+    msg.includes('0xfe')
+  );
+}
+
+async function ensureAuthenticatedOnDemand() {
+  if (!bleLib || !bleLib.isConnected) throw new Error('Not connected');
+  const urlKey = getEncryptionKeyFromUrl();
+  if (urlKey) {
+    const needsAuth = await bleLib.setEncryptionKey(urlKey);
+    if (needsAuth) await bleLib.authenticate();
+    return;
+  }
+  // No URL key; prompt now because we know an operation required it.
+  const needsAuth = await bleLib.setEncryptionKey(null);
+  if (needsAuth) await bleLib.authenticate();
+}
+function isToolboxEncodedConfigParam(configParamTrimmed) {
+  return configParamTrimmed.length > 50 &&
+    !configParamTrimmed.includes('/') &&
+    !configParamTrimmed.endsWith('.json') &&
+    !configParamTrimmed.includes('..');
+}
+
+async function loadConfigFromUrl() {
+  const configParam = getUrlParameter('config');
+  if (!configParam) {
+    return;
+  }
+  if (!schema) {
+    addLog('Schema not loaded yet, waiting...', 'info');
+    setTimeout(loadConfigFromUrl, 100);
+    return;
+  }
+  const configParamTrimmed = configParam.trim();
+  if (!isToolboxEncodedConfigParam(configParamTrimmed)) {
+    return;
+  }
+  try {
+    addLog('Loading config from URL (binary format)...', 'info');
+    const bytes = base64urlDecode(configParamTrimmed);
+    parseRawBytes(bytes);
+    addLog('Config loaded from URL successfully', 'success');
+    showAutoInstallPanel();
+  } catch (error) {
+    addLog(`Error decoding config from URL: ${error.message}`, 'error');
+    console.error('Failed to decode config from URL:', error);
+  }
+}
+function showAutoInstallPanel() {
+  const panel = document.getElementById('autoInstallPanel');
+  if (panel) {
+    panel.classList.add('show');
+  }
+}
+function openBleTester() {
+  window.open('https://opendisplay.org/firmware/display/', '_blank');
+}
+async function startAutoInstall() {
+  const autoInstallBtn = document.getElementById('autoInstallBtn');
+  if (autoInstallBtn.disabled) {
+    return;
+  }
+  autoInstallBtn.disabled = true;
+  autoInstallBtn.textContent = 'Installing...';
+  try {
+    addLog('Starting auto-install sequence...', 'info');
+    addLog('Step 1: Connecting to BLE device...', 'info');
+    await connectToBleDevice();
+    addLog('Step 2: Waiting for connection to stabilize...', 'info');
+        await bleLib.delay(2000);
+    addLog('Step 3: Writing config to device...', 'info');
+    await writeConfigToDevice();
+    addLog('Step 4: Waiting before reboot...', 'info');
+        await bleLib.delay(1500);
+    addLog('Step 5: Rebooting device...', 'info');
+    reboot();
+    
+    addLog('Auto-install sequence completed!', 'success');
+    const bleTesterBtn = document.getElementById('openBleTesterBtn');
+    if (bleTesterBtn && autoInstallBtn) {
+      autoInstallBtn.style.display = 'none';
+      bleTesterBtn.style.display = 'block';
+    }
+    redirectToDisplayTesterAfterAutoInstall();
+  } catch (error) {
+    addLog(`Auto-install failed: ${error.message}`, 'error');
+    autoInstallBtn.disabled = false;
+    autoInstallBtn.textContent = 'Auto Install to Device';
+    alert('Auto-install failed: ' + error.message);
+  }
+}
+function connectToBleDevice() {
+  return new Promise((resolve, reject) => {
+    if (bleLib && bleLib.isConnected) {
+      addLog('Already connected to device', 'info');
+      resolve();
+      return;
+    }
+    const namePrefix = document.getElementById('namePrefix').value.trim();
+    if (!namePrefix) {
+      reject(new Error('Device filter needed'));
+      return;
+    }
+    if (!bleLib) {
+      bleLib = new OpenDisplayBLE({
+        deviceNamePrefix: namePrefix,
+        maxReconnectAttempts: 3,
+        reconnectDelay: 2000,
+        onConnect: async () => {
+          addLog('BLE connection established', 'success');
+          document.getElementById("connectbutton").innerHTML = 'Disconnect';
+          await ensureAuthenticatedOnConnect();
+          resolve();
+        },
+        onDisconnect: () => {
+          addLog('Device disconnected.');
+          setStatus("Disconnected");
+          document.getElementById("connectbutton").innerHTML = 'Connect';
+        },
+        onError: (error) => {
+          addLog(`Error: ${error.name} - ${error.message}`, 'error');
+          setStatus(`Error: ${error.message}`);
+          document.getElementById("connectbutton").innerHTML = 'Connect';
+          reject(error);
+        },
+        onNotification: handleNotification,
+        onLog: (message, type) => {
+          addLog(message, type);
+        },
+        onStatusChange: (message, isConnected) => {
+          setStatus(message, isConnected);
+        }
+      });
+    }
+    addLog("Requesting device with filters: " + namePrefix);
+    setStatus("Requesting device...");
+    document.getElementById("connectbutton").innerHTML = 'Scanning...';
+    bleLib.connect(namePrefix)
+      .then(() => {
+        // onConnect callback will call resolve()
+      })
+      .catch(error => {
+        if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+          reject(new Error('No device selected/found'));
+        } else {
+          reject(error);
+        }
+      });
+  });
+}
+async function writeConfigToDevice() {
+  if (!bleLib || !bleLib.isConnected) {
+    throw new Error('Not connected to device');
+  }
+  // If in simple config mode, ensure config is merged before building
+  if (simpleConfigMode && simpleConfigSelections.driverBoard && 
+      simpleConfigSelections.display && simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  const packetBytes = collectPacketBytes();
+  if (!packetBytes) {
+    throw new Error('No packet built');
+  }
+  addLog("Writing config to device...", 'info');
+  await bleLib.writeConfig(new Uint8Array(packetBytes));
+  addLog("Config written successfully", 'success');
+  await bleLib.delay(1000);
+}
+function loadYamlFromText(yamlText) {
+  try {
+    const doc = jsyaml.load(yamlText);
+    if (!doc || !doc.ble_proto) {
+      alert('Invalid YAML or missing ble_proto root');
+      return;
+    }
+    schema = doc.ble_proto;
+    const versionInfo = document.getElementById('versionInfo');
+    const version = schema.version || 1;
+    const minorVersion = schema.minor_version || 0;
+    versionInfo.textContent = `(v${version}.${minorVersion})`;
+    
+    const urlPreset = getUrlParameter('config');
+    const urlPresetTrimmed = urlPreset ? urlPreset.trim() : '';
+    const encodedConfigInUrl = urlPresetTrimmed && isToolboxEncodedConfigParam(urlPresetTrimmed);
+    if (encodedConfigInUrl) {
+      simpleConfigMode = false;
+      const simplePanel = document.getElementById('simpleConfigPanel');
+      const builderPanel = document.getElementById('builderUIPanel');
+      const blePanel = document.getElementById('bleConnectionPanel');
+      const bytesPanel = document.getElementById('finishedBytesPanel');
+      const yamlPanel = document.getElementById('yamlConfigPanel');
+      simplePanel.style.display = 'none';
+      builderPanel.style.display = 'block';
+      blePanel.style.display = 'block';
+      bytesPanel.style.display = 'block';
+      yamlPanel.style.display = 'block';
+      updateBleConnectionButtons();
+      renderBuilder();
+      setTimeout(() => {
+        loadConfigFromUrl();
+      }, 100);
+    } else {
+      initializeSimpleConfigMode();
+      renderBuilder();
+    }
+  } catch (e) {
+    alert('YAML parse error: ' + e);
+  }
+}
+
+function initializeSimpleConfigMode() {
+  if (!simpleConfigMode) return;
+  
+  // Check if presets are loaded
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    alert('Configuration presets are still loading. Please wait a moment and try again.');
+    return;
+  }
+  
+  // Populate driver board dropdown
+  const driverBoardSelect = document.getElementById('driverBoardSelect');
+  driverBoardSelect.innerHTML = '<option value="">-- Select driver board --</option>';
+  simpleConfigPresets.driverBoards.forEach(board => {
+    const option = document.createElement('option');
+    option.value = board.id;
+    option.textContent = board.name;
+    driverBoardSelect.appendChild(option);
+  });
+  
+  // Populate power dropdown
+  const powerSelect = document.getElementById('powerSelect');
+  powerSelect.innerHTML = '<option value="">-- Select power option --</option>';
+  simpleConfigPresets.powerOptions.forEach(power => {
+    const option = document.createElement('option');
+    option.value = power.id;
+    option.textContent = power.name;
+    powerSelect.appendChild(option);
+  });
+  
+  // Show simple config panel, hide builder and other panels
+  // Set visibility immediately (panels already start hidden, so no flashing)
+  document.getElementById('simpleConfigPanel').style.display = 'block';
+  document.getElementById('premadeConfigPanel').style.display = 'block';
+  document.getElementById('builderUIPanel').style.display = 'none';
+  document.getElementById('bleConnectionPanel').style.display = 'none';
+  document.getElementById('finishedBytesPanel').style.display = 'none';
+  document.getElementById('yamlConfigPanel').style.display = 'none';
+  
+  // Hide BLE connection buttons in simple mode
+  updateBleConnectionButtons();
+  
+  // Event handlers
+  driverBoardSelect.onchange = handleDriverBoardChange;
+  document.getElementById('displaySelect').onchange = handleDisplayChange;
+  powerSelect.onchange = handlePowerChange;
+  document.getElementById('switchToFullModeBtn').onclick = switchToFullMode;
+  document.getElementById('simpleAutoInstallBtn').onclick = startSimpleAutoInstall;
+  document.getElementById('shareSimpleConfigBtn').onclick = shareSimpleConfig;
+  
+  // Initialize button state
+  updateSwitchToFullModeButton();
+  
+  // Check if URL has a simple config parameter
+  loadSimpleConfigFromUrl();
+}
+
+function handleDriverBoardChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const driverBoardSelect = document.getElementById('driverBoardSelect');
+  const displaySelect = document.getElementById('displaySelect');
+  const installButtonContainer = document.getElementById('installButtonContainer');
+  const firmwareInstallButton = document.getElementById('firmwareInstallButton');
+  const installNrfBtn = document.getElementById('installNrfBtn');
+  const selectedBoardId = driverBoardSelect.value;
+  
+  if (!selectedBoardId) {
+    displaySelect.disabled = true;
+    displaySelect.innerHTML = '<option value="">-- Select display --</option>';
+    simpleConfigSelections.driverBoard = null;
+    installButtonContainer.style.display = 'none';
+    updateSwitchToFullModeButton();
+    return;
+  }
+  
+  const selectedBoard = simpleConfigPresets.driverBoards.find(b => b.id === selectedBoardId);
+  simpleConfigSelections.driverBoard = selectedBoard;
+  
+  // Show install button if board has install config
+  if (selectedBoard.installConfig) {
+    installButtonContainer.style.display = 'block';
+    if (selectedBoard.installConfig.type === 'esp32') {
+      firmwareInstallButton.style.display = 'block';
+      installNrfBtn.style.display = 'none';
+      firmwareInstallButton.setAttribute('manifest', selectedBoard.installConfig.manifest);
+    } else if (selectedBoard.installConfig.type === 'nrf52840') {
+      firmwareInstallButton.style.display = 'none';
+      installNrfBtn.style.display = 'block';
+      // Initialize nRF Web Tools
+      if (typeof NrfWebTools !== 'undefined') {
+        // Remove any existing onclick to avoid duplicates
+        installNrfBtn.onclick = null;
+        // Create new instance - firmware path is relative to toolbox page
+        const nrfInstaller = new NrfWebTools(installNrfBtn, 'firmware/NRF52840.zip');
+      } else {
+        installNrfBtn.onclick = () => {
+          alert('nRF Web Tools library not loaded. Please refresh the page.');
+        };
+      }
+    }
+  } else {
+    installButtonContainer.style.display = 'none';
+  }
+  
+  // Filter displays by connector compatibility
+  displaySelect.innerHTML = '<option value="">-- Select display --</option>';
+  const compatibleDisplays = simpleConfigPresets.displays.filter(display => {
+    return selectedBoard.connectorPins.some(pin => display.connectorPins.includes(pin));
+  });
+  
+  compatibleDisplays.forEach(display => {
+    const option = document.createElement('option');
+    option.value = display.id;
+    option.textContent = display.name;
+    displaySelect.appendChild(option);
+  });
+  
+  displaySelect.disabled = false;
+  
+  // Apply default display if not already selected and default is defined
+  if (selectedBoard.defaultDisplay && !displaySelect.value) {
+    // Check if the default display is compatible and available
+    const defaultDisplayExists = compatibleDisplays.some(d => d.id === selectedBoard.defaultDisplay);
+    if (defaultDisplayExists) {
+      displaySelect.value = selectedBoard.defaultDisplay;
+      handleDisplayChange();
+    }
+  }
+  
+  // Apply default power if not already selected and default is defined
+  if (selectedBoard.defaultPower) {
+    const powerSelect = document.getElementById('powerSelect');
+    if (powerSelect && !powerSelect.value) {
+      // Check if the default power option exists
+      const defaultPowerExists = simpleConfigPresets.powerOptions.some(p => p.id === selectedBoard.defaultPower);
+      if (defaultPowerExists) {
+        powerSelect.value = selectedBoard.defaultPower;
+        handlePowerChange();
+      }
+    }
+  }
+  
+  updateSwitchToFullModeButton();
+}
+
+function handleDisplayChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const displaySelect = document.getElementById('displaySelect');
+  const selectedDisplayId = displaySelect.value;
+  
+  if (!selectedDisplayId) {
+    simpleConfigSelections.display = null;
+    updateSwitchToFullModeButton();
+    return;
+  }
+  
+  const selectedDisplay = simpleConfigPresets.displays.find(d => d.id === selectedDisplayId);
+  simpleConfigSelections.display = selectedDisplay;
+  updateSwitchToFullModeButton();
+}
+
+function handlePowerChange() {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return;
+  }
+  
+  const powerSelect = document.getElementById('powerSelect');
+  const selectedPowerId = powerSelect.value;
+  
+  if (!selectedPowerId) {
+    simpleConfigSelections.power = null;
+    updateSwitchToFullModeButton();
+    return;
+  }
+  
+  const selectedPower = simpleConfigPresets.powerOptions.find(p => p.id === selectedPowerId);
+  simpleConfigSelections.power = selectedPower;
+  updateSwitchToFullModeButton();
+}
+
+function shareSimpleConfig() {
+  // Allow partial configurations - only include selected options
+  const driverBoardId = simpleConfigSelections.driverBoard ? simpleConfigSelections.driverBoard.id : null;
+  const displayId = simpleConfigSelections.display ? simpleConfigSelections.display.id : null;
+  const powerId = simpleConfigSelections.power ? simpleConfigSelections.power.id : null;
+  
+  // Check if at least one selection is made
+  if (!driverBoardId && !displayId && !powerId) {
+    alert('Please select at least one option (driver board, display, or power) to share.');
+    return;
+  }
+  
+  const url = new URL(window.location);
+  // Remove old config parameter if present (to avoid conflicts)
+  url.searchParams.delete('config');
+  url.searchParams.delete('simple');
+  // Remove old simple config parameters
+  url.searchParams.delete('driver');
+  url.searchParams.delete('display');
+  url.searchParams.delete('power');
+  
+  // Add only selected parameters
+  if (driverBoardId) {
+    url.searchParams.set('driver', driverBoardId);
+  }
+  if (displayId) {
+    url.searchParams.set('display', displayId);
+  }
+  if (powerId) {
+    url.searchParams.set('power', powerId);
+  }
+  
+  window.history.pushState({}, '', url);
+  
+  addLog('Simple config encoded in URL. Share this link!', 'success');
+  navigator.clipboard.writeText(url.toString()).then(() => {
+    addLog('URL copied to clipboard!', 'success');
+    alert('Configuration link copied to clipboard!');
+  }).catch(() => {
+    addLog('URL updated. Copy it manually from the address bar.', 'info');
+    alert('Configuration link updated in the address bar. Please copy it manually.');
+  });
+}
+
+function loadSimpleConfigFromUrl() {
+  if (!simpleConfigMode || !simpleConfigPresets) {
+    return;
+  }
+  const legacyConfigParam = getUrlParameter('config');
+  if (legacyConfigParam && isToolboxEncodedConfigParam(legacyConfigParam.trim())) {
+    return;
+  }
+  const driverBoardId = getUrlParameter('driver');
+  const displayId = getUrlParameter('display');
+  const powerId = getUrlParameter('power');
+  const simpleParam = getUrlParameter('simple');
+  let parsedDriverBoardId = driverBoardId;
+  let parsedDisplayId = displayId;
+  let parsedPowerId = powerId;
+  if (simpleParam && !driverBoardId && !displayId && !powerId) {
+    const parts = simpleParam.split(':');
+    if (parts.length === 3) {
+      parsedDriverBoardId = parts[0] || null;
+      parsedDisplayId = parts[1] || null;
+      parsedPowerId = parts[2] || null;
+    }
+  }
+  if (!parsedDriverBoardId && !parsedDisplayId && !parsedPowerId) {
+    if (legacyConfigParam && typeof getPremadeLegacySimpleTriple === 'function') {
+      const triple = getPremadeLegacySimpleTriple(legacyConfigParam);
+      if (triple) {
+        parsedDriverBoardId = triple.driverBoardId;
+        parsedDisplayId = triple.displayId;
+        parsedPowerId = triple.powerId;
+      } else if (legacyConfigParam.trim()) {
+        addLog('Unknown ?config= preset. Use base64 payload, ?driver=/display=/power=, or a known premade name.', 'warning');
+        return;
+      }
+    }
+  }
+  if (!parsedDriverBoardId && !parsedDisplayId && !parsedPowerId) {
+    return;
+  }
+  let loadedCount = 0;
+  if (parsedDriverBoardId) {
+    const driverBoard = simpleConfigPresets.driverBoards.find(b => b.id === parsedDriverBoardId);
+    if (driverBoard) {
+      const driverBoardSelect = document.getElementById('driverBoardSelect');
+      driverBoardSelect.value = parsedDriverBoardId;
+      handleDriverBoardChange();
+      loadedCount++;
+      setTimeout(() => {
+        if (parsedDisplayId) {
+          const display = simpleConfigPresets.displays.find(d => d.id === parsedDisplayId);
+          if (display) {
+            const displaySelect = document.getElementById('displaySelect');
+            displaySelect.value = parsedDisplayId;
+            handleDisplayChange();
+            loadedCount++;
+          }
+        }
+        setTimeout(() => {
+          if (parsedPowerId) {
+            const power = simpleConfigPresets.powerOptions.find(p => p.id === parsedPowerId);
+            if (power) {
+              const powerSelect = document.getElementById('powerSelect');
+              powerSelect.value = parsedPowerId;
+              handlePowerChange();
+              loadedCount++;
+            }
+          }
+          if (loadedCount > 0) {
+            addLog(`Simple config loaded from URL (${loadedCount} selection${loadedCount > 1 ? 's' : ''})`, 'success');
+          }
+        }, 100);
+      }, 100);
+    } else {
+      console.warn(`Driver board not found: ${parsedDriverBoardId}`);
+    }
+  } else if (parsedPowerId) {
+    const power = simpleConfigPresets.powerOptions.find(p => p.id === parsedPowerId);
+    if (power) {
+      const powerSelect = document.getElementById('powerSelect');
+      powerSelect.value = parsedPowerId;
+      handlePowerChange();
+      loadedCount++;
+      addLog('Simple config (power only) loaded from URL', 'success');
+    }
+  }
+}
+
+function updateSwitchToFullModeButton() {
+  const autoInstallBtn = document.getElementById('simpleAutoInstallBtn');
+  if (!autoInstallBtn) return;
+  
+  const allSelected = simpleConfigSelections.driverBoard && 
+                      simpleConfigSelections.display && 
+                      simpleConfigSelections.power;
+  
+  // Add/remove visual "incomplete" styling
+  if (allSelected) {
+    autoInstallBtn.classList.remove('incomplete');
+  } else {
+    autoInstallBtn.classList.add('incomplete');
+  }
+  
+  // Share simple config button is always enabled (allows partial configs)
+  const shareSimpleConfigBtn = document.getElementById('shareSimpleConfigBtn');
+  if (shareSimpleConfigBtn) {
+    shareSimpleConfigBtn.disabled = false;
+    shareSimpleConfigBtn.style.opacity = '1';
+    shareSimpleConfigBtn.style.cursor = 'pointer';
+  }
+}
+
+function updateBleConnectionButtons() {
+  const bleConnectionButtons = document.getElementById('bleConnectionButtons');
+  const bleConfigButtons = document.getElementById('bleConfigButtons');
+  const autoInstallButtons = document.getElementById('autoInstallButtons');
+  const deviceFilterGroup = document.getElementById('deviceFilterGroup');
+  const progressBarGroup = document.getElementById('progressBarGroup');
+  
+  if (simpleConfigMode) {
+    // Hide all buttons in simple mode
+    if (bleConnectionButtons) bleConnectionButtons.style.display = 'none';
+    if (bleConfigButtons) bleConfigButtons.style.display = 'none';
+    if (autoInstallButtons) autoInstallButtons.style.display = 'none';
+    // Hide device filter, show progress bar
+    if (deviceFilterGroup) deviceFilterGroup.style.display = 'none';
+    if (progressBarGroup) progressBarGroup.style.display = 'flex';
+  } else {
+    // Show all buttons in full mode
+    if (bleConnectionButtons) bleConnectionButtons.style.display = 'flex';
+    if (bleConfigButtons) bleConfigButtons.style.display = 'flex';
+    if (autoInstallButtons) autoInstallButtons.style.display = 'flex';
+    // Show device filter, hide progress bar
+    if (deviceFilterGroup) deviceFilterGroup.style.display = 'flex';
+    if (progressBarGroup) progressBarGroup.style.display = 'none';
+  }
+}
+
+function updateProgressBar(percent, text) {
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  if (progressBar) {
+    progressBar.style.width = percent + '%';
+  }
+  if (progressText) {
+    progressText.textContent = text || (percent + '%');
+  }
+}
+
+function switchToFullMode() {
+  // Always allow switching to full mode, even with partial selections
+  // Merge whatever simple config selections exist into full config
+  if (simpleConfigSelections.driverBoard || 
+      simpleConfigSelections.display || 
+      simpleConfigSelections.power) {
+    mergeSimpleConfigToFull();
+  }
+  
+  // Switch to full mode
+  simpleConfigMode = false;
+  // Set visibility immediately
+  document.getElementById('simpleConfigPanel').style.display = 'none';
+  document.getElementById('premadeConfigPanel').style.display = 'none';
+  document.getElementById('builderUIPanel').style.display = 'block';
+  document.getElementById('bleConnectionPanel').style.display = 'block';
+  document.getElementById('finishedBytesPanel').style.display = 'block';
+  document.getElementById('yamlConfigPanel').style.display = 'block';
+  
+  // Show BLE connection buttons in full mode
+  updateBleConnectionButtons();
+  
+  // Re-render builder with merged config (may be partial)
+  renderBuilderFromInstances();
+}
+
+async function startSimpleAutoInstall() {
+  const simpleAutoInstallBtn = document.getElementById('simpleAutoInstallBtn');
+  if (!simpleAutoInstallBtn) {
+    alert('Auto install button not found');
+    return;
+  }
+  
+  // Check what's missing and alert user (same functionality as build button)
+  if (simpleConfigMode) {
+    const missing = [];
+    if (!simpleConfigSelections.driverBoard) {
+      missing.push('driver board');
+    }
+    if (!simpleConfigSelections.display) {
+      missing.push('display');
+    }
+    if (!simpleConfigSelections.power) {
+      missing.push('power option');
+    }
+    
+    if (missing.length > 0) {
+      alert('Please select the following options before installing:\n- ' + missing.join('\n- '));
+      return;
+    }
+  }
+  
+  // Merge simple config into full config before installing
+  mergeSimpleConfigToFull();
+  
+  // Show BLE connection panel when auto install is pressed
+  document.getElementById('bleConnectionPanel').style.display = 'block';
+  // Buttons should remain hidden in simple mode
+  updateBleConnectionButtons();
+  
+  simpleAutoInstallBtn.disabled = true;
+  simpleAutoInstallBtn.textContent = 'Configuring...';
+  try {
+    updateProgressBar(0, 'Starting...');
+    addLog('Starting auto-install sequence from simple config...', 'info');
+    
+    updateProgressBar(10, 'Connecting...');
+    addLog('Step 1: Connecting to BLE device...', 'info');
+    await connectToBleDevice();
+    
+    updateProgressBar(30, 'Stabilizing...');
+    addLog('Step 2: Waiting for connection to stabilize...', 'info');
+    await bleLib.delay(2000);
+    
+    updateProgressBar(50, 'Writing config...');
+    addLog('Step 3: Writing config to device...', 'info');
+    await writeConfigToDevice();
+    
+    updateProgressBar(90, 'Rebooting...');
+    addLog('Step 5: Rebooting device...', 'info');
+    reboot();
+    
+    updateProgressBar(100, 'Complete!');
+    addLog('Auto-install sequence completed!', 'success');
+    simpleAutoInstallBtn.disabled = false;
+    simpleAutoInstallBtn.textContent = 'Configure Device';
+    redirectToDisplayTesterAfterAutoInstall();
+  } catch (error) {
+    updateProgressBar(0, 'Failed');
+    addLog(`Auto-install failed: ${error.message}`, 'error');
+    simpleAutoInstallBtn.disabled = false;
+    simpleAutoInstallBtn.textContent = 'Configure Device';
+    alert('Auto-install failed: ' + error.message);
+  }
+}
+
+function getDisplayInfoFromConfig() {
+  // Get display packet from instances
+  const displayPacket = instances.packets.find(p => p.pid === '32' && p.fields.instance_number === '0x0');
+  if (!displayPacket) {
+    return null;
+  }
+  
+  const pixelWidth = parseValueToNumber(displayPacket.fields.pixel_width) || 800;
+  const pixelHeight = parseValueToNumber(displayPacket.fields.pixel_height) || 480;
+  const colorScheme = parseInt(displayPacket.fields.color_scheme) || 0;
+  const rotation = parseInt(displayPacket.fields.rotation) || 0;
+  
+  return { pixelWidth, pixelHeight, colorScheme, rotation };
+}
+
+function createTestImageCanvas(width, height, colorScheme) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  
+  // Fill with white background
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, width, height);
+  
+  // Draw test text in center
+  const text = 'Test';
+  const fontSize = Math.min(width, height) * 0.15;
+  const x = width / 2;
+  const y = height / 2;
+  
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `bold ${fontSize}px Arial`;
+  
+  // Draw black text
+  ctx.fillStyle = 'black';
+  ctx.fillText(text, x, y);
+  
+  // Draw colored text based on color scheme
+  if (colorScheme >= 1 && colorScheme !== 6) {
+    // Red
+    ctx.fillStyle = 'rgb(255, 0, 0)';
+    ctx.fillText(text, x, y + fontSize * 0.7);
+  }
+  if (colorScheme >= 2 && colorScheme !== 6) {
+    // Yellow
+    ctx.fillStyle = 'rgb(255, 255, 0)';
+    ctx.fillText(text, x, y - fontSize * 0.7);
+  }
+  if (colorScheme >= 3 && colorScheme !== 6) {
+    // Red + Yellow already drawn
+  }
+  if (colorScheme === 4) {
+    // 6-color: Green and Blue
+    ctx.fillStyle = 'rgb(0, 255, 0)';
+    ctx.fillText(text, x, y + fontSize * 1.4);
+    ctx.fillStyle = 'rgb(0, 0, 255)';
+    ctx.fillText(text, x, y - fontSize * 1.4);
+  }
+  if (colorScheme === 5) {
+    // Grayscale
+    ctx.fillStyle = 'rgb(85, 85, 85)';
+    ctx.fillText(text, x, y + fontSize * 0.7);
+    ctx.fillStyle = 'rgb(170, 170, 170)';
+    ctx.fillText(text, x, y - fontSize * 0.7);
+  }
+  if (colorScheme === 6) {
+    ctx.fillStyle = 'rgb(128, 128, 128)';
+    ctx.fillText(text, x, y + fontSize * 0.7);
+    ctx.fillStyle = 'rgb(64, 64, 64)';
+    ctx.fillText(text, x, y - fontSize * 0.7);
+  }
+  
+  return canvas;
+}
+
+async function waitForDeviceReboot(maxWaitTime = 65000, retryInterval = 5000) {
+  const namePrefix = document.getElementById('namePrefix')?.value || 'OD';
+  const startTime = Date.now();
+  let lastError = null;
+  
+  // Helper function to delay
+  const delay = (ms) => {
+    if (bleLib && bleLib.delay) {
+      return bleLib.delay(ms);
+    }
+    return new Promise(resolve => setTimeout(resolve, ms));
+  };
+  
+  // Disconnect if still connected from before reboot
+  if (bleLib && bleLib.isConnected) {
+    try {
+      await bleLib.disconnect();
+      await delay(1000);
+    } catch (e) {
+      // Ignore disconnect errors
+    }
+  }
+  
+  while (Date.now() - startTime < maxWaitTime) {
+    try {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      addLog(`Attempting to reconnect (waited ${elapsed}s)...`, 'info');
+      updateProgressBar(92 + Math.min(5, Math.floor(elapsed / 10)), `Waiting for reboot (${elapsed}s)...`);
+      
+      // Try to connect
+      await connectToBleDevice();
+      
+      // If we get here, connection succeeded
+      addLog('Device reconnected after reboot!', 'success');
+      await delay(2000); // Wait for connection to stabilize
+      return true;
+    } catch (error) {
+      lastError = error;
+      addLog(`Reconnection attempt failed: ${error.message}. Retrying in ${retryInterval / 1000}s...`, 'info');
+      await delay(retryInterval);
+    }
+  }
+  
+  throw new Error(`Device did not reconnect within ${maxWaitTime / 1000} seconds. Last error: ${lastError?.message || 'Unknown'}`);
+}
+
+async function uploadTestImageAfterReboot() {
+  try {
+    // Get display info from config
+    const displayInfo = getDisplayInfoFromConfig();
+    if (!displayInfo) {
+      addLog('Could not determine display info from config. Skipping test image upload.', 'warning');
+      return;
+    }
+    
+    const { pixelWidth, pixelHeight, colorScheme, rotation } = displayInfo;
+    addLog(`Display info: ${pixelWidth}x${pixelHeight}, color scheme: ${colorScheme}, rotation: ${rotation * 90}°`, 'info');
+    
+    // Wait for device to reboot and reconnect
+    await waitForDeviceReboot();
+    
+    // Create test image
+    updateProgressBar(95, 'Creating test image...');
+    addLog('Creating test image with all colors...', 'info');
+    const testCanvas = createTestImageCanvas(pixelWidth, pixelHeight, colorScheme);
+    
+    // Apply dithering if needed (for color schemes that support it)
+    if (colorScheme > 0 && bleLib && bleLib.applyDithering) {
+      const ctx = testCanvas.getContext('2d', { willReadFrequently: true });
+      bleLib.applyDithering(ctx, pixelWidth, pixelHeight, colorScheme, 'floyd-steinberg');
+    }
+    
+    // Upload test image - wrap in promise to wait for completion
+    updateProgressBar(96, 'Uploading image...');
+    addLog('Uploading test image to display (compressed)...', 'info');
+    await new Promise((resolve, reject) => {
+      bleLib.sendCanvasToDisplay(testCanvas, colorScheme, {
+        rotation: rotation,
+        originalWidth: pixelWidth,
+        originalHeight: pixelHeight,
+        useFastRefresh: false,
+        onProgress: (current, total) => {
+          const progress = Math.floor((current / total) * 100);
+          const overallProgress = 96 + Math.floor(progress * 0.03);
+          updateProgressBar(overallProgress, `Uploading: ${progress}%`);
+          if (current % 10 === 0 || current === total) {
+            addLog(`Upload progress: ${progress}%`, 'info');
+          }
+        },
+        onStatusChange: (message) => {
+          addLog(message, 'info');
+        },
+        onComplete: (success, error) => {
+          if (success) {
+            addLog('Test image uploaded successfully!', 'success');
+            resolve();
+          } else {
+            const errorMsg = error ? error.message : 'Unknown error';
+            addLog('Error uploading test image: ' + errorMsg, 'error');
+            reject(new Error(errorMsg));
+          }
+        }
+      }).catch(reject);
+    });
+    
+    addLog('Test image upload completed!', 'success');
+  } catch (error) {
+    addLog(`Failed to upload test image: ${error.message}`, 'error');
+    // Don't throw - this is not critical, just log the error
+  }
+}
+
+function mergeSimpleConfigToFull() {
+  if (!schema) {
+    alert('Schema not loaded. Cannot merge config.');
+    return;
+  }
+  
+  // Don't clear all packets - merge with existing ones
+  // Only add packets that don't already exist or update existing ones
+  
+  // Add system_config packet if driver board is selected
+  if (simpleConfigSelections.driverBoard) {
+    const existingSystemConfig = instances.packets.find(p => p.pid === '1');
+    if (existingSystemConfig) {
+      existingSystemConfig.fields = { ...simpleConfigSelections.driverBoard.systemConfig };
+    } else {
+      const systemConfigInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '1',
+        fields: { ...simpleConfigSelections.driverBoard.systemConfig }
+      };
+      instances.packets.push(systemConfigInst);
+    }
+    
+    // Add manufacturer_data packet if driver board is selected
+    const existingManufacturerData = instances.packets.find(p => p.pid === '2');
+    if (existingManufacturerData) {
+      existingManufacturerData.fields = { ...simpleConfigSelections.driverBoard.manufacturerData };
+    } else {
+      const manufacturerDataInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '2',
+        fields: { ...simpleConfigSelections.driverBoard.manufacturerData }
+      };
+      instances.packets.push(manufacturerDataInst);
+    }
+  }
+  
+  // Add power_option packet if power is selected
+  if (simpleConfigSelections.power) {
+    // Merge power option with driver board defaults
+    const powerOptionFields = { ...simpleConfigSelections.power.powerOption };
+    // Only apply driver board defaults for battery/solar modes (not USB)
+    if (simpleConfigSelections.driverBoard && 
+        simpleConfigSelections.driverBoard.powerDefaults &&
+        simpleConfigSelections.power.powerOption.power_mode !== '2') {
+      // Override with driver board specific power settings for battery/solar
+      powerOptionFields.battery_sense_pin = simpleConfigSelections.driverBoard.powerDefaults.battery_sense_pin;
+      powerOptionFields.battery_sense_enable_pin = simpleConfigSelections.driverBoard.powerDefaults.battery_sense_enable_pin;
+      powerOptionFields.voltage_scaling_factor = simpleConfigSelections.driverBoard.powerDefaults.voltage_scaling_factor;
+      if (simpleConfigSelections.driverBoard.powerDefaults.deep_sleep_current_ua !== undefined) {
+        powerOptionFields.deep_sleep_current_ua = simpleConfigSelections.driverBoard.powerDefaults.deep_sleep_current_ua;
+      }
+    }
+    
+    const existingPowerOption = instances.packets.find(p => p.pid === '4');
+    if (existingPowerOption) {
+      existingPowerOption.fields = powerOptionFields;
+    } else {
+      const powerOptionInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '4',
+        fields: powerOptionFields
+      };
+      instances.packets.push(powerOptionInst);
+    }
+  }
+  
+  // Add display packet if display is selected (requires driver board for pin config)
+  if (simpleConfigSelections.display) {
+    // If driver board is not selected, use default pins
+    const driverBoardId = simpleConfigSelections.driverBoard ? simpleConfigSelections.driverBoard.id : 'en04';
+    const displayFields = createDisplayConfig(
+      simpleConfigSelections.display,
+      driverBoardId
+    );
+    const existingDisplay = instances.packets.find(p => p.pid === '32' && p.fields.instance_number === '0x0');
+    if (existingDisplay) {
+      existingDisplay.fields = displayFields;
+    } else {
+      const displayInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '32',
+        fields: displayFields
+      };
+      instances.packets.push(displayInst);
+    }
+  }
+  
+  // Add LED packet if driver board has LED configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.led) {
+    const existingLed = instances.packets.find(p => p.pid === '33' && p.fields.instance_number === '0x0');
+    if (existingLed) {
+      existingLed.fields = { ...simpleConfigSelections.driverBoard.led };
+    } else {
+      const ledInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '33',
+        fields: { ...simpleConfigSelections.driverBoard.led }
+      };
+      instances.packets.push(ledInst);
+    }
+  }
+  
+  // Add binary_inputs (buttons) packet if driver board has button configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.buttons) {
+    const existingButtons = instances.packets.find(p => p.pid === '37' && p.fields.instance_number === '0x0');
+    if (existingButtons) {
+      existingButtons.fields = { ...simpleConfigSelections.driverBoard.buttons };
+    } else {
+      const buttonsInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '37',
+        fields: { ...simpleConfigSelections.driverBoard.buttons }
+      };
+      instances.packets.push(buttonsInst);
+    }
+  }
+  
+  // Add data_bus packet if driver board has data bus configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.dataBus) {
+    const existingDataBus = instances.packets.find(p => p.pid === '36' && p.fields.instance_number === '0x0');
+    if (existingDataBus) {
+      existingDataBus.fields = { ...simpleConfigSelections.driverBoard.dataBus };
+    } else {
+      const dataBusInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '36',
+        fields: { ...simpleConfigSelections.driverBoard.dataBus }
+      };
+      instances.packets.push(dataBusInst);
+    }
+  }
+
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.touchController) {
+    const existingTouch = instances.packets.find(p => p.pid === '40' && p.fields.instance_number === '0x0');
+    if (existingTouch) {
+      existingTouch.fields = { ...simpleConfigSelections.driverBoard.touchController };
+    } else {
+      const touchInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '40',
+        fields: { ...simpleConfigSelections.driverBoard.touchController }
+      };
+      instances.packets.push(touchInst);
+    }
+  }
+  
+  // Add sensor_data packet if driver board has sensor data configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.sensorData) {
+    const existingSensorData = instances.packets.find(p => p.pid === '35');
+    if (existingSensorData) {
+      existingSensorData.fields = { ...simpleConfigSelections.driverBoard.sensorData };
+    } else {
+      const sensorDataInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '35',
+        fields: { ...simpleConfigSelections.driverBoard.sensorData }
+      };
+      instances.packets.push(sensorDataInst);
+    }
+  }
+
+  instances.packets = instances.packets.filter(function (p) {
+    return !(p.pid === '39' && p._autoToolboxSecurity);
+  });
+  const encCb = document.getElementById('initRandomEncryptionCb');
+  if (encCb && encCb.checked) {
+    const keyBytes = new Uint8Array(16);
+    crypto.getRandomValues(keyBytes);
+    const keyHex = Array.from(keyBytes, function (b) {
+      return b.toString(16).padStart(2, '0');
+    }).join('');
+    lastAutoInstallRedirectKeyHex = keyHex;
+    const secFields = {
+      encryption_enabled: '0x1',
+      encryption_key: keyHex,
+      session_timeout_seconds: '0x0',
+      flags: '0x2',
+      reset_pin: '0xff'
+    };
+    const existingSec = instances.packets.find(function (p) {
+      return p.pid === '39';
+    });
+    if (existingSec) {
+      existingSec.fields = secFields;
+      existingSec._autoToolboxSecurity = true;
+    } else {
+      instances.packets.push({
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '39',
+        fields: secFields,
+        _autoToolboxSecurity: true
+      });
+    }
+  } else {
+    lastAutoInstallRedirectKeyHex = null;
+  }
+}
+
+function createDisplayConfig(display, driverBoardId) {
+  if (!simpleConfigPresets) {
+    console.error('Simple config presets not loaded yet');
+    return null;
+  }
+  
+  // Get pin configuration from driver board preset
+  const driverBoard = simpleConfigPresets.driverBoards.find(b => b.id === driverBoardId);
+  const pins = driverBoard && driverBoard.displayPins ? driverBoard.displayPins : {
+    reset: '0xFF', busy: '0xFF', dc: '0xFF', cs: '0xFF', data: '0x0', clk: '0x0'
+  };
+  
+  // Get config from display object, or use defaults (transmission_modes comes from driver board)
+  const config = display && display.config ? display.config : {
+    pixel_width: '0x0', pixel_height: '0x0', active_width_mm: '0x0', active_height_mm: '0x0',
+    partial_update_support: '0', color_scheme: '0', full_update_mC: '0x0'
+  };
+  const transmission_modes = (driverBoard && driverBoard.transmission_modes != null && `${driverBoard.transmission_modes}` !== '')
+    ? `${driverBoard.transmission_modes}`
+    : ((config.transmission_modes != null && `${config.transmission_modes}` !== '')
+      ? `${config.transmission_modes}`
+      : '10');
+  
+  return {
+    instance_number: '0x0',
+    display_technology: '1',
+    panel_ic_type: display.panelIcType,
+    pixel_width: config.pixel_width,
+    pixel_height: config.pixel_height,
+    active_width_mm: config.active_width_mm,
+    active_height_mm: config.active_height_mm,
+    legacy_tagtype: '0x0',
+    rotation: '0',
+    reset_pin: pins.reset,
+    busy_pin: pins.busy,
+    dc_pin: pins.dc,
+    cs_pin: pins.cs,
+    data_pin: pins.data,
+    partial_update_support: config.partial_update_support,
+    color_scheme: config.color_scheme,
+    transmission_modes: transmission_modes,
+    clk_pin: pins.clk,
+    reserved_pin_2: '0x0',
+    reserved_pin_3: '0x0',
+    reserved_pin_4: '0x0',
+    reserved_pin_5: '0x0',
+    reserved_pin_6: '0x0',
+    reserved_pin_7: '0x0',
+    reserved_pin_8: '0x0',
+    full_update_mC: config.full_update_mC,
+    reserved: '0x0'
+  };
+}
+
+
+loadYamlFromFile();
+</script>
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="https://opendisplay.org/index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+</body>
+</html>
+
+

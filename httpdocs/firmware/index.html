@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Web-based tools for OpenDisplay firmware: installer, BLE tester, config builder, battery calculator, and DFU updates. Get started with your e-paper display.">
+  <link rel="canonical" href="https://opendisplay.org/firmware/">
+  <meta property="og:title" content="OpenDisplay Firmware Tools">
+  <meta property="og:description" content="Web-based tools for OpenDisplay firmware: installer, BLE tester, config builder, battery calculator, and DFU updates.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/firmware/">
+  <link rel="shortcut icon" href="install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Firmware Tools</title>
+<style>
+/* Page-specific styles */
+.notice-panel {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.notice-panel h2 {
+  color: #92400e;
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.notice-panel p {
+  color: #78350f;
+  margin: 0;
+  line-height: 1.6;
+}
+.notice-panel a {
+  color: var(--accent);
+  font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+  .notice-panel {
+    background: #78350f;
+    border-color: #f59e0b;
+  }
+  .notice-panel h2 {
+    color: #fef3c7;
+  }
+  .notice-panel p {
+    color: #fef3c7;
+  }
+}
+</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <span>Firmware</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Firmware</h1>
+
+  <div class="col panel">
+    <h2>Getting Started</h2>
+    <p class="tool-description">
+      Follow these steps to get your e-paper display up and running:
+    </p>
+    <ol style="margin: 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong><a href="toolbox/index.html" style="color: var(--accent); text-decoration: none; font-weight: 600;">Install & Configure</a></strong> - Use the Toolbox to flash OpenDisplay firmware to your device and configure device settings. Select your device type (ESP32-S3, ESP32-C3, ESP32-C6, or NRF52840) and follow the installation instructions. Premade configurations are automatically selected after installation for popular device models (Seeed EN04, EE04, XIAO breakout boards, etc.) and can be applied with a single button click. You can also customize settings including display dimensions, color scheme, and other parameters.</li>
+      <li><strong><a href="display/index.html" style="color: var(--accent); text-decoration: none; font-weight: 600;">Display</a></strong> - Use the BLE Tester to upload images and test your display. You can upload images, preview them, and send them directly to your e-paper display.</li>
+    </ol>
+  </div>
+
+
+  <div class="col panel">
+    <h2>Home Assistant Integration</h2>
+    <p class="tool-description">
+      This firmware is fully compatible with the <a href="../homeassistant/index.html" style="color: var(--accent); font-weight: 500;">OpenDisplay Home Assistant Integration</a>. 
+      Unlike AP-based setups, this BLE firmware does <strong>not require an access point</strong>. It only needs active BLE proxies (such as ESPHome Bluetooth proxies) to communicate with Home Assistant. 
+      This makes setup simpler and more flexible, allowing direct communication between your Home Assistant instance and your e-paper displays via Bluetooth Low Energy.
+    </p>
+    <p class="tool-description">
+      Learn more about the integration's features, entities, services, and installation in the <a href="../homeassistant/index.html" style="color: var(--accent); font-weight: 500;">Home Assistant Integration documentation</a>.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Toolbox - Install & Configure</h2>
+      <p class="tool-description">
+        All-in-one toolbox for OpenDisplay firmware management. Install firmware directly to your device through your web browser (supports ESP32-S3, ESP32-C3, ESP32-C6, and NRF52840) and configure device settings in a single workflow. Premade configurations are automatically selected after installation for popular device models (Seeed EN04, EE04, XIAO breakout boards, etc.) and can be applied with a single button click. You can also customize settings including display dimensions, color scheme, and other parameters. This tool supports all Seeed Studio devices and breakout boards and some Waveshare devices.
+      </p>
+      <a href="toolbox/index.html" class="tool-link">Open Toolbox</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>BLE Tester</h2>
+      <p class="tool-description">
+        Test and upload images to your OpenDisplay device via BLE. Upload images, preview them on a canvas, and send them directly to your e-paper display. Supports various color schemes including monochrome, B/W + Red, B/W + Yellow, and multi-color modes.
+      </p>
+      <a href="display/index.html" class="tool-link">BLE Tester</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Battery Life Calculator</h2>
+      <p class="tool-description">
+        Calculate the expected battery life of your e-paper display based on battery capacity, standby current, update energy consumption, and update frequency. Load configuration values directly from BLE devices or preset configurations. Visualize consumption breakdown with interactive charts.
+      </p>
+      <a href="battery/index.html" class="tool-link">Calculator</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Adding New Displays Guide</h2>
+      <p class="tool-description">
+        Step-by-step guide on how to add support for new display panels to the OpenDisplay firmware. 
+        Learn how to find existing displays, add new panel types, implement firmware support, 
+        create preset configurations, test your implementation, and measure power consumption.
+      </p>
+      <a href="adding-displays.html" class="tool-link">View Guide</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Seeed Display Compatibility</h2>
+      <p class="tool-description">
+        Check compatibility information for Seeed Studio ePaper displays with OpenDisplay Firmware. View detailed compatibility status, resolution information, partial refresh support, and setup notes for various Seeed Studio display models.
+      </p>
+      <a href="seeed_display_compatibility.html" class="tool-link">View Compatibility</a>
+    </div>
+  </div>
+
+  <div class="col notice-panel">
+    <h2>⚠️ Important: OpenDisplay Firmware Only</h2>
+    <p>
+      These tools are designed specifically for the <strong>OpenDisplay firmware</strong>, not the ATC_BLE firmware. 
+      If your Bluetooth device name starts with <strong>"ATC"</strong>, you should use the 
+      <a href="https://atc1441.github.io/ATC_BLE_OEPL_Image_Upload.html" target="_blank">ATC_BLE Image Upload tool</a> instead.
+    </p>
+  </div>
+  
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
+

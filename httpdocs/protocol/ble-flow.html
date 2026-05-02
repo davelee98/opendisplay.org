@@ -1,0 +1,996 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenDisplay Flex communication protocol: BLE GATT and optional Wi‑Fi LAN (TCP). Connection setup, length-prefixed LAN framing, configuration, image transfer, commands, and responses.">
+  <link rel="canonical" href="https://opendisplay.org/protocol/ble-flow.html">
+  <meta property="og:title" content="Flex communication protocol - OpenDisplay">
+  <meta property="og:description" content="OpenDisplay Flex: BLE and Wi‑Fi LAN transports with the same command and response semantics.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/protocol/ble-flow.html">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>Flex communication protocol (BLE &amp; LAN) - OpenDisplay</title>
+<style>
+/* Page-specific styles for sequence diagrams */
+.flow-step {
+  background: var(--card-background);
+  border-left: 4px solid var(--accent);
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+.flow-step h4 {
+  color: var(--foreground);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.flow-step p {
+  color: var(--muted-foreground);
+  margin: 0;
+  line-height: 1.6;
+}
+.code-block {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+.code-block code {
+  color: var(--foreground);
+}
+.command-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.command-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.command-list li:last-child {
+  border-bottom: none;
+}
+.command-list code {
+  background: var(--card-background);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+.sequence-diagram {
+  margin: 32px 0;
+  position: relative;
+  min-height: 200px;
+}
+.sequence-header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  position: relative;
+}
+.sequence-participant {
+  text-align: center;
+  flex: 1;
+  position: relative;
+}
+.sequence-participant-box {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 2px solid;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.sequence-participant.client-box {
+  border-color: #3b82f6;
+  background: #dbeafe;
+  color: #1e40af;
+}
+.sequence-participant.device-box {
+  border-color: #10b981;
+  background: #d1fae5;
+  color: #065f46;
+}
+.sequence-lifeline {
+  display: none;
+}
+.sequence-messages {
+  position: relative;
+  padding-bottom: 40px;
+}
+.sequence-diagram {
+  overflow: visible;
+}
+.sequence-message {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.sequence-message-line {
+  position: absolute;
+  height: 2px;
+  background: #6b7280;
+  z-index: 2;
+}
+.sequence-message.to-device {
+  left: 20%;
+  width: 60%;
+}
+.sequence-message.to-device .sequence-message-line {
+  left: 20%;
+  width: 60%;
+  background: #3b82f6;
+}
+.sequence-message.to-device .sequence-message-line::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid #3b82f6;
+}
+.sequence-message.to-device.dotted .sequence-message-line {
+  border-top: 2px dashed #3b82f6;
+  background: transparent;
+  height: 0;
+}
+.sequence-message.to-device.dotted .sequence-message-line::after {
+  border-left-color: #3b82f6;
+}
+.sequence-message.to-client {
+  left: 20%;
+  width: 60%;
+}
+.sequence-message.to-client .sequence-message-line {
+  left: 20%;
+  width: 60%;
+  background: #10b981;
+}
+.sequence-message.to-client .sequence-message-line::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 8px solid #10b981;
+}
+.sequence-message.to-client.dotted .sequence-message-line {
+  border-top: 2px dashed #10b981;
+  background: transparent;
+  height: 0;
+}
+.sequence-message.to-client.dotted .sequence-message-line::after {
+  border-right-color: #10b981;
+}
+.sequence-message-box {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+  white-space: normal;
+  z-index: 3;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  line-height: 1.5;
+  max-width: 200px;
+  min-height: 30px;
+}
+.sequence-message.to-device .sequence-message-box {
+  left: 25%;
+  top: -18px;
+  color: #1e40af;
+}
+.sequence-message.to-client .sequence-message-box {
+  right: 25%;
+  top: -18px;
+  color: #065f46;
+}
+.sequence-activation {
+  position: absolute;
+  width: 10px;
+  background: rgba(59, 130, 246, 0.15);
+  border-left: 2px solid #3b82f6;
+  border-right: 2px solid #3b82f6;
+  z-index: 1;
+}
+.sequence-activation.client {
+  left: 20%;
+  transform: translateX(-50%);
+}
+.sequence-activation.device {
+  right: 20%;
+  transform: translateX(50%);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+}
+.sequence-disconnect {
+  position: relative;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sequence-disconnect-line {
+  position: absolute;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: #00bfff;
+  z-index: 2;
+}
+.sequence-disconnect-line::before,
+.sequence-disconnect-line::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  background: #00bfff;
+  border-radius: 50%;
+}
+.sequence-disconnect-line::before {
+  left: 0;
+}
+.sequence-disconnect-line::after {
+  right: 0;
+}
+.sequence-disconnect-label {
+  position: absolute;
+  padding: 4px 8px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  z-index: 3;
+}
+.breadcrumb {
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+.breadcrumb a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: var(--muted-foreground);
+}
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.back-link:hover {
+  color: var(--accent);
+}
+.back-link::before {
+  content: "← ";
+  margin-right: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  .flow-step[style*="background: #dbeafe"] {
+    background: #1e3a8a !important;
+    border-left-color: #3b82f6 !important;
+  }
+  .flow-step[style*="background: #dbeafe"] h4 {
+    color: #dbeafe;
+  }
+  .flow-step[style*="background: #dbeafe"] p {
+    color: #dbeafe;
+  }
+  div[style*="background: #fef3c7"] {
+    background: #78350f !important;
+    border-left-color: #f59e0b !important;
+  }
+  div[style*="background: #fef3c7"] strong {
+    color: #fef3c7;
+  }
+  div[style*="background: #fef3c7"] {
+    color: #fef3c7;
+  }
+}
+</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col" style="max-width: 1200px; margin-bottom: 10px;">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="index.html">Protocol</a><span class="breadcrumb-separator">/</span>
+      <span>Flex communication protocol</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Flex — communication protocol</h1>
+  <p style="color: var(--muted-foreground); margin-top: -12px; margin-bottom: 24px;">
+    BLE GATT and optional <strong><a href="#lan-wifi-transport" style="color: var(--accent);">Wi‑Fi LAN (TCP)</a></strong> — same commands and responses on both transports. 
+    Optional <strong><a href="#encryption-authentication" style="color: var(--accent);">application-layer encryption</a></strong> uses the same session on BLE and LAN.
+  </p>
+
+  <div class="col panel">
+    <h2>Overview</h2>
+    <p class="intro-text">
+      This document is part of <strong><a href="flex-standard.html" style="color: var(--accent);">OpenDisplay Flex</a></strong>. 
+      It defines how clients talk to devices over <strong>Bluetooth Low Energy</strong> (GATT) and, when enabled, over 
+      <strong>Wi‑Fi</strong> as a <strong>TCP client to the device</strong> (the device is the TCP server). 
+      After connection setup, the <strong>byte-level command and response format is the same</strong> as on BLE: configuration 
+      read/write, direct write, block upload, encryption session rules, and error responses apply to both transports.
+    </p>
+    <div class="flow-step" style="background: #dbeafe; border-left-color: #3b82f6;">
+      <h4>Protocol Standard</h4>
+      <p>
+        This is an open protocol standard. Any firmware implementation that follows this specification will be compatible 
+        with OpenDisplay clients, including the Python module, web tools, and Home Assistant integration.
+      </p>
+    </div>
+    <p class="intro-text" style="margin-top: 16px;">
+      For a simpler protocol option, see <strong><a href="basic-standard.html" style="color: var(--accent);">OpenDisplay</a></strong> 
+      (its Wi‑Fi appendix describes a different, pull-based model; Flex firmware follows the LAN rules below).
+    </p>
+  </div>
+
+  <div class="col panel" id="lan-wifi-transport">
+    <h2>LAN (Wi‑Fi) transport</h2>
+    <p class="intro-text">
+      On supported devices (e.g. ESP32 with Flex firmware), Wi‑Fi adds a second path for the <em>same</em> protocol bytes 
+      that would otherwise be written to the BLE characteristic. Use this when the device is on the same IPv4 LAN as the client.
+    </p>
+
+    <h3>Enabling Wi‑Fi in configuration</h3>
+    <div class="flow-step">
+      <h4><code>communication_modes</code> and <code>wifi_config</code></h4>
+      <p>
+        In <a href="yaml-config.html">system configuration</a>, <strong>bit 2</strong> of <code>communication_modes</code> 
+        (<code>wifi</code>) must be set to advertise that the device supports Wi‑Fi transfer. The saved configuration must 
+        also include <strong>packet type 38</strong> (<code>wifi_config</code>, ID <code>0x26</code>) with a 
+        <strong>non-empty SSID</strong> (and password / encryption type as appropriate). Devices typically receive this 
+        over BLE once; after reboot they join the access point as a station (STA).
+      </p>
+      <p style="margin-top: 12px;">
+        The TCP listen port defaults to <strong>2446</strong> in reference firmware unless overridden by implementation.
+      </p>
+    </div>
+
+    <h3>Discovery (mDNS)</h3>
+    <div class="flow-step">
+      <h4>Service advertised by the device</h4>
+      <p>
+        Once associated to Wi‑Fi, the device advertises mDNS so clients can find it without a fixed IP:
+      </p>
+      <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+        <li><strong>Hostname:</strong> <code>OD</code> + device chip ID in hex, e.g. <code>ODa1b2c3d4e5f.local</code></li>
+        <li><strong>Service type:</strong> <code>_opendisplay._tcp</code> (PTR/SRV on the local domain)</li>
+        <li><strong>Port:</strong> TCP port (default <code>2446</code>)</li>
+        <li><strong>TXT <code>msd</code>:</strong> 28 lowercase hexadecimal characters (14 bytes) derived from manufacturer 
+        specific data for disambiguation when several devices are on the network</li>
+      </ul>
+      <p style="margin-top: 12px;">
+        Clients should browse for <code>_opendisplay._tcp</code>, resolve the target host and port, then open a TCP connection 
+        to the device. You may also connect by IP if you already know it.
+      </p>
+    </div>
+
+    <h3>TCP framing</h3>
+    <div class="flow-step">
+      <h4>Length-prefixed payloads</h4>
+      <p>
+        The TCP byte stream is a sequence of frames:
+      </p>
+      <div class="code-block">
+        <code>Each frame:<br>
+[payload_length: 2 bytes, little-endian][payload: payload_length bytes]<br><br>
+payload_length must be from 1 to 4096 (inclusive).<br>
+payload is exactly the same blob as a single BLE <em>write</em> to the OpenDisplay characteristic<br>
+(raw command bytes as used elsewhere in this document).</code>
+      </div>
+      <p style="margin-top: 12px;">
+        Partial frames are buffered until complete. Multiple frames may arrive in one socket read. A new TCP connection 
+        replaces any previous one; only one client session is served at a time. Because each frame may carry up to 
+        4096 bytes of payload, a single LAN frame can hold a larger command chunk than a typical BLE ATT write; 
+        the command IDs and inner layout are unchanged.
+      </p>
+    </div>
+
+    <h3>Responses and encryption</h3>
+    <div class="flow-step">
+      <h4>Same semantics as BLE</h4>
+      <p>
+        Device responses are sent on the TCP socket as <strong>one frame per response</strong>, using the same framing 
+        (<code>length</code> + payload). Payload format matches BLE notifications (including application-layer encryption 
+        when a session is active). Clients must parse RX the same way as BLE notify payloads.
+      </p>
+      <p style="margin-top: 12px;">
+        If the radio link drops or the device restarts, the TCP connection closes; the client should reconnect and, if 
+        using encryption, re-establish the session as after a BLE disconnect. Details: 
+        <a href="#encryption-authentication" style="color: var(--accent);">Encryption and authentication</a>.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel" id="encryption-authentication">
+    <h2>Encryption and authentication</h2>
+    <p class="intro-text">
+      Devices may store <strong><a href="yaml-config.html#packet-type-39">packet type 39</a></strong> (<code>security_config</code>, ID <code>0x27</code>): 
+      a 16-byte <strong>AES-128 pre-shared key</strong> and an <code>encryption_enabled</code> flag. If the key is <strong>all zero</strong>, 
+      encryption is treated as off regardless of the flag. When encryption is <strong>on</strong>, almost every command requires an 
+      authenticated session; payloads are protected with <strong>AES-CCM</strong> (13-byte nonce, 12-byte tag, 2-byte associated data = command ID).
+    </p>
+
+    <h3>Commands allowed without a session</h3>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong><code>0x0050</code> Authenticate</strong> — challenge/response handshake (always unencrypted on the wire).</li>
+      <li><strong><code>0x0043</code> Firmware version</strong> — read-only, always unencrypted.</li>
+    </ul>
+    <p class="intro-text">
+      Any other command while encryption is enabled must be sent <strong>after</strong> a successful <code>0x0050</code> flow, in the 
+      encrypted form below. If the client is not authenticated, the device typically answers with status <code>0xFE</code> on the 
+      low byte of the response (see <a href="#response-codes-auth">response codes</a>).
+    </p>
+
+    <h3>Config writes without authentication (optional)</h3>
+    <div class="flow-step">
+      <h4><code>rewrite_allowed</code> flag</h4>
+      <p>
+        If <code>security_config.flags</code> bit 0 (<code>rewrite_allowed</code>) is set, the device may allow 
+        <strong>unauthenticated</strong> configuration writes (<code>0x0041</code> / <code>0x0042</code>) as a recovery path: 
+        reference firmware may erase existing config when such a write arrives without a session. When the bit is clear, 
+        unauthenticated config writes are rejected with <code>0xFE</code> while encryption is enabled.
+      </p>
+    </div>
+
+    <h3>Session lifetime</h3>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong>Timeout:</strong> <code>session_timeout_seconds</code> in <code>security_config</code> (0 = no timeout until disconnect).</li>
+      <li><strong>Disconnect:</strong> BLE disconnect or LAN TCP close clears the session; the client must run <code>0x0050</code> again.</li>
+      <li><strong>Config saved:</strong> After a successful config write and reload, reference firmware clears the session.</li>
+      <li><strong>Integrity:</strong> Repeated decrypt/nonce failures (reference firmware: three) clear the session.</li>
+    </ul>
+
+    <h3>Authenticate command <code>0x0050</code></h3>
+    <p class="intro-text">All authenticate messages use the usual command header <code>0x00 0x50</code> plus a payload. Responses use <code>0x00 0x50</code> and a status byte in the third octet unless noted.</p>
+
+    <div class="flow-step">
+      <h4>Step 1 — Client requests a challenge</h4>
+      <p><strong>Write payload:</strong> single byte <code>0x00</code> after <code>0x00 0x50</code>.</p>
+      <p style="margin-top: 12px;"><strong>Device response (success):</strong> <code>0x00 0x50 0x00</code>, then <strong>16 bytes</strong> server nonce (random), then <strong>4 bytes</strong> device ID (derived from chip identity; used in MAC inputs).</p>
+      <p style="margin-top: 12px;"><strong>Other <code>0x0050</code> statuses:</strong> <code>0x03</code> — encryption disabled; <code>0x04</code> — rate limited (too many attempts within a short window).</p>
+    </div>
+
+    <div class="flow-step">
+      <h4>Step 2 — Client proves knowledge of the pre-shared key</h4>
+      <p>
+        Within <strong>30 seconds</strong> of step 1, the client sends <strong>32 bytes</strong>: its own random 
+        <strong>client_nonce</strong> (16 bytes) concatenated with <strong>challenge_response</strong> (16 bytes), where:
+      </p>
+      <div class="code-block">
+        <code>challenge_response = AES-128-CMAC(psk, server_nonce || client_nonce || device_id)<br>
+// server_nonce: 16 B from step 1<br>
+// client_nonce: 16 B client random<br>
+// device_id: 4 B from step 1 response<br>
+// total CMAC input length: 36 bytes</code>
+      </div>
+      <p style="margin-top: 12px;">
+        The device recomputes the same CMAC with the stored key. On mismatch it responds with <code>0x00 0x50 0x01</code> and aborts. 
+        On success it derives a <strong>session key</strong> and <strong>session ID</strong> from the PSK and both nonces (reference: 
+        KDF in firmware <code>deriveSessionKey</code> / <code>deriveSessionId</code>), marks the session authenticated, and sends:
+      </p>
+      <p style="margin-top: 12px;"><strong>Device response:</strong> <code>0x00 0x50 0x00</code> followed by 16 bytes:</p>
+      <div class="code-block">
+        <code>server_proof = AES-128-CMAC(session_key, server_nonce || client_nonce || device_id)</code>
+      </div>
+      <p style="margin-top: 12px;">The client should verify <code>server_proof</code> the same way before trusting the channel.</p>
+      <p style="margin-top: 12px;"><strong>Errors:</strong> <code>0x00 0x50 0xFF</code> — bad format, expired nonce, or internal failure.</p>
+    </div>
+
+    <h3>Encrypted commands (after authentication)</h3>
+    <div class="flow-step">
+      <h4>Wire layout (BLE write or LAN frame inner payload)</h4>
+      <div class="code-block">
+        <code>[cmd_hi][cmd_lo][nonce_full: 16 bytes][ciphertext: variable][auth_tag: 12 bytes]<br><br>
+• cmd_hi/cmd_lo: same big-endian command as plaintext mode (e.g. 0x00 0x40).<br>
+• nonce_full: 8-byte session ID (from handshake) + 8-byte big-endian counter (client-chosen for writes).<br>
+  AES-CCM uses the last 13 bytes of nonce_full (bytes 3–15) as the CCM nonce.<br>
+• Associated data (AD) for CCM: the two command bytes [cmd_hi][cmd_lo].<br>
+• ciphertext: AES-CCM encryption of [L][payload…] where L = length of command-specific payload (one byte),<br>
+  followed by that many payload bytes (the same bytes that would follow the command in plaintext mode).<br>
+• Encrypted payload size per command is limited in reference firmware (e.g. 512 bytes including length byte).</code>
+      </div>
+      <p style="margin-top: 12px;">
+        The device checks the nonce (session ID + replay window around the last seen counter) before decrypting. 
+        After decrypt, processing is identical to plaintext commands.
+      </p>
+    </div>
+
+    <h3>Encrypted responses</h3>
+    <div class="flow-step">
+      <h4>When responses are encrypted</h4>
+      <p>
+        Once authenticated, the device encrypts <strong>most</strong> responses the same way: layout 
+        <code>[cmd_hi][cmd_lo][nonce_full: 16][ciphertext…][tag: 12]</code>, where the plaintext inside CCM is 
+        <code>[L][rest…]</code> with <code>L</code> = number of bytes after the command in the unencrypted response. 
+        The device uses its own monotonic counter in the nonce for responses.
+      </p>
+      <p style="margin-top: 12px;"><strong>Left unencrypted</strong> (reference firmware): authenticate (<code>0x0050</code>), firmware version (<code>0x0043</code>), and responses whose status byte is <code>0xFE</code> or <code>0xFF</code> (errors / not authenticated).</p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>BLE connection establishment</h2>
+    
+    <h3>1. Device Discovery</h3>
+    <div class="flow-step">
+      <h4>Scan for Devices</h4>
+      <p>
+        The client scans for BLE devices with names starting with "OD" (OpenDisplay prefix). 
+        Devices advertise with the service UUID <code>0x2446</code>.
+      </p>
+      <div class="code-block">
+        <code>Service UUID: 0x2446<br>Characteristic UUID: 0x2446<br>Device Name: OD[chip_id]</code>
+      </div>
+    </div>
+
+    <h3>2. GATT Connection</h3>
+    <div class="flow-step">
+      <h4>Connect to GATT Server</h4>
+      <p>
+        Once a device is selected, the client connects to the device's GATT server and discovers the primary service.
+      </p>
+      <div class="code-block">
+        <code>1. Connect to GATT Server<br>2. Get Primary Service (0x2446)<br>3. Get Characteristic (0x2446)<br>4. Start Notifications</code>
+      </div>
+    </div>
+
+    <h3>3. Notification Setup</h3>
+    <div class="flow-step">
+      <h4>Enable Notifications</h4>
+      <p>
+        The client enables notifications on the characteristic to receive responses from the device. 
+        All device responses are sent via notifications.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Configuration Reading Flow</h2>
+    
+    <h3>1. Send Read Command</h3>
+    <div class="flow-step">
+      <h4>Command: 0x0040</h4>
+      <p>
+        The client sends a read config command to request the device's current configuration.
+      </p>
+      <div class="code-block">
+        <code>Command: 0x00 0x40</code>
+      </div>
+    </div>
+
+    <h3>2. Receive Config Chunks</h3>
+    <div class="flow-step">
+      <h4>Chunked Response</h4>
+      <p>
+        The device responds with configuration data in chunks. The first chunk contains:
+      </p>
+      <ul>
+        <li>Response type: <code>0x00</code> (success)</li>
+        <li>Command: <code>0x40</code></li>
+        <li>Chunk number: <code>0x0000</code> for first chunk</li>
+        <li>Total length: 2 bytes (little-endian)</li>
+        <li>Config data: variable length</li>
+      </ul>
+      <p>
+        Subsequent chunks contain chunk number and data only. Each chunk is up to 512 bytes (minus headers).
+      </p>
+      <div style="margin-top: 12px; padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+        <strong>Required Configuration:</strong> The configuration must include a display packet (<a href="yaml-config.html#packet-type-32">Packet Type 32</a>) that defines 
+        the display dimensions, color scheme, and other display-specific parameters. This is mandatory for the protocol to function correctly. 
+        See the <a href="yaml-config.html">YAML Configuration Documentation</a> for complete packet definitions.
+      </div>
+    </div>
+
+    <h3>3. Reconstruct Configuration</h3>
+    <div class="flow-step">
+      <h4>Assemble Chunks</h4>
+      <p>
+        The client collects all chunks and reconstructs the complete configuration packet. 
+        The configuration is validated using CRC16-CCITT checksum.
+      </p>
+    </div>
+
+    <h3>4. Parse Configuration</h3>
+    <div class="flow-step">
+      <h4>Decode Packet Structure</h4>
+      <p>
+        The reconstructed bytes are parsed according to the <a href="yaml-config.html">protocol specification</a>:
+      </p>
+      <ul>
+        <li>Length (2 bytes)</li>
+        <li>Version (1 byte)</li>
+        <li>Packets (variable, sequence of single packets)</li>
+        <li>CRC (2 bytes)</li>
+      </ul>
+      <p>
+        Each single packet contains a packet number, packet ID, and payload specific to that packet type. 
+        See the <a href="yaml-config.html#packet-structure">Packet Structure</a> section for detailed information.
+      </p>
+      <p style="margin-top: 12px;">
+        <strong>Display Configuration Requirement:</strong> The configuration must contain a display packet (<a href="yaml-config.html#packet-type-32">Packet Type 32</a>) 
+        that specifies the display dimensions, color scheme, and refresh capabilities. Without this information, clients cannot 
+        properly format and send image data to the device. See the <a href="yaml-config.html">YAML Configuration Documentation</a> for details on packet structure.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Configuration Writing Flow</h2>
+    
+    <h3>1. Prepare Configuration</h3>
+    <div class="flow-step">
+      <h4>Build Packet</h4>
+      <p>
+        The client builds a configuration packet containing all required and optional packet types. 
+        The packet is encoded with length, version, packet sequence, and CRC.
+      </p>
+      <p style="margin-top: 12px;">
+        <strong>Required Packet:</strong> The configuration must include a display packet (<a href="yaml-config.html#packet-type-32">Packet Type 32</a>) with display dimensions, 
+        color scheme, and refresh mode. This is essential for the device to know how to process incoming image data. 
+        See the <a href="yaml-config.html">YAML Configuration Documentation</a> for details on all packet types.
+      </p>
+    </div>
+
+    <h3>2. Send Configuration</h3>
+    <div class="flow-step">
+      <h4>Write Command: 0x0041</h4>
+      <p>
+        For small configurations (&lt;200 bytes), the entire packet is sent in one command:
+      </p>
+      <div class="code-block">
+        <code>Command: 0x00 0x41<br>Payload: [config bytes]</code>
+      </div>
+      <p>
+        For larger configurations, chunked transmission is used:
+      </p>
+      <ul>
+        <li>First chunk (0x0041): Contains total size (2 bytes) + first 200 bytes</li>
+        <li>Subsequent chunks (0x0042): Contains remaining data in 200-byte chunks</li>
+      </ul>
+    </div>
+
+    <h3>3. Device Processing</h3>
+    <div class="flow-step">
+      <h4>Apply Configuration</h4>
+      <p>
+        The device validates the configuration, checks CRC, and stores it in non-volatile memory. 
+        A reboot command (0x000F) may be sent to apply the new configuration.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Image Transfer Flow</h2>
+    
+    <h3>1. Direct Write Mode (Recommended)</h3>
+    <div class="flow-step">
+      <h4>Start Direct Write: 0x0070</h4>
+      <p>
+        The client initiates direct write mode, which sends image data directly to the display buffer without intermediate storage.
+        The image dimensions and color scheme must match the display configuration that was previously read or written.
+      </p>
+      <div class="code-block">
+        <code>Command: 0x00 0x70<br>Payload: [width (2 bytes), height (2 bytes), color_scheme (1 byte), refresh_mode (1 byte)]</code>
+      </div>
+      <p>
+        The device responds with <code>0x0070</code> (ACK) if ready to receive data. The width, height, and color_scheme 
+        must match the display configuration (<a href="yaml-config.html#packet-type-32">Packet Type 32</a>) for the transfer to succeed.
+      </p>
+    </div>
+
+    <h3>2. Send Image Data</h3>
+    <div class="flow-step">
+      <h4>Data Chunks: 0x0071</h4>
+      <p>
+        Image data is sent in chunks using the direct write data command. Each chunk contains:
+      </p>
+      <div class="code-block">
+        <code>Command: 0x00 0x71<br>Payload: [chunk data, up to 230 bytes]</code>
+      </div>
+      <p>
+        The device responds with <code>0x0071</code> (ACK) after each chunk is received.
+      </p>
+    </div>
+
+    <h3>3. Complete Transfer</h3>
+    <div class="flow-step">
+      <h4>End Direct Write: 0x0072</h4>
+      <p>
+        When all image data has been sent, the client sends the end command:
+      </p>
+      <div class="code-block">
+        <code>Command: 0x00 0x72</code>
+      </div>
+      <p>
+        The device responds with <code>0x0072</code> (ACK) and refreshes the display with the new image.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Command Reference</h2>
+    <ul class="command-list">
+      <li><code>0x0040</code> - Read configuration</li>
+      <li><code>0x0041</code> - Write configuration (first chunk or small config)</li>
+      <li><code>0x0042</code> - Write configuration (subsequent chunks)</li>
+      <li><code>0x0043</code> - Read firmware version (always plaintext; allowed without encryption session)</li>
+      <li><code>0x0050</code> - Authenticate / encryption handshake (plaintext; see <a href="#encryption-authentication" style="color: var(--accent);">Encryption and authentication</a>)</li>
+      <li><code>0x000F</code> - Reboot device</li>
+      <li><code>0x0070</code> - Direct write start</li>
+      <li><code>0x0071</code> - Direct write data</li>
+      <li><code>0x0072</code> - Direct write end</li>
+      <li><code>0x0064</code> - Send data info (block-based)</li>
+      <li><code>0x0065</code> - Send block part (block-based)</li>
+    </ul>
+  </div>
+
+  <div class="col panel">
+    <h2>Response codes</h2>
+    <ul class="command-list">
+      <li><code>0x00 [command]</code> - Success response</li>
+      <li><code>0xFF [command]</code> - Error response</li>
+      <li><code>0x00C4</code> - Block part acknowledged</li>
+      <li><code>0x00C5</code> - Request next block part</li>
+      <li><code>0x00C6</code> - Request block</li>
+      <li><code>0x00C7</code> - Upload complete</li>
+      <li><code>0x00C8</code> - Image already displayed</li>
+    </ul>
+    <h3 id="response-codes-auth">Encryption and <code>0x0050</code> statuses</h3>
+    <p class="intro-text" style="margin-top: 12px;">
+      When encryption is enabled, many responses use <code>0x00</code>, the low byte of the command being answered, and a third status byte. 
+      Reference firmware sends these <strong>unencrypted</strong> (so clients can read errors before decrypt):
+    </p>
+    <ul class="command-list">
+      <li><strong>Third byte <code>0xFE</code>:</strong> Command rejected — e.g. authentication required, or unauthenticated config write not allowed.</li>
+      <li><strong>Third byte <code>0xFF</code>:</strong> Decryption or integrity failure for an encrypted command.</li>
+    </ul>
+    <p class="intro-text" style="margin-top: 12px;">Authenticate command <code>0x0050</code> replies (body after <code>0x00 0x50</code>):</p>
+    <ul class="command-list">
+      <li><code>0x00</code> + 16-byte server nonce + 4-byte device ID — challenge (step 1)</li>
+      <li><code>0x00</code> + 16-byte server proof — handshake complete (step 2)</li>
+      <li><code>0x01</code> — wrong pre-shared key</li>
+      <li><code>0x03</code> — encryption not enabled on device</li>
+      <li><code>0x04</code> — rate limited</li>
+      <li><code>0xFF</code> — invalid payload, expired challenge, or internal error</li>
+    </ul>
+  </div>
+
+  <div class="col panel">
+    <h2>Error handling</h2>
+    <p class="intro-text">
+      If a command fails, the device responds with <code>0xFF</code> followed by the command code. 
+      The client should handle errors gracefully and may retry operations if appropriate. 
+      On BLE, connection timeouts and GATT errors should be handled with retry logic. 
+      On LAN, invalid frame length or protocol errors may result in the device closing the TCP connection; 
+      the client should reconnect and recover state as needed.
+    </p>
+  </div>
+  
+  <div class="col panel">
+    <h3>Example 1: Configuration Reading (Chunked)</h3>
+    <div class="sequence-diagram">
+      <div class="sequence-header">
+        <div class="sequence-participant">
+          <div class="sequence-participant-box client-box">CLIENT</div>
+        </div>
+        <div class="sequence-participant">
+          <div class="sequence-participant-box device-box">DEVICE</div>
+        </div>
+      </div>
+      <div class="sequence-messages">
+        <div class="sequence-message to-device" style="top: 0px;">
+          <div class="sequence-activation client" style="top: 0px; height: 320px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connect<br><small>GATT connection</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 40px;">
+          <div class="sequence-activation device" style="top: -40px; height: 320px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connected<br><small>Ready</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 90px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x40<br><small>Read Config</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 140px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x40<br>Chunk 0, Total: 1280<br><small>508 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 200px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x40<br>Chunk 1<br><small>512 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 260px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x40<br>Chunk 2 (final)<br><small>260 bytes</small></div>
+        </div>
+        <div class="sequence-disconnect" style="top: 320px;">
+          <div class="sequence-disconnect-line"></div>
+          <div class="sequence-disconnect-label">Disconnect</div>
+        </div>
+      </div>
+      <div style="height: 360px;"></div>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h3>Example 2: Image Transfer (Direct Write Mode)</h3>
+    <div class="sequence-diagram">
+      <div class="sequence-header">
+        <div class="sequence-participant">
+          <div class="sequence-participant-box client-box">CLIENT</div>
+        </div>
+        <div class="sequence-participant">
+          <div class="sequence-participant-box device-box">DEVICE</div>
+        </div>
+      </div>
+      <div class="sequence-messages">
+        <div class="sequence-message to-device" style="top: 0px;">
+          <div class="sequence-activation client" style="top: 0px; height: 690px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connect<br><small>GATT connection</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 40px;">
+          <div class="sequence-activation device" style="top: -40px; height: 690px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connected<br><small>Ready</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 90px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x70<br>800×600, B/W, full refresh</div>
+        </div>
+        <div class="sequence-message to-client" style="top: 140px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x70<br><small>Ready for data</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 190px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x71<br><small>Chunk 1: 230 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 240px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x71<br><small>ACK</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 290px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x71<br><small>Chunk 2: 230 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 340px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x71<br><small>ACK</small></div>
+        </div>
+        <div class="sequence-message to-device dotted" style="top: 390px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x71<br><small>Chunk 3...N: 230 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client dotted" style="top: 440px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x71<br><small>ACK (repeated)</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 490px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x71<br><small>Final chunk: 150 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 540px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x71<br><small>ACK</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 590px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x72<br><small>End transfer</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 640px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x72<br><small>Display refreshed</small></div>
+        </div>
+        <div class="sequence-disconnect" style="top: 690px;">
+          <div class="sequence-disconnect-line"></div>
+          <div class="sequence-disconnect-label">Disconnect</div>
+        </div>
+      </div>
+      <div style="height: 730px;"></div>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h3>Example 3: Configuration Writing (Chunked)</h3>
+    <div class="sequence-diagram">
+      <div class="sequence-header">
+        <div class="sequence-participant">
+          <div class="sequence-participant-box client-box">CLIENT</div>
+        </div>
+        <div class="sequence-participant">
+          <div class="sequence-participant-box device-box">DEVICE</div>
+        </div>
+      </div>
+      <div class="sequence-messages">
+        <div class="sequence-message to-device" style="top: 0px;">
+          <div class="sequence-activation client" style="top: 0px; height: 390px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connect<br><small>GATT connection</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 40px;">
+          <div class="sequence-activation device" style="top: -40px; height: 390px;"></div>
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Connected<br><small>Ready</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 90px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x41<br>Total: 900, Chunk 1: 198 bytes</div>
+        </div>
+        <div class="sequence-message to-client" style="top: 140px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x41<br><small>ACK</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 190px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x42<br><small>Chunk 2: 200 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 240px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x42<br><small>ACK</small></div>
+        </div>
+        <div class="sequence-message to-device" style="top: 290px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Write: 0x00 0x42<br><small>Chunk 3: 200 bytes</small></div>
+        </div>
+        <div class="sequence-message to-client" style="top: 340px;">
+          <div class="sequence-message-line"></div>
+          <div class="sequence-message-box">Notify: 0x00 0x42<br><small>ACK, Config saved</small></div>
+        </div>
+        <div class="sequence-disconnect" style="top: 390px;">
+          <div class="sequence-disconnect-line"></div>
+          <div class="sequence-disconnect-label">Disconnect</div>
+        </div>
+      </div>
+      <div style="height: 430px;"></div>
+    </div>
+  </div>
+  
+  <div class="col panel">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>&emsp;
+      <a href="index.html">Protocol</a>&emsp;
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
+

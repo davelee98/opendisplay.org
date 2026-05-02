@@ -1,0 +1,1802 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="../install/favicon.ico"> 
+    <link rel="stylesheet" href="https://opendisplay.org/common.css">
+    <title>OpenDisplay BLE Tester</title>
+    <style>
+/* Page-specific styles */
+label{font-weight:600;font-size:1.1rem;color:var(--foreground);margin-bottom:16px;display:block}
+textarea,input,select,button{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+}
+textarea{
+  width:100%;height:220px;background:var(--card-background);border:1px solid var(--border-color);border-radius:8px;
+  padding:12px;color:var(--foreground);font-size:14px;line-height:1.5;resize:vertical
+}
+textarea:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,191,255,.1)
+}
+button{
+  background:var(--accent);
+  border:none;border-radius:8px;padding:10px 16px;margin:4px 6px 4px 0;
+  color:var(--accent-button);font-weight:500;cursor:pointer;transition:.2s;font-size:14px
+}
+button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,191,255,.3)}
+button:active{transform:none}
+input[type=text],select,
+.field-row input,input[style*="flex"]{
+  background:var(--card-background)!important;border:1px solid var(--border-color)!important;border-radius:6px!important;
+  padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace!important;
+  min-height:40px!important;transition:.2s;appearance:none
+}
+input:focus,select:focus{
+  outline:none!important;border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px rgba(0,191,255,.1)!important;background:var(--card-background)!important
+}
+input:hover,select:hover{border-color:var(--accent)!important;background:var(--card-background)!important}
+input::placeholder{color:#8b949e!important}
+select{
+  background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'/%3e%3c/svg%3e")!important;
+  background-repeat:no-repeat!important;background-position:right 8px center!important;
+  background-size:16px!important;padding-right:32px!important
+}
+select option{background:var(--card-background)!important;color:var(--foreground)!important;padding:8px 12px!important}
+input[type=file]{
+  background:var(--card-background)!important;border:1px solid var(--border-color)!important;
+  border-radius:6px!important;padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
+  cursor:pointer!important;transition:.2s
+}
+input[type=file]:hover{
+  border-color:var(--accent)!important;background:var(--card-background)!important
+}
+input[type=file]:focus{
+  outline:none!important;border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px rgba(0,191,255,.1)!important;background:var(--card-background)!important
+}
+input[type=file]::file-selector-button{
+  background:var(--accent);
+  color:var(--accent-button);border:none;border-radius:6px;padding:6px 12px;
+  margin-right:12px;font-weight:500;cursor:pointer;transition:.2s;
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:13px
+}
+input[type=file]::file-selector-button:hover{
+  background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,191,255,.3)
+}
+input[type=file]::file-selector-button:active{
+  transform:none
+}
+.ble-controls{display:flex;flex-direction:column;gap:16px}
+.ble-input-group,.ble-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ble-input-group label{font-size:.9rem;margin:0;min-width:120px}
+.ble-input-group input[type=text]{flex:1;min-width:200px}
+.ble-actions button{flex:1;min-width:120px}
+.status-display{padding:12px;min-height:auto;text-align:center}
+.status-text{font-weight:600;color:var(--foreground);margin:0 0 8px}
+.status-text.error{color:#f85149}
+.upload-progress-wrap{display:none;margin-top:8px;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden}
+.upload-progress-wrap.visible{display:block}
+.upload-progress-wrap progress{width:100%;height:100%;border:0;accent-color:var(--accent);color:var(--accent)}
+.upload-progress-wrap progress::-webkit-progress-value{background:var(--accent)}
+.upload-progress-wrap progress::-webkit-progress-bar{background:var(--border-color)}
+.upload-progress-wrap progress::-moz-progress-bar{background:var(--accent)}
+.connection-actions{display:flex;justify-content:center;flex-wrap:nowrap;gap:10px;margin-top:12px;width:100%}
+.connection-actions > button{min-width:120px}
+.connection-actions > #connectbutton{flex:1 1 100%}
+.connection-actions > button.connected-only{flex:1 1 50%;min-width:0}
+.connected-only{display:none}
+.connected-only.visible{display:block}
+.log-display{
+  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-size:12px;color:#8b949e;max-height:200px;overflow-y:auto;white-space:pre-wrap
+}
+.log-entry{margin-bottom:2px}
+.log-entry.error{color:#f85149}
+.log-entry.success{color:#3fb950}
+.log-entry.info{color:#58a6ff}
+#myCanvas {
+  border: 1px solid var(--border-color);
+  background: var(--background);
+  display: block;
+  margin: 10px auto;
+  border-radius: 8px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.draw-tools{margin-top:12px}
+.draw-tools .field-row{align-items:center}
+.draw-label{font-size:.9rem;margin:0 8px 0 0;font-weight:500}
+.color-swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.color-swatch{width:28px;height:28px;border:2px solid var(--border-color);border-radius:6px;padding:0;cursor:pointer;flex-shrink:0}
+.color-swatch:hover{border-color:var(--accent);transform:scale(1.05)}
+.color-swatch.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.draw-hint{font-size:.8rem;color:var(--muted-foreground);margin-left:8px}
+.selected-text-wrap{flex-wrap:wrap;align-items:center;gap:8px}
+.draw-mode-bar{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.draw-mode-btn{
+  display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;
+  padding:0;margin:0;border:2px solid var(--border-color);border-radius:10px;
+  background:var(--card-background);color:var(--foreground);cursor:pointer;transition:.15s
+}
+.draw-mode-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.draw-mode-btn:hover{border-color:var(--accent);color:var(--accent)}
+.draw-mode-btn.active{border-color:var(--accent);background:rgba(0,191,255,.08);color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.draw-mode-panel{display:none}
+.draw-mode-panel.active{display:block}
+.preview-header{text-align:center;margin-top:24px;margin-bottom:8px}
+.preview-header label{display:inline;margin-bottom:0}
+.preview-meta{display:inline;font-size:0.9rem;color:var(--muted-foreground);font-weight:normal;margin-left:0.25em}
+.preview-meta svg{vertical-align:middle;width:1em;height:1em;fill:currentColor}
+.canvas-container{
+  text-align:center;padding:16px 0
+}
+.checkbox-group{
+  display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px
+}
+.checkbox-group input[type=checkbox]{
+  transform:scale(1.4);accent-color:var(--accent);cursor:pointer
+}
+.checkbox-group label{
+  font-weight:normal;font-size:.9rem;margin:0;display:inline-flex;align-items:center;gap:6px
+}
+.field-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+/* Responsive */
+.col{min-width:0}
+.ble-input-group input[type=text]{min-width:0}
+.ble-input-group{flex-wrap:wrap}
+.ble-input-group label{min-width:0}
+.field-row label{min-width:0}
+@media (max-width:640px){
+  .field-row{flex-direction:column;align-items:stretch}
+  .field-row label{min-width:0}
+  .field-row input,.field-row select,.field-row div{flex:1 1 auto;min-width:0}
+}
+#myCanvas{width:min(800px,100%);height:auto;display:block;margin:10px auto}
+.canvas-container{overflow:hidden;padding:16px 0;-webkit-overflow-scrolling:touch}
+.log-display{word-break:break-word;overflow-wrap:anywhere}
+.status-display{min-width:0;overflow-wrap:break-word}
+/* Link styles are in common.css */
+        </style>
+</head>
+<body>
+    <div class="col">
+      <div class="breadcrumb">
+        <a href="../../index.html">Home</a><span class="breadcrumb-separator">/</span>
+        <a href="../index.html">Firmware</a><span class="breadcrumb-separator">/</span>
+        <span>BLE Tester</span>
+      </div>
+    </div>
+    <div class="col panel">
+        <div class="status-display">
+            <div id="statusText" class="status-text">Not connected</div>
+            <div id="uploadProgressWrap" class="upload-progress-wrap"><progress id="uploadProgress" max="100" value="0"></progress></div>
+        </div>
+        <div class="connection-actions">
+            <button id="connectbutton" type="button" onclick="preConnect();">Connect</button>
+            <button id="uploadButton" type="button" onclick="sendDirectWriteAuto();" class="connected-only">Upload image</button>
+            <button id="disconnectbutton" type="button" onclick="preConnect();" class="connected-only">Disconnect</button>
+        </div>
+        <div class="preview-header">
+            <label>Preview</label>
+            <span id="previewMeta" class="preview-meta"></span>
+            <span id="previewLockIcon" class="preview-meta" style="display:none;"></span>
+        </div>
+        <div class="canvas-container">
+            <canvas id="myCanvas" width="800" height="480"></canvas>
+        </div>
+        <div id="drawTools" class="draw-tools">
+            <!-- New tool: add <button class="draw-mode-btn" data-draw-mode="id">…</button> and <div class="draw-mode-panel" data-draw-mode-panel="id">…</div>; setDrawMode only toggles panels that exist. -->
+            <div class="draw-mode-bar" role="tablist" aria-label="Canvas tools">
+                <button type="button" class="draw-mode-btn active" data-draw-mode="draw" role="tab" aria-selected="true" title="Draw" aria-label="Draw">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                </button>
+                <button type="button" class="draw-mode-btn" data-draw-mode="text" role="tab" aria-selected="false" title="Text" aria-label="Text">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h16v2"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                </button>
+                <button type="button" class="draw-mode-btn" data-draw-mode="qr" role="tab" aria-selected="false" title="QR code" aria-label="QR code">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3zm2 2h4v4H5zm9-2h8v8h-8zm2 2h4v4h-4zM3 14h8v8H3zm2 2h4v4H5zm9-2h2v2h-2v2h2v2h-2m2-6h2v2h2v2h-2v2h2m-6 2h2v2m4 0h2v2h2v2h-2v2"/></svg>
+                </button>
+            </div>
+            <div id="drawModePanelDraw" class="draw-mode-panel active" data-draw-mode-panel="draw">
+                <div class="field-row">
+                    <button type="button" id="clearCanvasBtn" onclick="clearDrawingCanvas()">Clear</button>
+                    <button type="button" id="undoBtn" onclick="undoLast()">Undo</button>
+                    <span class="draw-label">Draw color:</span>
+                    <div id="drawColorSwatches" class="color-swatches"></div>
+                </div>
+            </div>
+            <div id="drawModePanelText" class="draw-mode-panel" data-draw-mode-panel="text">
+                <div class="field-row">
+                    <span class="draw-label">Color:</span>
+                    <div id="textColorSwatches" class="color-swatches"></div>
+                </div>
+                <div class="field-row">
+                    <label for="drawTextInput" style="margin: 0; min-width: 80px;">Text:</label>
+                    <input type="text" id="drawTextInput" placeholder="Type then Add" style="flex: 1;" />
+                    <button type="button" id="addTextBtn" onclick="addUserText()">Add text</button>
+                    <span class="draw-hint">Tap canvas to set position</span>
+                </div>
+                <div id="selectedTextWrap" class="field-row selected-text-wrap" style="display: none;">
+                    <span class="draw-label">Selected:</span>
+                    <span class="draw-label" style="margin-left:8px">Color</span>
+                    <div id="selectedTextColorSwatches" class="color-swatches"></div>
+                    <label for="selectedTextSize" style="margin: 0;">Size</label>
+                    <input type="number" id="selectedTextSize" min="8" max="200" value="24" style="width: 60px;" />
+                    <button type="button" onclick="deselectText();">Deselect</button>
+                    <span class="draw-hint">Drag to move</span>
+                </div>
+            </div>
+            <div id="drawModePanelQr" class="draw-mode-panel" data-draw-mode-panel="qr">
+                <div class="field-row">
+                    <span class="draw-label">Color:</span>
+                    <div id="qrColorSwatches" class="color-swatches"></div>
+                </div>
+                <div class="field-row">
+                    <label for="qrDataInput" style="margin: 0; min-width: 80px;">QR code:</label>
+                    <input type="text" id="qrDataInput" placeholder="URL or text" style="flex: 1;" />
+                    <button type="button" id="addQRBtn" onclick="addUserQR()">Add QR</button>
+                    <span class="draw-hint">Tap canvas to set position</span>
+                </div>
+                <div id="selectedQRWrap" class="field-row selected-text-wrap" style="display: none;">
+                    <span class="draw-label">Selected QR:</span>
+                    <span class="draw-label" style="margin-left:8px">Color</span>
+                    <div id="selectedQRColorSwatches" class="color-swatches"></div>
+                    <label for="selectedQRSize" style="margin: 0;">Size</label>
+                    <input type="number" id="selectedQRSize" min="32" max="400" value="80" style="width: 60px;" />
+                    <button type="button" onclick="deselectQR();">Deselect</button>
+                    <span class="draw-hint">Drag to move</span>
+                </div>
+            </div>
+        </div>
+        <div id="canvasOptions" class="connected-only">
+            <div class="field-row" style="margin-top: 12px;">
+                <label for="ditheringSelect" style="margin: 0; min-width: 120px;">Dithering:</label>
+                <select id="ditheringSelect" onchange="getPixelData()" style="flex: 1;">
+                    <option value="none" selected>None</option>
+                    <option value="floyd-steinberg">Floyd-Steinberg</option>
+                    <option value="atkinson">Atkinson</option>
+                    <option value="stucki">Stucki</option>
+                    <option value="sierra">Sierra</option>
+                    <option value="sierra-lite">Sierra Lite</option>
+                    <option value="burkes">Burkes</option>
+                    <option value="jarvis-judice-ninke">Jarvis-Judice-Ninke</option>
+                </select>
+            </div>
+            <div class="field-row" style="margin-top: 16px;">
+                <label for="imageUpload" style="margin: 0; min-width: 120px;">Select image:</label>
+                <input type="file" id="imageUpload" accept="image/*" onclick="resetImageSelector()" onchange="uploadImage()" style="flex: 1;" />
+            </div>
+            <div class="checkbox-group">
+                <label style="margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                    <input type="checkbox" id="fastRefreshToggle" />
+                    <span>Use fast/partial refresh (if supported)</span>
+                </label>
+            </div>
+            <div class="field-row" style="margin-top: 12px;display:none">
+                <label for="colorSchemeSelect" style="margin: 0; min-width: 120px;">Color Scheme:</label>
+                <select id="colorSchemeSelect" onchange="getPixelData()" style="flex: 1;">
+                    <option value="0">Monochrome (B/W)</option>
+                    <option value="1">B/W + Red</option>
+                    <option value="2">B/W + Yellow</option>
+                    <option value="3">B/W + Red + Yellow</option>
+                    <option value="4" selected>B/W + Green + Blue + Red + Yellow (6-color)</option>
+                    <option value="5">4 Grayscale</option>
+                    <option value="6">16 Grayscale (4bpp)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div id="ledControlPanel" class="col panel" style="display: none;">
+        <label>LED</label>
+        <div class="ble-controls" style="margin-top: 8px;">
+            <div class="field-row" style="align-items: center;">
+                <span id="ledInstanceLabel" style="display: none; margin-right: 8px;">Instance:</span>
+                <select id="ledInstanceSelect" style="display: none; min-width: 80px;"></select>
+                <button type="button" onclick="applyLedPreset('single');">Single</button>
+                <button type="button" onclick="applyLedPreset('double');">Double</button>
+                <button type="button" onclick="applyLedPreset('rgb');">RGB</button>
+                <button type="button" id="ledSendBtn" onclick="sendLedPattern();">Send</button>
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Brightness</span>
+                <input id="ledBrightness" type="range" min="1" max="16" value="8" oninput="syncLedBrightnessLabel();" style="width: 120px; accent-color: var(--accent);" />
+                <span id="ledBrightnessVal" class="draw-label" style="min-width: 24px;">8</span>
+                <span class="draw-label" style="min-width: 70px;">Repeats</span>
+                <input id="ledRepeats" type="number" min="1" max="254" value="1" style="width: 92px;" />
+                <span class="draw-hint">Units are 100ms steps on-device</span>
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Color 1</span>
+                <input id="ledColor1" type="color" value="#ffffff" style="width: 64px; padding: 0 6px!important;" />
+                <span class="draw-label">x</span>
+                <input id="ledCount1" type="number" min="0" max="15" value="1" style="width: 76px;" />
+                <span class="draw-label">on</span>
+                <input id="ledOn1" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <span class="draw-label">gap</span>
+                <input id="ledGap1" type="number" min="0" max="25500" value="200" style="width: 92px;" />
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Color 2</span>
+                <input id="ledColor2" type="color" value="#000000" style="width: 64px; padding: 0 6px!important;" />
+                <span class="draw-label">x</span>
+                <input id="ledCount2" type="number" min="0" max="15" value="0" style="width: 76px;" />
+                <span class="draw-label">on</span>
+                <input id="ledOn2" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <span class="draw-label">gap</span>
+                <input id="ledGap2" type="number" min="0" max="25500" value="0" style="width: 92px;" />
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Color 3</span>
+                <input id="ledColor3" type="color" value="#000000" style="width: 64px; padding: 0 6px!important;" />
+                <span class="draw-label">x</span>
+                <input id="ledCount3" type="number" min="0" max="15" value="0" style="width: 76px;" />
+                <span class="draw-label">on</span>
+                <input id="ledOn3" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <span class="draw-label">gap</span>
+                <input id="ledGap3" type="number" min="0" max="25500" value="0" style="width: 92px;" />
+            </div>
+        </div>
+    </div>
+    <div id="buzzerControlPanel" class="col panel" style="display: none;">
+        <label>Buzzer</label>
+        <div class="ble-controls" style="margin-top: 8px;">
+            <div class="field-row" style="align-items: center;">
+                <span id="buzzerInstanceLabel" style="display: none; margin-right: 8px;">Instance:</span>
+                <select id="buzzerInstanceSelect" style="display: none; min-width: 80px;"></select>
+                <button type="button" onclick="applyBuzzerPreset('single');">Single</button>
+                <button type="button" onclick="applyBuzzerPreset('double');">Double</button>
+                <button type="button" onclick="applyBuzzerPreset('alarm');">Alarm</button>
+                <button type="button" id="buzzerSendBtn" onclick="sendBuzzerPattern();">Send</button>
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Outer repeats</span>
+                <input id="buzzerOuterRepeats" type="number" min="1" max="255" value="1" style="width: 92px;" />
+                <span class="draw-hint">Frequency indices map linearly to the device min–max Hz from config</span>
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Step 1</span>
+                <span class="draw-label">Hz</span>
+                <input id="buzzerHz1" type="number" min="0" max="20000" value="2000" style="width: 96px;" />
+                <span class="draw-label">ms</span>
+                <input id="buzzerMs1" type="number" min="0" max="65535" value="120" style="width: 88px;" />
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Step 2</span>
+                <span class="draw-label">Hz</span>
+                <input id="buzzerHz2" type="number" min="0" max="20000" value="0" style="width: 96px;" />
+                <span class="draw-label">ms</span>
+                <input id="buzzerMs2" type="number" min="0" max="65535" value="80" style="width: 88px;" />
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Step 3</span>
+                <span class="draw-label">Hz</span>
+                <input id="buzzerHz3" type="number" min="0" max="20000" value="0" style="width: 96px;" />
+                <span class="draw-label">ms</span>
+                <input id="buzzerMs3" type="number" min="0" max="65535" value="0" style="width: 88px;" />
+            </div>
+            <div class="field-row" style="margin-top: 8px; align-items: center;">
+                <span class="draw-label" style="min-width: 88px;">Step 4</span>
+                <span class="draw-label">Hz</span>
+                <input id="buzzerHz4" type="number" min="0" max="20000" value="0" style="width: 96px;" />
+                <span class="draw-label">ms</span>
+                <input id="buzzerMs4" type="number" min="0" max="65535" value="0" style="width: 88px;" />
+            </div>
+        </div>
+    </div>
+    <div class="col panel">
+        <label>Device filter &amp; log</label>
+        <div class="ble-controls">
+            <div class="ble-input-group">
+                <label for="namePrefix">OD Device filter:</label>
+                <input type="text" id="namePrefix" value="OD" placeholder="OD (comma separated)" />
+            </div>
+            <div id="deviceControlWrap" class="connected-only" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                <label style="margin-bottom: 8px;">Device</label>
+                <div class="field-row" style="align-items: center;">
+                    <button type="button" onclick="deviceReboot();">Reboot</button>
+                    <button type="button" onclick="deviceDeepSleep();">Deep sleep</button>
+                    <button type="button" onclick="deviceRebootBootloader();">Reboot to bootloader</button>
+                </div>
+            </div>
+            <div id="msdPanelWrap" class="connected-only" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                <label style="margin-bottom: 8px;">Manufacturer data (same as BLE advertising)</label>
+                <div class="field-row" style="align-items: flex-start; flex-direction: column; gap: 8px;">
+                    <button type="button" id="msdReadBtn" onclick="readMsdAdvertisingDecode();">Read &amp; decode MSD</button>
+                    <pre id="msdDecodeOut" class="log-display" style="min-height: 72px; max-height: 260px; overflow: auto; white-space: pre-wrap; margin: 0; width: 100%; box-sizing: border-box; font-size: 12px;"></pre>
+                </div>
+            </div>
+            <div class="status-display" style="margin-top: 12px;">
+                <div id="logDisplay" class="log-display"></div>
+            </div>
+            <div class="field-row" style="margin-top: 12px;">
+                <label for="cmdTXT" style="margin: 0; min-width: 120px;">Debug CMD (Hex):</label>
+                <input type="text" id="cmdTXT" value="0001" style="flex: 1;" />
+                <button type="button" onclick="if(bleLib)bleLib.sendHexCommand(document.getElementById('cmdTXT').value).catch(e=>addLog('Error: '+e.message,'error'));">Send</button>
+            </div>
+        </div>
+    </div>
+      <script src="https://opendisplay.org/js/pako.js"></script>
+      <script src="https://opendisplay.org/js/js-yaml.min.js"></script>
+      <script src="../../l/qrcode.js"></script>
+      <script src="../../js/ble-common.js"></script>
+      <script src="../../js/opendisplay-msd.js"></script>
+    <script>
+        let bleLib;
+        widthInput = 800;
+        heightInput = 480;
+        let displayRotation = 0; // 0=0°, 1=90°, 2=180°, 3=270°
+        let transmissionModes = null;
+        let originalImageData = null;
+        let firmwareVersionPreview = '';
+        let drawColor = '#000000';
+        let textColor = '#000000';
+        let qrColor = '#000000';
+        let isDrawing = false;
+        let lastTextX = 20, lastTextY = 40;
+        let strokes = [];
+        let textObjects = [];
+        let baseImageData = null;
+        let currentStroke = null;
+        let selectedTextId = null;
+        let isDraggingText = false;
+        let textIdCounter = 0;
+        let pointerDownOnText = false;
+        let qrObjects = [];
+        let qrIdCounter = 0;
+        let selectedQRId = null;
+        let isDraggingQR = false;
+        let pointerDownOnQR = false;
+        let actionStack = [];
+        let drawToolMode = 'draw';
+        let deviceLedCount = 0;
+        let deviceBuzzerCount = 0;
+        let lastDeviceParsedConfigForMsd = null;
+        const buzzerScale = { freqMinHz: 200, freqMaxHz: 4000, durationUnitMs: 5 };
+        function setDrawMode(mode) {
+            if (!document.querySelector('[data-draw-mode-panel="' + mode + '"]')) return;
+            drawToolMode = mode;
+            document.querySelectorAll('.draw-mode-btn').forEach(b => {
+                const on = b.dataset.drawMode === mode;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            document.querySelectorAll('.draw-mode-panel').forEach(p => {
+                p.classList.toggle('active', p.dataset.drawModePanel === mode);
+            });
+        }
+        function initDrawModeBar() {
+            document.querySelectorAll('.draw-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => setDrawMode(btn.dataset.drawMode));
+            });
+        }
+        const PALETTE = [
+            ['#000000', '#ffffff'],
+            ['#000000', '#ffffff', '#ff0000'],
+            ['#000000', '#ffffff', '#ffff00'],
+            ['#000000', '#ffffff', '#ff0000', '#ffff00'],
+            ['#000000', '#ffffff', '#ff0000', '#ffff00', '#00ff00', '#0000ff'],
+            ['#000000', '#555555', '#aaaaaa', '#ffffff'],
+            Array.from({ length: 16 }, (_, k) => {
+                const v = Math.round((k * 255) / 15);
+                const h = v.toString(16).padStart(2, '0');
+                return '#' + h + h + h;
+            })
+        ];
+        function setConnectedUI(connected) {
+            const connectBtn = document.getElementById('connectbutton');
+            const uploadBtn = document.getElementById('uploadButton');
+            const disconnectBtn = document.getElementById('disconnectbutton');
+            const canvasOptions = document.getElementById('canvasOptions');
+            const deviceControlWrap = document.getElementById('deviceControlWrap');
+            const msdPanelWrap = document.getElementById('msdPanelWrap');
+            if (connectBtn) connectBtn.style.display = connected ? 'none' : '';
+            if (uploadBtn) uploadBtn.classList.toggle('visible', connected);
+            if (disconnectBtn) disconnectBtn.classList.toggle('visible', connected);
+            if (canvasOptions) canvasOptions.classList.toggle('visible', connected);
+            if (deviceControlWrap) deviceControlWrap.classList.toggle('visible', connected);
+            if (msdPanelWrap) msdPanelWrap.classList.toggle('visible', connected);
+            if (!connected) {
+                const msdOut = document.getElementById('msdDecodeOut');
+                if (msdOut) msdOut.textContent = '';
+                lastDeviceParsedConfigForMsd = null;
+                setLedUI(false);
+                setBuzzerUI(false);
+            }
+        }
+        function readMsdAdvertisingDecode() {
+            const out = document.getElementById('msdDecodeOut');
+            const btn = document.getElementById('msdReadBtn');
+            const M = typeof OpenDisplayMsd !== 'undefined' ? OpenDisplayMsd : null;
+            if (!bleLib || !bleLib.isConnected) {
+                if (out) out.textContent = 'Not connected.';
+                addLog('MSD: not connected', 'error');
+                return;
+            }
+            if (!M) {
+                if (out) out.textContent = 'OpenDisplayMsd script not loaded.';
+                return;
+            }
+            if (btn) btn.disabled = true;
+            if (out) out.textContent = 'Reading…';
+            const msdOpts = typeof M.extractMsdOptsFromParsedConfig === 'function'
+                ? M.extractMsdOptsFromParsedConfig(lastDeviceParsedConfigForMsd)
+                : {};
+            M.readAndDecodeFromBle(bleLib, msdOpts)
+                .then((d) => {
+                    if (out) out.textContent = M.formatDecoded(d);
+                })
+                .catch((e) => {
+                    const msg = e && e.message ? e.message : String(e);
+                    if (out) out.textContent = 'Error: ' + msg;
+                    addLog('MSD read: ' + msg, 'error');
+                })
+                .finally(() => {
+                    if (btn) btn.disabled = false;
+                });
+        }
+        function setBuzzerUI(show) {
+            const wrap = document.getElementById('buzzerControlPanel');
+            const instanceLabel = document.getElementById('buzzerInstanceLabel');
+            const instanceSelect = document.getElementById('buzzerInstanceSelect');
+            if (!wrap) return;
+            wrap.style.display = show ? 'block' : 'none';
+            if (!show) return;
+            const multi = deviceBuzzerCount > 1;
+            if (instanceLabel) instanceLabel.style.display = multi ? '' : 'none';
+            if (instanceSelect) {
+                instanceSelect.style.display = multi ? '' : 'none';
+                instanceSelect.innerHTML = '';
+                for (let i = 0; i < deviceBuzzerCount; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i.toString();
+                    instanceSelect.appendChild(opt);
+                }
+            }
+        }
+        function hzToBuzzerIndex(hz) {
+            const fmin = Math.max(1, buzzerScale.freqMinHz || 200);
+            const fmax = Math.max(fmin + 1, buzzerScale.freqMaxHz || 4000);
+            if (!hz || hz <= 0) return 0;
+            if (hz <= fmin) return 1;
+            if (hz >= fmax) return 255;
+            const span = fmax - fmin;
+            return Math.min(255, Math.max(1, Math.round(1 + ((hz - fmin) * 254) / span)));
+        }
+        function msToBuzzerDurationUnits(ms) {
+            const u = buzzerScale.durationUnitMs || 5;
+            return Math.min(255, Math.max(0, Math.round(ms / u)));
+        }
+        function buildBuzzerPatternBytes() {
+            const rows = [
+                { hz: document.getElementById('buzzerHz1')?.value, ms: document.getElementById('buzzerMs1')?.value },
+                { hz: document.getElementById('buzzerHz2')?.value, ms: document.getElementById('buzzerMs2')?.value },
+                { hz: document.getElementById('buzzerHz3')?.value, ms: document.getElementById('buzzerMs3')?.value },
+                { hz: document.getElementById('buzzerHz4')?.value, ms: document.getElementById('buzzerMs4')?.value }
+            ];
+            const bytes = [];
+            for (let i = 0; i < rows.length; i++) {
+                const hz = clampInt(rows[i].hz, 0, 20000, 0);
+                const ms = clampInt(rows[i].ms, 0, 65535, 0);
+                if (hz === 0 && ms === 0) continue;
+                bytes.push(hzToBuzzerIndex(hz), msToBuzzerDurationUnits(ms));
+            }
+            if (bytes.length === 0) {
+                bytes.push(hzToBuzzerIndex(2000), msToBuzzerDurationUnits(100));
+            }
+            return bytes;
+        }
+        function applyBuzzerPreset(name) {
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+            if (name === 'single') {
+                set('buzzerHz1', 2000); set('buzzerMs1', 150);
+                set('buzzerHz2', 0); set('buzzerMs2', 0);
+                set('buzzerHz3', 0); set('buzzerMs3', 0);
+                set('buzzerHz4', 0); set('buzzerMs4', 0);
+                set('buzzerOuterRepeats', 1);
+            } else if (name === 'double') {
+                set('buzzerHz1', 2000); set('buzzerMs1', 80);
+                set('buzzerHz2', 0); set('buzzerMs2', 60);
+                set('buzzerHz3', 2000); set('buzzerMs3', 80);
+                set('buzzerHz4', 0); set('buzzerMs4', 0);
+                set('buzzerOuterRepeats', 1);
+            } else if (name === 'alarm') {
+                set('buzzerHz1', 3000); set('buzzerMs1', 100);
+                set('buzzerHz2', 1500); set('buzzerMs2', 100);
+                set('buzzerHz3', 3000); set('buzzerMs3', 100);
+                set('buzzerHz4', 0); set('buzzerMs4', 0);
+                set('buzzerOuterRepeats', 2);
+            }
+        }
+        function sendBuzzerPattern() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog("Not connected", 'error');
+                return;
+            }
+            const sel = document.getElementById('buzzerInstanceSelect');
+            const instance = (sel && sel.style.display !== 'none') ? (parseInt(sel.value, 10) || 0) : 0;
+            const outer = clampInt(document.getElementById('buzzerOuterRepeats')?.value, 1, 255, 1);
+            const body = buildBuzzerPatternBytes();
+            const nsteps = body.length / 2;
+            const patternCount = 1;
+            const payloadHex = hexByte(instance) + hexByte(outer) + hexByte(patternCount) + hexByte(nsteps) + body.map(hexByte).join('');
+            const cmdHex = '0075' + payloadHex;
+            bleLib.sendHexCommand(cmdHex).catch(function(e) { addLog('Buzzer command error: ' + e.message, 'error'); });
+        }
+        function setLedUI(show) {
+            const wrap = document.getElementById('ledControlPanel');
+            const instanceLabel = document.getElementById('ledInstanceLabel');
+            const instanceSelect = document.getElementById('ledInstanceSelect');
+            if (!wrap) return;
+            wrap.style.display = show ? 'block' : 'none';
+            if (!show) return;
+            const multi = deviceLedCount > 1;
+            if (instanceLabel) instanceLabel.style.display = multi ? '' : 'none';
+            if (instanceSelect) {
+                instanceSelect.style.display = multi ? '' : 'none';
+                instanceSelect.innerHTML = '';
+                for (let i = 0; i < deviceLedCount; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = i.toString();
+                    instanceSelect.appendChild(opt);
+                }
+            }
+            syncLedBrightnessLabel();
+        }
+        function syncLedBrightnessLabel() {
+            const s = document.getElementById('ledBrightness');
+            const v = document.getElementById('ledBrightnessVal');
+            if (s && v) v.textContent = s.value;
+        }
+        function clampInt(v, min, max, fallback) {
+            const n = parseInt(v, 10);
+            if (!Number.isFinite(n)) return fallback;
+            return Math.min(max, Math.max(min, n));
+        }
+        function hexByte(n) {
+            return (n & 0xFF).toString(16).padStart(2, '0').toUpperCase();
+        }
+        function rgbTo332(hex) {
+            if (!hex || hex[0] !== '#' || hex.length !== 7) return 0x00;
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            const r3 = Math.round((r / 255) * 7) & 0x07;
+            const g3 = Math.round((g / 255) * 7) & 0x07;
+            const b2 = Math.round((b / 255) * 3) & 0x03;
+            return (r3 << 5) | (g3 << 2) | b2;
+        }
+        function msToDelayNibble(ms) {
+            const steps = Math.round((clampInt(ms, 0, 1500, 0)) / 100);
+            return Math.min(15, Math.max(0, steps));
+        }
+        function msToDelayByte(ms) {
+            const steps = Math.round((clampInt(ms, 0, 25500, 0)) / 100);
+            return Math.min(255, Math.max(0, steps));
+        }
+        function buildLedPatternBytes() {
+            // Firmware format (mode 1 only):
+            // byte0: [brightness-1]<<4 | mode
+            // group1: c1, (loopdelay<<4|loopcnt), ildelay
+            // group2: c2, (loopdelay<<4|loopcnt), ildelay
+            // group3: c3, (loopdelay<<4|loopcnt), ildelay
+            // byte10: grouprepeats-1 (MUST NOT result in 255 repeats, that would hang)
+            // byte11: reserved
+            const brightness = clampInt(document.getElementById('ledBrightness')?.value, 1, 16, 8);
+            const repeats = clampInt(document.getElementById('ledRepeats')?.value, 1, 254, 1);
+            const c1 = rgbTo332(document.getElementById('ledColor1')?.value || '#FFFFFF');
+            const c2 = rgbTo332(document.getElementById('ledColor2')?.value || '#000000');
+            const c3 = rgbTo332(document.getElementById('ledColor3')?.value || '#000000');
+            const cnt1 = clampInt(document.getElementById('ledCount1')?.value, 0, 15, 1);
+            const cnt2 = clampInt(document.getElementById('ledCount2')?.value, 0, 15, 0);
+            const cnt3 = clampInt(document.getElementById('ledCount3')?.value, 0, 15, 0);
+            const on1 = msToDelayNibble(document.getElementById('ledOn1')?.value);
+            const on2 = msToDelayNibble(document.getElementById('ledOn2')?.value);
+            const on3 = msToDelayNibble(document.getElementById('ledOn3')?.value);
+            const gap1 = msToDelayByte(document.getElementById('ledGap1')?.value);
+            const gap2 = msToDelayByte(document.getElementById('ledGap2')?.value);
+            const gap3 = msToDelayByte(document.getElementById('ledGap3')?.value);
+            const b0 = ((brightness - 1) << 4) | 0x01;
+            const bytes = [
+                b0,
+                c1, ((on1 & 0x0F) << 4) | (cnt1 & 0x0F), gap1,
+                c2, ((on2 & 0x0F) << 4) | (cnt2 & 0x0F), gap2,
+                c3, ((on3 & 0x0F) << 4) | (cnt3 & 0x0F), gap3,
+                (repeats - 1) & 0xFF,
+                0x00
+            ];
+            return bytes;
+        }
+        function applyLedPreset(name) {
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+            if (name === 'single') {
+                set('ledBrightness', 8); set('ledRepeats', 1);
+                set('ledColor1', '#ffffff'); set('ledCount1', 1); set('ledOn1', 200); set('ledGap1', 200);
+                set('ledColor2', '#000000'); set('ledCount2', 0); set('ledOn2', 200); set('ledGap2', 0);
+                set('ledColor3', '#000000'); set('ledCount3', 0); set('ledOn3', 200); set('ledGap3', 0);
+            } else if (name === 'double') {
+                set('ledBrightness', 10); set('ledRepeats', 1);
+                set('ledColor1', '#ffffff'); set('ledCount1', 2); set('ledOn1', 150); set('ledGap1', 250);
+                set('ledColor2', '#000000'); set('ledCount2', 0); set('ledOn2', 200); set('ledGap2', 0);
+                set('ledColor3', '#000000'); set('ledCount3', 0); set('ledOn3', 200); set('ledGap3', 0);
+            } else if (name === 'rgb') {
+                set('ledBrightness', 12); set('ledRepeats', 1);
+                set('ledColor1', '#ff0000'); set('ledCount1', 1); set('ledOn1', 150); set('ledGap1', 80);
+                set('ledColor2', '#00ff00'); set('ledCount2', 1); set('ledOn2', 150); set('ledGap2', 80);
+                set('ledColor3', '#0000ff'); set('ledCount3', 1); set('ledOn3', 150); set('ledGap3', 200);
+            }
+        }
+        function sendLedPattern() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog("Not connected", 'error');
+                return;
+            }
+            const sel = document.getElementById('ledInstanceSelect');
+            const instance = (sel && sel.style.display !== 'none') ? (parseInt(sel.value, 10) || 0) : 0;
+            const cfg = buildLedPatternBytes();
+            const payloadHex = hexByte(instance) + cfg.map(hexByte).join('');
+            const cmdHex = '0073' + payloadHex;
+            bleLib.sendHexCommand(cmdHex).catch(function(e) { addLog('LED command error: ' + e.message, 'error'); });
+        }
+        function deviceReboot() {
+            if (!bleLib || !bleLib.isConnected) return;
+            bleLib.sendHexCommand('000F').catch(function(e) { addLog('Reboot error: ' + e.message, 'error'); });
+        }
+        function deviceDeepSleep() {
+            if (!bleLib || !bleLib.isConnected) return;
+            bleLib.sendHexCommand('0052').catch(function(e) { addLog('Deep sleep error: ' + e.message, 'error'); });
+        }
+        async function deviceRebootBootloader() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog('Not connected', 'error');
+                return;
+            }
+            addLog('Reboot to bootloader (0x0051) — device will disconnect; use OTA/DFU to reconnect.', 'info');
+            try {
+                await bleLib.rebootToBootloader();
+            } catch (e) {
+                addLog('Bootloader reboot error: ' + e.message, 'error');
+            }
+        }
+        function setProgressBar(show, value) {
+            const wrap = document.getElementById('uploadProgressWrap');
+            const bar = document.getElementById('uploadProgress');
+            if (wrap) wrap.classList.toggle('visible', !!show);
+            if (bar) bar.value = value == null ? 0 : value;
+        }
+        function getScheme() {
+            return Math.min(Math.max(parseInt(document.getElementById('colorSchemeSelect')?.value || '0', 10), 0), 6);
+        }
+        function fillColorSwatches(container, currentColor, onSelect) {
+            if (!container) return;
+            const scheme = getScheme();
+            const colors = PALETTE[scheme];
+            const cur = currentColor || '#000000';
+            container.innerHTML = '';
+            colors.forEach((hex) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'color-swatch' + (hex === cur ? ' selected' : '');
+                btn.style.background = hex;
+                btn.style.borderColor = (hex === '#ffffff' || hex === '#aaaaaa') ? 'var(--border-color)' : hex;
+                btn.title = hex;
+                btn.addEventListener('click', () => onSelect(hex));
+                container.appendChild(btn);
+            });
+        }
+        function updateDrawPalette() {
+            const container = document.getElementById('drawColorSwatches');
+            if (!container) return;
+            fillColorSwatches(container, drawColor, (hex) => {
+                drawColor = hex;
+                updateDrawPalette();
+            });
+        }
+        function updateTextColorSwatches() {
+            const container = document.getElementById('textColorSwatches');
+            fillColorSwatches(container, textColor, (hex) => {
+                textColor = hex;
+                const t = textObjects.find(x => x.id === selectedTextId);
+                if (t) t.color = hex;
+                renderContent();
+                updateSelectedTextUI();
+                updateTextColorSwatches();
+            });
+            const selContainer = document.getElementById('selectedTextColorSwatches');
+            const t = textObjects.find(x => x.id === selectedTextId);
+            fillColorSwatches(selContainer, t ? t.color : textColor, (hex) => {
+                textColor = hex;
+                const obj = textObjects.find(x => x.id === selectedTextId);
+                if (obj) obj.color = hex;
+                renderContent();
+                updateSelectedTextUI();
+                updateTextColorSwatches();
+            });
+        }
+        function updateQRColorSwatches() {
+            const container = document.getElementById('qrColorSwatches');
+            fillColorSwatches(container, qrColor, (hex) => {
+                qrColor = hex;
+                const q = qrObjects.find(x => x.id === selectedQRId);
+                if (q) q.color = hex;
+                renderContent();
+                updateSelectedQRUI();
+                updateQRColorSwatches();
+            });
+            const selContainer = document.getElementById('selectedQRColorSwatches');
+            const q = qrObjects.find(x => x.id === selectedQRId);
+            fillColorSwatches(selContainer, q ? q.color : qrColor, (hex) => {
+                qrColor = hex;
+                const obj = qrObjects.find(x => x.id === selectedQRId);
+                if (obj) obj.color = hex;
+                renderContent();
+                updateSelectedQRUI();
+                updateQRColorSwatches();
+            });
+        }
+        function clearDrawingCanvas() {
+            createCanvas();
+            actionStack = [];
+            if (typeof getPixelData === 'function') getPixelData();
+        }
+        function undoLast() {
+            if (actionStack.length === 0) return;
+            const action = actionStack.pop();
+            if (action === 'stroke' && strokes.length > 0) {
+                strokes.pop();
+            } else if (action === 'text' && textObjects.length > 0) {
+                const removed = textObjects.pop();
+                if (selectedTextId === removed.id) selectedTextId = null;
+                updateSelectedTextUI();
+            } else if (action === 'qr' && qrObjects.length > 0) {
+                const removed = qrObjects.pop();
+                if (selectedQRId === removed.id) { selectedQRId = null; updateSelectedQRUI(); }
+                updateSelectedTextUI();
+            }
+            renderContent();
+        }
+        function renderContent() {
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas || canvas.width === 0 || canvas.height === 0) return;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (baseImageData) {
+                ctx.putImageData(baseImageData, 0, 0);
+            } else {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            strokes.forEach(s => {
+                if (s.points.length < 2) return;
+                ctx.strokeStyle = s.color;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(s.points[0].x, s.points[0].y);
+                for (let i = 1; i < s.points.length; i++) ctx.lineTo(s.points[i].x, s.points[i].y);
+                ctx.stroke();
+            });
+            textObjects.forEach(t => {
+                ctx.font = t.fontSize + 'px Arial';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = t.color;
+                ctx.fillText(t.text, t.x, t.y);
+            });
+            qrObjects.forEach(qr => {
+                drawQRToCanvas(ctx, qr);
+            });
+            originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            if (typeof getPixelData === 'function') getPixelData();
+            const sel = textObjects.find(t => t.id === selectedTextId);
+            if (sel) {
+                ctx.font = sel.fontSize + 'px Arial';
+                const w = ctx.measureText(sel.text).width;
+                const h = sel.fontSize * 1.2;
+                ctx.strokeStyle = '#0ea5e9';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(sel.x - 2, sel.y - 2, w + 4, h + 4);
+                ctx.setLineDash([]);
+            }
+            const selQR = qrObjects.find(q => q.id === selectedQRId);
+            if (selQR) {
+                ctx.strokeStyle = '#0ea5e9';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(selQR.x - 2, selQR.y - 2, selQR.size + 4, selQR.size + 4);
+                ctx.setLineDash([]);
+            }
+        }
+        function drawQRToCanvas(ctx, qr) {
+            if (typeof QRCode === 'undefined' || !qr.data) return;
+            const div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.left = '-9999px';
+            document.body.appendChild(div);
+            try {
+                const dark = qr.color || '#000000';
+                const qrCode = new QRCode(div, { text: qr.data, width: qr.size, height: qr.size, colorDark: dark, colorLight: '#ffffff' });
+                const qrCanvas = qrCode._oDrawing._elCanvas;
+                if (qrCanvas) ctx.drawImage(qrCanvas, qr.x, qr.y, qr.size, qr.size);
+            } finally {
+                document.body.removeChild(div);
+            }
+        }
+        function getQRAtPoint(px, py) {
+            for (let i = qrObjects.length - 1; i >= 0; i--) {
+                const q = qrObjects[i];
+                if (px >= q.x && px <= q.x + q.size && py >= q.y && py <= q.y + q.size) return q;
+            }
+            return null;
+        }
+        function deselectQR() {
+            selectedQRId = null;
+            updateSelectedQRUI();
+            renderContent();
+        }
+        function updateSelectedQRUI() {
+            const wrap = document.getElementById('selectedQRWrap');
+            const sizeInput = document.getElementById('selectedQRSize');
+            if (!wrap) return;
+            const q = qrObjects.find(x => x.id === selectedQRId);
+            if (!q) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'flex';
+            if (sizeInput) {
+                sizeInput.value = q.size;
+                sizeInput.oninput = () => {
+                    const obj = qrObjects.find(x => x.id === selectedQRId);
+                    if (obj) {
+                        obj.size = Math.min(400, Math.max(32, parseInt(sizeInput.value, 10) || 80));
+                        renderContent();
+                    }
+                };
+            }
+            updateQRColorSwatches();
+        }
+        function getTextAtPoint(px, py) {
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas) return null;
+            const ctx = canvas.getContext('2d');
+            for (let i = textObjects.length - 1; i >= 0; i--) {
+                const t = textObjects[i];
+                ctx.font = t.fontSize + 'px Arial';
+                const w = ctx.measureText(t.text).width;
+                const h = t.fontSize * 1.2;
+                if (px >= t.x && px <= t.x + w && py >= t.y && py <= t.y + h) return t;
+            }
+            return null;
+        }
+        function deselectText() {
+            selectedTextId = null;
+            updateSelectedTextUI();
+            renderContent();
+        }
+        function updateSelectedTextUI() {
+            const wrap = document.getElementById('selectedTextWrap');
+            const sizeInput = document.getElementById('selectedTextSize');
+            if (!wrap) return;
+            const t = textObjects.find(x => x.id === selectedTextId);
+            if (!t) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'flex';
+            if (sizeInput) {
+                sizeInput.value = t.fontSize;
+                sizeInput.oninput = () => {
+                    const obj = textObjects.find(x => x.id === selectedTextId);
+                    if (obj) {
+                        obj.fontSize = Math.min(200, Math.max(8, parseInt(sizeInput.value, 10) || 12));
+                        renderContent();
+                    }
+                };
+            }
+            updateTextColorSwatches();
+        }
+        function getCanvasPoint(canvas, e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY != null ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+        }
+        function setupCanvasDrawing() {
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            let lastX, lastY, startX, startY;
+            canvas.addEventListener('pointerdown', function(e) {
+                if (e.pointerType !== 'mouse' && e.pointerType !== 'touch') return;
+                e.preventDefault();
+                const p = getCanvasPoint(canvas, e);
+                const hitQR = getQRAtPoint(p.x, p.y);
+                const hitText = getTextAtPoint(p.x, p.y);
+                if (hitQR && hitQR.id === selectedQRId) {
+                    isDraggingQR = true;
+                    lastX = p.x;
+                    lastY = p.y;
+                    isDrawing = false;
+                    currentStroke = null;
+                } else if (hitQR) {
+                    pointerDownOnQR = true;
+                    isDrawing = false;
+                    currentStroke = null;
+                } else if (hitText && hitText.id === selectedTextId) {
+                    isDraggingText = true;
+                    lastX = p.x;
+                    lastY = p.y;
+                    isDrawing = false;
+                    currentStroke = null;
+                } else if (hitText) {
+                    pointerDownOnText = true;
+                    isDrawing = false;
+                    currentStroke = null;
+                } else {
+                    pointerDownOnText = false;
+                    startX = lastX = p.x;
+                    startY = lastY = p.y;
+                    isDrawing = true;
+                    currentStroke = { color: drawColor, points: [{ x: p.x, y: p.y }] };
+                    ctx.strokeStyle = drawColor;
+                    ctx.lineWidth = 3;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                }
+                canvas.setPointerCapture(e.pointerId);
+            });
+            canvas.addEventListener('pointermove', function(e) {
+                e.preventDefault();
+                const p = getCanvasPoint(canvas, e);
+                if (isDraggingQR) {
+                    const q = qrObjects.find(q => q.id === selectedQRId);
+                    if (q) {
+                        q.x += p.x - lastX;
+                        q.y += p.y - lastY;
+                        lastX = p.x;
+                        lastY = p.y;
+                        renderContent();
+                    }
+                } else if (isDraggingText) {
+                    const t = textObjects.find(t => t.id === selectedTextId);
+                    if (t) {
+                        t.x += p.x - lastX;
+                        t.y += p.y - lastY;
+                        lastX = p.x;
+                        lastY = p.y;
+                        renderContent();
+                    }
+                } else if (isDrawing && currentStroke) {
+                    currentStroke.points.push({ x: p.x, y: p.y });
+                    ctx.lineTo(p.x, p.y);
+                    ctx.stroke();
+                }
+            });
+            canvas.addEventListener('pointerup', function(e) {
+                e.preventDefault();
+                if (isDraggingQR) {
+                    isDraggingQR = false;
+                } else if (isDraggingText) {
+                    isDraggingText = false;
+                } else if (pointerDownOnQR) {
+                    const p = getCanvasPoint(canvas, e);
+                    const hit = getQRAtPoint(p.x, p.y);
+                    if (hit) {
+                        selectedQRId = hit.id;
+                        selectedTextId = null;
+                        updateSelectedTextUI();
+                        updateSelectedQRUI();
+                        setDrawMode('qr');
+                        renderContent();
+                    }
+                    pointerDownOnQR = false;
+                } else if (pointerDownOnText) {
+                    const p = getCanvasPoint(canvas, e);
+                    const hit = getTextAtPoint(p.x, p.y);
+                    if (hit) {
+                        selectedTextId = hit.id;
+                        selectedQRId = null;
+                        updateSelectedTextUI();
+                        updateSelectedQRUI();
+                        setDrawMode('text');
+                        renderContent();
+                    }
+                    pointerDownOnText = false;
+                } else if (isDrawing) {
+                    isDrawing = false;
+                    if (currentStroke && currentStroke.points.length >= 2) {
+                        strokes.push(currentStroke);
+                        actionStack.push('stroke');
+                        renderContent();
+                    } else {
+                        lastTextX = Math.round(lastX);
+                        lastTextY = Math.round(lastY);
+                        renderContent();
+                    }
+                    currentStroke = null;
+                }
+                canvas.releasePointerCapture(e.pointerId);
+            });
+            canvas.addEventListener('pointercancel', function(e) {
+                isDrawing = false;
+                isDraggingText = false;
+                isDraggingQR = false;
+                pointerDownOnText = false;
+                pointerDownOnQR = false;
+                currentStroke = null;
+                canvas.releasePointerCapture(e.pointerId);
+            });
+        }
+        function addUserText() {
+            const canvas = document.getElementById('myCanvas');
+            const input = document.getElementById('drawTextInput');
+            if (!canvas || canvas.width === 0 || canvas.height === 0 || !input) return;
+            const text = input.value.trim();
+            if (!text) return;
+            const fontSize = Math.min(72, Math.max(12, Math.floor(canvas.width / 20)));
+            const newText = {
+                id: ++textIdCounter,
+                text,
+                x: lastTextX,
+                y: lastTextY,
+                fontSize,
+                color: textColor
+            };
+            textObjects.push(newText);
+            actionStack.push('text');
+            selectedTextId = newText.id;
+            updateSelectedTextUI();
+            setDrawMode('text');
+            renderContent();
+            input.value = '';
+        }
+        function addUserQR() {
+            const canvas = document.getElementById('myCanvas');
+            const input = document.getElementById('qrDataInput');
+            if (!canvas || canvas.width === 0 || canvas.height === 0 || !input) return;
+            const data = input.value.trim();
+            if (!data) return;
+            const size = 80;
+            const newQR = {
+                id: ++qrIdCounter,
+                x: lastTextX,
+                y: lastTextY,
+                size,
+                data,
+                color: qrColor
+            };
+            qrObjects.push(newQR);
+            actionStack.push('qr');
+            selectedQRId = newQR.id;
+            selectedTextId = null;
+            updateSelectedTextUI();
+            updateSelectedQRUI();
+            setDrawMode('qr');
+            renderContent();
+            input.value = '';
+        }
+        function createCanvas() {
+            var width = widthInput;
+            var height = heightInput;
+            var canvas = document.getElementById('myCanvas');
+            if (isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
+                addLog("Invalid canvas dimensions.");
+                return;
+            }
+            if (width > 4000 || height > 4000) {
+                addLog("Canvas dimensions too large.");
+                return;
+            }
+            // Swap dimensions for 90° or 270° rotation
+            if (displayRotation === 1 || displayRotation === 3) {
+                canvas.width = height;
+                canvas.height = width;
+            } else {
+                canvas.width = width;
+                canvas.height = height;
+            }
+            var ctx = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            originalImageData = null;
+            baseImageData = null;
+            strokes = [];
+            textObjects = [];
+            qrObjects = [];
+            selectedTextId = null;
+            selectedQRId = null;
+            actionStack = [];
+            addLog(`Canvas created/cleared: ${canvas.width}x${canvas.height} (rotation: ${displayRotation * 90}°)`);
+        }
+        function addText() {
+            var canvas = document.getElementById('myCanvas');
+            if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                addLog("Cannot add text: Canvas not ready.");
+                return;
+            }
+            var ctx = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
+            var text = "Test";
+            var fontSize = 72;
+            var maxWidth = canvas.width - 20;
+            var x = canvas.width / 2;
+            var y = canvas.height / 2;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'black';
+            do {
+                fontSize--;
+                ctx.font = fontSize + 'px Arial';
+            } while (ctx.measureText(text).width > maxWidth && fontSize > 1);
+            if (fontSize <= 1) {
+                addLog("Warning: Text too long to fit significantly.");
+            }
+            ctx.fillStyle = 'black';
+            ctx.fillText(text, x, y);
+            const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+            if (colorScheme >= 1 && colorScheme !== 6) {
+                let y2 = y + fontSize * 0.7;
+                ctx.fillStyle = 'rgb(255, 0, 0)';  // Pure red - exact display color
+                ctx.fillText(text, x, y2);
+            }
+            if (colorScheme >= 2 && colorScheme !== 6) {
+                let y2 = y - fontSize * 0.7;
+                ctx.fillStyle = 'rgb(255, 255, 0)';  // Pure yellow - exact display color
+                ctx.fillText(text, x, y2);
+            }
+            if (colorScheme === 4) {
+                let y3 = y + fontSize * 1.4;
+                ctx.fillStyle = 'rgb(0, 255, 0)';  // Pure green - exact display color
+                ctx.fillText(text, x, y3);
+                let y4 = y - fontSize * 1.4;
+                ctx.fillStyle = 'rgb(0, 0, 255)';  // Pure blue - exact display color
+                ctx.fillText(text, x, y4);
+            }
+            if (colorScheme === 5) {
+                let y2 = y + fontSize * 0.7;
+                ctx.fillStyle = 'rgb(85, 85, 85)';
+                ctx.fillText(text, x, y2);
+                let y3 = y - fontSize * 0.7;
+                ctx.fillStyle = 'rgb(170, 170, 170)';
+                ctx.fillText(text, x, y3);
+            }
+            if (colorScheme === 6) {
+                let y2 = y + fontSize * 0.7;
+                ctx.fillStyle = 'rgb(128, 128, 128)';
+                ctx.fillText(text, x, y2);
+                let y3 = y - fontSize * 0.7;
+                ctx.fillStyle = 'rgb(64, 64, 64)';
+                ctx.fillText(text, x, y3);
+            }
+            const ctxForSave = canvas.getContext('2d', { willReadFrequently: true });
+            originalImageData = ctxForSave.getImageData(0, 0, canvas.width, canvas.height);
+            getPixelData();
+        }
+        function getPixelData() {
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                addLog("Cannot get pixel data: Canvas not ready.");
+                return;
+            }
+            const ctx = canvas.getContext('2d', {
+                willReadFrequently: true
+            });
+            const ditheringType = document.getElementById('ditheringSelect').value;
+            if (originalImageData) {
+                ctx.putImageData(originalImageData, 0, 0);
+            } else {
+                originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+            if (ditheringType === 'none') {
+                return;
+            }
+            const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+            bleLib.applyDithering(ctx, canvas.width, canvas.height, colorScheme, ditheringType);
+        }
+        function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                addLog("Cannot upload image: Canvas not ready.");
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvasWidth = canvas.width;
+                        const canvasHeight = canvas.height;
+                        const imgWidth = img.width;
+                        const imgHeight = img.height;
+                        const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+                        const newWidth = imgWidth * scale;
+                        const newHeight = imgHeight * scale;
+                        const offsetX = (canvasWidth - newWidth) / 2;
+                        const offsetY = (canvasHeight - newHeight) / 2;
+                        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                        ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+                        baseImageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+                        strokes = [];
+                        textObjects = [];
+                        qrObjects = [];
+                        selectedTextId = null;
+                        selectedQRId = null;
+                        actionStack = [];
+                        const ditherSel = document.getElementById('ditheringSelect');
+                        if (ditherSel) ditherSel.value = 'floyd-steinberg';
+                        renderContent();
+                    };
+                    img.onerror = function () {
+                        addLog("Error loading image file.");
+                    }
+                    img.src = e.target.result;
+                };
+                reader.onerror = function (e) {
+                    addLog("Error reading file: " + e);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+        function resetVariables() {
+            bleLib.resetDFUState();
+            setStatus("Disconnected");
+            setConnectedUI(false);
+            lastDeviceParsedConfigForMsd = null;
+            deviceLedCount = 0;
+            deviceBuzzerCount = 0;
+            setLedUI(false);
+            setBuzzerUI(false);
+            firmwareVersionPreview = '';
+            const previewMeta = document.getElementById('previewMeta');
+            const previewLockIcon = document.getElementById('previewLockIcon');
+            if (previewMeta) previewMeta.textContent = '';
+            if (previewLockIcon) { previewLockIcon.innerHTML = ''; previewLockIcon.style.display = 'none'; }
+        }
+        function handleError(error) {
+            console.error("BLE Error:", error);
+            addLog("BLE Error: " + error.message, 'error');
+            setStatus("Connection failed", false, true);
+            setConnectedUI(false);
+        }
+        function sendDirectWriteAuto() {
+            const canvas = document.getElementById('myCanvas');
+            if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                addLog("Cannot upload: Canvas not ready.", 'error');
+                return;
+            }
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const ditheringType = document.getElementById('ditheringSelect').value;
+            if (originalImageData) {
+                ctx.putImageData(originalImageData, 0, 0);
+            }
+            if (ditheringType !== 'none') {
+                const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+                bleLib.applyDithering(ctx, canvas.width, canvas.height, colorScheme, ditheringType);
+            }
+            const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
+            const useFastRefresh = document.getElementById('fastRefreshToggle')?.checked || false;
+            bleLib.sendCanvasToDisplay(canvas, colorScheme, {
+                rotation: displayRotation,
+                originalWidth: widthInput,
+                originalHeight: heightInput,
+                useFastRefresh: useFastRefresh,
+                transmissionModes: transmissionModes,
+                onProgress: (current, total) => {
+                    const progress = Math.floor((current / total) * 100);
+                    setProgressBar(true, progress);
+                    setStatus(`Uploading: ${progress}%`);
+                },
+                onStatusChange: (message) => {
+                    setStatus(message, !!(bleLib && bleLib.isConnected));
+                },
+                onComplete: (success, error) => {
+                    setProgressBar(false);
+                    if (success) {
+                        addLog("Canvas sent to display successfully!", 'success');
+                    } else {
+                        addLog("Error sending to display: " + (error ? error.message : 'Unknown error'), 'error');
+                        setStatusWithFirmware("Send failed", true);
+                    }
+                }
+            }).catch(error => {
+                setProgressBar(false);
+                addLog("Error: " + error.message, 'error');
+                setStatus("Error: " + error.message, false, true);
+            });
+        }
+        function resetImageSelector() {
+            document.getElementById("imageUpload").value = '';
+        };
+        function handleDisplayNotification(bytes, hexString, event) {
+            const continuousHex = hexString.replace(/\s+/g, '').toUpperCase();
+            addLog("BLE< " + hexString);
+            if (continuousHex.length >= 4) {
+                const cmdHex = continuousHex.substring(0, 4);
+                if (cmdHex === "0005") {
+                    addLog("Display Info (0005) received but ignored - using Dynamic Config instead");
+                } else if (cmdHex === "00CD") {
+                    addLog("Dynamic Config received (legacy, ignoring).");
+                    setStatus("Dynamic config received (legacy).");
+                } else if (continuousHex === "00730000") {
+                    addLog("LED pattern done", 'success');
+                } else if (continuousHex === "00750000") {
+                    addLog("Buzzer pattern done", 'success');
+                } else if (continuousHex.length >= 4 && cmdHex === "0052") {
+                    addLog("Deep sleep ACK (device will go offline)", 'info');
+                } else if (continuousHex.length >= 4 && continuousHex.substring(0, 4) === "FF73") {
+                    const err = continuousHex.length >= 6 ? continuousHex.substring(4, 6) : "??";
+                    addLog("LED error (0x" + err + ")", 'error');
+                } else if (continuousHex.length >= 4 && continuousHex.substring(0, 4) === "FF75") {
+                    const err = continuousHex.length >= 6 ? continuousHex.substring(4, 6) : "??";
+                    addLog("Buzzer error (0x" + err + ")", 'error');
+                }
+            }
+        }
+        
+        function preConnect() {
+            if (bleLib && bleLib.isConnected) {
+                addLog("Disconnecting...");
+                setStatus("Disconnecting...");
+                bleLib.disconnect();
+            } else {
+                if (!navigator.bluetooth) {
+                    alert("Web Bluetooth is not supported in this browser.\n\nUse Chrome, Edge, or another Chromium-based browser on desktop or Android. On iPhone or iPad, use the Bluefy app from the App Store.");
+                    return;
+                }
+                const namePrefix = document.getElementById('namePrefix').value.trim();
+                if (!namePrefix) {
+                    addLog("Error: Prefix filter(s) needed.");
+                    setStatus("Error: No prefix", false, true);
+                    return;
+                }
+                bleLib = new OpenDisplayBLE({
+                    deviceNamePrefix: namePrefix,
+                    maxReconnectAttempts: 5,
+                    reconnectDelay: 2000,
+                    onConnect: () => {
+                        addLog('Connection successful!', 'success');
+                        setStatus('Connected', true);
+                        setConnectedUI(true);
+                        setTimeout(() => {
+                            readDynamicConfig();
+                            setTimeout(() => {
+                                readFirmwareVersion();
+                            }, 200);
+                        }, 450);
+                    },
+                    onDisconnect: () => {
+                        addLog('Device disconnected.');
+                        resetVariables();
+                    },
+                    onError: (error) => {
+                        handleError(error);
+                    },
+                    onNotification: handleDisplayNotification,
+                    onLog: (message, type) => {
+                        addLog(message, type);
+                    },
+                    onStatusChange: (message, isConnected) => {
+                        setStatus(message, isConnected);
+                    },
+                    onCommandAck: () => {
+                        setStatus("Command ACK.");
+                    },
+                    onCommandError: (errorCode) => {
+                        addLog(`ERROR: General CMD Error (${errorCode}).`, 'error');
+                        setStatus(`Command Error (${errorCode}).`, false, true);
+                    }
+                });
+                bleLib.connect(namePrefix).catch(error => {
+                    if (error.name === 'NotFoundError' || error.name === 'AbortError') {
+                        addLog("No device selected/found.");
+                        setStatus("No device selected", false, true);
+                        setConnectedUI(false);
+                    } else {
+                        handleError(error);
+                    }
+                });
+            }
+        }
+        let lastStatusText = '';
+        let lastStatusConnected = false;
+        function setStatus(statusText, isConnected = false, isError = false) {
+            lastStatusText = statusText;
+            lastStatusConnected = isConnected;
+            const displayText = statusText;
+            const statusElement = document.getElementById("statusText");
+            if (statusElement) {
+                statusElement.textContent = displayText;
+                statusElement.className = 'status-text' + (isError ? ' error' : '');
+            }
+        }
+        function setStatusWithFirmware(statusText, isError = false) {
+            setStatus(statusText, !!(bleLib && bleLib.isConnected), isError);
+        }
+        function addLog(logTXT, type = 'info') {
+            const logArea = document.getElementById("logDisplay");
+            if (!logArea) return;
+            const today = new Date();
+            const time = ("0" + today.getHours()).slice(-2) + ":" + ("0" + today.getMinutes()).slice(-2) + ":" + ("0" + today.getSeconds()).slice(-2);
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${time}] ${logTXT}`;
+            logArea.insertBefore(logEntry, logArea.firstChild);
+            while (logArea.children.length > 50) {
+                logArea.removeChild(logArea.lastChild);
+            }
+            console.log("BLE Log: " + time + " : " + logTXT);
+        }
+        async function readDynamicConfig() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog("Cannot read config: Not connected.", 'error');
+                return;
+            }
+            addLog("Requesting config (0x0040)...", 'info');
+            
+            // Helper function to actually perform the config read
+            const performConfigRead = async () => {
+                return new Promise((resolve, reject) => {
+            bleLib.readConfig((configBytes, error) => {
+                if (error) {
+                            reject(error);
+                            return;
+                        }
+                        if (!configBytes || configBytes.length === 0) {
+                            reject(new Error("Config read callback received empty data"));
+                    return;
+                }
+                        resolve(configBytes);
+                    }, (received, total) => {
+                        addLog(`Progress: ${received}/${total} bytes`, 'info');
+                    });
+                });
+            };
+            
+            try {
+                const configBytes = await performConfigRead();
+                addLog(`Config read callback received ${configBytes ? configBytes.length : 0} bytes`, 'info');
+                try {
+                    const parsedConfig = bleLib.parseConfigBytes(configBytes);
+                    applyParsedConfig(parsedConfig);
+                } catch (error) {
+                    addLog("Error parsing config: " + error.message, 'error');
+                }
+            } catch (error) {
+                // Check if this is an authentication error
+                // The error might be in the message or we need to check the notification
+                const errorMsg = error.message || '';
+                if (errorMsg.includes('auth') || errorMsg.includes('encryption') || errorMsg.includes('0xFE')) {
+                    const urlKey = getUrlParameter('key');
+                    const keyBytes = parseKeyFromUrl(urlKey);
+                    if (keyBytes) {
+                        addLog("Authentication required. Using encryption key from URL.", 'info');
+                    } else {
+                        addLog("Authentication required for config read. Prompting for encryption key...", 'info');
+                    }
+                    try {
+                        await bleLib.setEncryptionKey(keyBytes || null);
+                        addLog("Encryption key set, authenticating...", 'info');
+                        
+                        // Perform authentication
+                        await bleLib.authenticate();
+                        addLog("Authentication successful! Retrying config read...", 'success');
+                        
+                        // Retry config read after authentication
+                        const configBytes = await performConfigRead();
+                        addLog(`Config read callback received ${configBytes ? configBytes.length : 0} bytes`, 'info');
+                        try {
+                            const parsedConfig = bleLib.parseConfigBytes(configBytes);
+                            applyParsedConfig(parsedConfig);
+                        } catch (parseError) {
+                            addLog("Error parsing config: " + parseError.message, 'error');
+                        }
+                    } catch (authError) {
+                        addLog("Authentication failed: " + authError.message, 'error');
+                    }
+                } else {
+                    addLog("Config read failed: " + error.message, 'error');
+                }
+            }
+        }
+        function applyParsedConfig(parsedConfig) {
+            lastDeviceParsedConfigForMsd = parsedConfig || null;
+            try {
+                const displayCfg = bleLib.extractDisplayConfig(parsedConfig);
+                if (!displayCfg) {
+                    addLog("No display config found in device config", 'warning');
+                    return;
+                }
+                const instanceNumber = displayCfg.instanceNumber;
+                const pixelWidth = displayCfg.pixelWidth;
+                const pixelHeight = displayCfg.pixelHeight;
+                const colorScheme = displayCfg.colorScheme;
+                const rotation = displayCfg.rotation || 0;
+                const tm = displayCfg.transmissionModes || 0;
+                addLog(`Display[${instanceNumber}]: ${pixelWidth}x${pixelHeight}, rotation=${rotation * 90}°, color_scheme=${colorScheme}, transmission_modes=0x${tm.toString(16)}`, 'info');
+                
+                if (instanceNumber === 0) {
+                    if (pixelWidth > 0 && pixelHeight > 0 && pixelWidth < 4000 && pixelHeight < 4000) {
+                        widthInput = pixelWidth;
+                        heightInput = pixelHeight;
+                    }
+                    displayRotation = Math.min(Math.max(rotation, 0), 3);
+                    transmissionModes = tm; // Store globally for use in sendCanvasToDisplay
+                    const colorSchemeSelect = document.getElementById('colorSchemeSelect');
+                    const schemeShort = ['BW', 'BWR', 'BWY', 'BWRY', '6C', '4G', '16G'];
+                    const validScheme = Math.min(Math.max(colorScheme, 0), 6);
+                    if (colorSchemeSelect) {
+                        colorSchemeSelect.value = validScheme.toString();
+                        const schemeNames = ['Monochrome (B/W)', 'B/W + Red', 'B/W + Yellow', 'B/W + Red + Yellow', 'B/W + Green + Blue + Red + Yellow (6-color)', '4 Grayscale', '16 Grayscale (4bpp)'];
+                        addLog(`Color scheme automatically set to: ${schemeNames[validScheme]} (${validScheme})`, 'success');
+                    }
+                    updatePreviewLine(validScheme);
+                    updateDrawPalette();
+                    updateTextColorSwatches();
+                    updateQRColorSwatches();
+                    doAll();
+                }
+                deviceLedCount = (parsedConfig.packets || []).filter(function(p) { return p.id === 0x21; }).length;
+                setLedUI(deviceLedCount > 0);
+                if (deviceLedCount > 0) addLog('LED config: ' + deviceLedCount + ' instance(s)', 'info');
+                deviceBuzzerCount = (parsedConfig.packets || []).filter(function(p) { return p.id === 0x29; }).length;
+                buzzerScale.freqMinHz = 400;
+                buzzerScale.freqMaxHz = 12000;
+                buzzerScale.durationUnitMs = 5;
+                setBuzzerUI(deviceBuzzerCount > 0);
+                if (deviceBuzzerCount > 0) addLog('Passive buzzer config: ' + deviceBuzzerCount + ' instance(s)', 'info');
+                addLog("Config parsing completed", 'success');
+            } catch (e) {
+                addLog("Error applying parsed config: " + e.message, 'error');
+                console.error("Config apply error:", e);
+            }
+        }
+        function updatePreviewLine(validScheme) {
+            const schemeShort = ['BW', 'BWR', 'BWY', 'BWRY', '6C', '4G', '16G'];
+            const scheme = validScheme != null ? validScheme : Math.min(Math.max(parseInt(document.getElementById('colorSchemeSelect')?.value || '0', 10), 0), 6);
+            const previewMeta = document.getElementById('previewMeta');
+            const previewLockIcon = document.getElementById('previewLockIcon');
+            if (previewMeta) previewMeta.textContent = ' · ' + widthInput + '×' + heightInput + ' · ' + schemeShort[scheme] + (firmwareVersionPreview ? ' · v' + firmwareVersionPreview : '');
+            if (previewLockIcon) {
+                const enc = bleLib && bleLib.encryptionSession && bleLib.encryptionSession.authenticated;
+                previewLockIcon.style.display = '';
+                previewLockIcon.innerHTML = ' · ' + (enc
+                    ? '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>'
+                    : '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.65 1.35-3 3-3s3 1.35 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>');
+            }
+        }
+        function readFirmwareVersion() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog("Cannot read firmware version: Not connected.", 'error');
+                return;
+            }
+            addLog("Requesting firmware version...", 'info');
+            bleLib.readFirmwareVersion((versionInfo, error) => {
+                if (error) {
+                    addLog("Error reading firmware version: " + error.message, 'error');
+                    return;
+                }
+                if (!versionInfo) {
+                    addLog("No firmware version received", 'error');
+                    return;
+                }
+                const { major, minor, sha } = versionInfo;
+                firmwareVersionPreview = `${major}.${minor}`;
+                addLog(`Firmware Version: ${major}.${minor}${sha ? ' SHA: ' + sha.substring(0, 8) + '...' : ''}`, 'success');
+                updatePreviewLine();
+            });
+        }
+        function doAll() {
+            createCanvas();
+            getPixelData();
+        }
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        function parseKeyFromUrl(hexStr) {
+            if (!hexStr || typeof hexStr !== 'string') return null;
+            const cleaned = hexStr.replace(/[^0-9A-Fa-f]/g, '');
+            if (cleaned.length !== 32) return null;
+            const out = new Uint8Array(16);
+            for (let i = 0; i < 16; i++) {
+                const n = parseInt(cleaned.substr(i * 2, 2), 16);
+                if (isNaN(n)) return null;
+                out[i] = n;
+            }
+            return out;
+        }
+        
+        function initializeFromUrl() {
+            // Check for device filter in URL parameters
+            const filterParam = getUrlParameter('filter') || getUrlParameter('device') || getUrlParameter('prefix');
+            if (filterParam) {
+                const namePrefixInput = document.getElementById('namePrefix');
+                if (namePrefixInput) {
+                    namePrefixInput.value = filterParam;
+                    addLog(`Device filter set from URL: ${filterParam}`, 'info');
+                } else {
+                    console.error("Could not find namePrefix input element");
+                }
+            }
+            
+            // Check for auto-connect parameter
+            const autoConnect = getUrlParameter('connect') === 'true' || getUrlParameter('auto') === 'true';
+            if (autoConnect && filterParam) {
+                addLog("Auto-connecting...", 'info');
+                setTimeout(() => {
+                    preConnect();
+                }, 500);
+            }
+        }
+        
+        // Initialize from URL - run as early as possible and also on load
+        function setUrlFilter() {
+            const filterParam = getUrlParameter('filter') || getUrlParameter('device') || getUrlParameter('prefix');
+            if (filterParam) {
+                const namePrefixInput = document.getElementById('namePrefix');
+                if (namePrefixInput) {
+                    namePrefixInput.value = filterParam;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Try to set filter immediately if DOM is ready
+        if (document.readyState !== 'loading') {
+            setUrlFilter();
+        }
+        
+        // Also try when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setUrlFilter();
+        });
+        
+        window.addEventListener('load', function () {
+            setConnectedUI(false);
+            createCanvas();
+            updateDrawPalette();
+            updateTextColorSwatches();
+            updateQRColorSwatches();
+            setupCanvasDrawing();
+            initDrawModeBar();
+            if (setUrlFilter()) {
+                const filterParam = getUrlParameter('filter') || getUrlParameter('device') || getUrlParameter('prefix');
+                addLog(`Device filter set from URL: ${filterParam}`, 'info');
+            }
+            initializeFromUrl();
+            addLog("Page loaded. Ready.", 'info');
+            setStatus("Ready");
+        });
+    </script>
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="../../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+</body>
+</html>

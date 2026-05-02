@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generate QR codes with control over error correction and view capacity by version.">
+  <link rel="stylesheet" href="../common.css">
+  <title>QR Code Generator - OpenDisplay</title>
+  <style>
+    .qrcode-layout {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .qrcode-layout { grid-template-columns: 1fr; }
+    }
+    .qrcode-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .qrcode-output {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      background: var(--background);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      min-width: 200px;
+    }
+    .qrcode-inner {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.08);
+    }
+    #qrcode-container {
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #qrcode-container canvas,
+    #qrcode-container svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .qrcode-downloads {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .qrcode-downloads button {
+      padding: 10px 18px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-background);
+      color: var(--foreground);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .qrcode-downloads button:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-button);
+    }
+    .qrcode-downloads button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .capacity-info {
+      margin-top: 8px;
+      padding: 16px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--muted-foreground);
+    }
+    .capacity-info p {
+      margin: 0 0 8px;
+    }
+    .capacity-info p:last-child {
+      margin-bottom: 0;
+    }
+    .capacity-info strong {
+      color: var(--foreground);
+    }
+    label {
+      display: block;
+      font-weight: 500;
+      color: var(--foreground);
+      margin-bottom: 6px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-background);
+      color: var(--foreground);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2);
+    }
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-background);
+      color: var(--foreground);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+    <div class="col">
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+        <span>QR Code Generator</span>
+      </div>
+    </div>
+    <h1>QR Code Generator</h1>
+
+    <div class="col panel">
+      <p class="intro-text">
+        Generate a QR code from any text or URL. Choose error correction level (L, M, Q, H).
+        The panel below shows how many data bytes your content uses and how many bytes remain until the QR symbol would switch to the next version.
+      </p>
+
+      <div class="qrcode-layout">
+        <div class="qrcode-controls">
+          <div>
+            <label for="qrcode-data">Data</label>
+            <textarea id="qrcode-data" placeholder="Enter text or URL…"></textarea>
+          </div>
+          <div>
+            <label for="qrcode-ecc">Error correction</label>
+            <select id="qrcode-ecc">
+              <option value="L">L (7%)</option>
+              <option value="M" selected>M (15%)</option>
+              <option value="Q">Q (25%)</option>
+              <option value="H">H (30%)</option>
+            </select>
+          </div>
+          <div class="capacity-info" id="capacity-info" aria-live="polite">
+            <p><strong>Bytes used:</strong> <span id="bytes-used">0</span></p>
+            <p><strong>Version:</strong> <span id="version">—</span> <span id="version-size"></span></p>
+            <p><strong>Capacity (this version):</strong> <span id="capacity">—</span> bytes</p>
+            <p><strong>Bytes left until next version:</strong> <span id="bytes-left">—</span></p>
+          </div>
+        </div>
+        <div class="qrcode-output">
+          <div class="qrcode-inner">
+            <div id="qrcode-container"></div>
+          </div>
+          <div class="qrcode-downloads">
+            <button type="button" id="download-svg" disabled>Download SVG</button>
+            <button type="button" id="download-png" disabled>Download PNG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col panel footer">
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <span class="footer-separator">•</span>
+        <a href="https://github.com/OpenDisplay/" target="_blank" rel="noopener" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+        <span class="footer-separator">•</span>
+        <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noopener" aria-label="OpenDisplay Discord (opens in new tab)">Discord</a>
+        <span class="footer-separator">•</span>
+        <a href="../impressum.html">imprint (Impressum)</a>
+        <span class="footer-separator">•</span>
+        <a href="../datenschutz.html">privacy (Datenschutz)</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="qrcode.js"></script>
+  <script>
+    (function () {
+      var CAPACITY = [
+        [17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],[134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],[321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],[586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],[929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],[1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],[1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],[2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273]
+      ];
+      var ECC_INDEX = { L: 0, M: 1, Q: 2, H: 3 };
+
+      function getUTF8Length(s) {
+        var replaced = encodeURI(s).replace(/%[0-9a-fA-F]{2}/g, 'a');
+        return replaced.length + (replaced.length !== s.length ? 3 : 0);
+      }
+
+      function getVersionAndCapacity(byteCount, eccLevel) {
+        var idx = ECC_INDEX[eccLevel];
+        for (var v = 0; v < CAPACITY.length; v++) {
+          if (byteCount <= CAPACITY[v][idx]) {
+            var cap = CAPACITY[v][idx];
+            var nextCap = v < CAPACITY.length - 1 ? CAPACITY[v + 1][idx] : null;
+            return { version: v + 1, capacity: cap, bytesLeft: cap - byteCount, nextCapacity: nextCap };
+          }
+        }
+        return { version: 40, capacity: CAPACITY[39][idx], bytesLeft: -1, overflow: true };
+      }
+
+      var container = document.getElementById('qrcode-container');
+      var dataEl = document.getElementById('qrcode-data');
+      var eccEl = document.getElementById('qrcode-ecc');
+      var bytesUsedEl = document.getElementById('bytes-used');
+      var versionEl = document.getElementById('version');
+      var versionSizeEl = document.getElementById('version-size');
+      var capacityEl = document.getElementById('capacity');
+      var bytesLeftEl = document.getElementById('bytes-left');
+      var downloadSvgBtn = document.getElementById('download-svg');
+      var downloadPngBtn = document.getElementById('download-png');
+
+      var qr = null;
+      var correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+
+      function getQRModel() {
+        return qr && qr._oQRCode ? qr._oQRCode : null;
+      }
+
+      function downloadSVG() {
+        var model = getQRModel();
+        if (!model) return;
+        var n = model.getModuleCount();
+        var parts = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ', n, ' ', n, '" width="', n, '" height="', n, '"><rect width="', n, '" height="', n, '" fill="#ffffff"/>'];
+        for (var row = 0; row < n; row++) {
+          for (var col = 0; col < n; col++) {
+            if (model.isDark(row, col)) {
+              parts.push('<rect x="', col, '" y="', row, '" width="1" height="1" fill="#000000"/>');
+            }
+          }
+        }
+        parts.push('</svg>');
+        var blob = new Blob([parts.join('')], { type: 'image/svg+xml' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'qrcode.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function downloadPNG() {
+        var model = getQRModel();
+        if (!model) return;
+        var n = model.getModuleCount();
+        var canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = n;
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, n, n);
+        ctx.fillStyle = '#000000';
+        for (var row = 0; row < n; row++) {
+          for (var col = 0; col < n; col++) {
+            if (model.isDark(row, col)) ctx.fillRect(col, row, 1, 1);
+          }
+        }
+        var url = canvas.toDataURL('image/png');
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'qrcode.png';
+        a.click();
+      }
+
+      function update() {
+        var text = dataEl.value;
+        var ecc = eccEl.value;
+        var byteCount = getUTF8Length(text);
+        var info = getVersionAndCapacity(byteCount, ecc);
+
+        bytesUsedEl.textContent = byteCount;
+        var size = info.overflow ? 0 : info.version * 4 + 17;
+        versionEl.textContent = info.overflow ? '—' : info.version;
+        versionSizeEl.textContent = size ? '(' + size + '×' + size + ' px)' : '';
+        capacityEl.textContent = info.overflow ? '—' : info.capacity;
+        if (info.overflow) {
+          bytesLeftEl.textContent = 'Data too long for QR (max version 40)';
+        } else if (info.bytesLeft === 0 && info.version < 40) {
+          bytesLeftEl.textContent = '0 — one more byte will use version ' + (info.version + 1);
+        } else if (info.bytesLeft === 0) {
+          bytesLeftEl.textContent = '0 (max capacity)';
+        } else {
+          bytesLeftEl.textContent = info.bytesLeft;
+        }
+
+        if (!text.trim()) {
+          if (qr) { qr.clear(); qr = null; }
+          downloadSvgBtn.disabled = downloadPngBtn.disabled = true;
+          return;
+        }
+        if (info.overflow) {
+          if (qr) { qr.clear(); qr = null; }
+          downloadSvgBtn.disabled = downloadPngBtn.disabled = true;
+          return;
+        }
+        try {
+          if (!qr) {
+            qr = new QRCode(container, {
+              text: text,
+              width: 200,
+              height: 200,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: correctLevelMap[ecc]
+            });
+          } else {
+            qr._htOption.correctLevel = correctLevelMap[ecc];
+            qr.makeCode(text);
+          }
+        } catch (e) {
+          if (qr) qr.clear();
+          bytesLeftEl.textContent = 'Error: ' + (e.message || 'data too long');
+        }
+        downloadSvgBtn.disabled = downloadPngBtn.disabled = !getQRModel();
+      }
+
+      downloadSvgBtn.addEventListener('click', downloadSVG);
+      downloadPngBtn.addEventListener('click', downloadPNG);
+      dataEl.addEventListener('input', update);
+      dataEl.addEventListener('change', update);
+      eccEl.addEventListener('change', update);
+      update();
+    })();
+  </script>
+</body>
+</html>

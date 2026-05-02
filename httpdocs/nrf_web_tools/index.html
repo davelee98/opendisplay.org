@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nRF Web Tools</title>
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <style>
+    body {
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .intro {
+      font-size: 1.1rem;
+      color: var(--muted-foreground);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .demo-section {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 32px 0;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .demo-section h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+    .demo-section p {
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+    }
+    .demo-button {
+      background: var(--accent);
+      color: var(--accent-button);
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .demo-button:hover {
+      background: var(--accent-hover);
+    }
+    .products-section {
+      margin: 48px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .products-section h2 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .products-grid {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .product-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--foreground);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-logo:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .product-logo img {
+      height: 40px;
+      width: auto;
+    }
+    .section {
+      margin: 48px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .section h2 {
+      margin-bottom: 16px;
+    }
+    .section p {
+      color: var(--muted-foreground);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    code {
+      background: var(--card-background);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9em;
+      border: 1px solid var(--border-color);
+    }
+    pre {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      border: none;
+      font-size: 0.9em;
+    }
+    .step {
+      margin: 24px 0;
+    }
+    .step h3 {
+      margin-bottom: 8px;
+      color: var(--foreground);
+    }
+    .step p {
+      margin-bottom: 12px;
+    }
+    ul {
+      line-height: 1.8;
+      color: var(--muted-foreground);
+    }
+    ul li {
+      margin-bottom: 8px;
+    }
+    .note {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+    @media (prefers-color-scheme: dark) {
+      .note {
+        background: #78350f;
+        border-color: #f59e0b;
+      }
+    }
+    .note strong {
+      color: #92400e;
+    }
+    @media (prefers-color-scheme: dark) {
+      .note strong {
+        color: #fef3c7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>nRF Web Tools</h1>
+    
+    <div class="intro">
+      User-friendly tool to manage nRF52 devices in the browser:
+    </div>
+    <ul style="margin: 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li>Install & update firmware</li>
+      <li>Supports all devices with the Adafruit nRF bootloader</li>
+      <li>Works on desktop and Android (via WebUSB polyfill)</li>
+    </ul>
+
+    <div class="demo-section">
+    <h2>Try a live demo</h2>
+    <p>This demo will install OpenDisplay firmware. To get started, connect a device with the Adafruit nRF bootloader to your computer and hit the button:</p>
+    <button id="install-btn-2" class="demo-button">
+      Install Firmware
+    </button>
+    <p style="margin-top: 16px; font-size: 0.9rem;">
+      <em id="demo-status">
+        <span id="serial-support-check">Checking browser support...</span>
+      </em>
+    </p>
+  </div>
+
+    <div class="products-section">
+      <h2>Products using nRF Web Tools</h2>
+      <div class="products-grid">
+        <a href="https://opendisplay.org" class="product-logo" target="_blank">
+          <img src="od_dark.png" alt="OpenDisplay logo" />
+          <span style="font-weight: 600; font-size: 1.2rem;">OpenDisplay</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+    <h2>How it works</h2>
+    <p>
+      nRF Web Tool works by combining <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Serial_API" style="color: var(--accent);">Web Serial</a>, 
+      <a href="https://github.com/google/web-serial-polyfill" style="color: var(--accent);">Web Serial Polyfill</a> (for Android), 
+      and DFU packages which contain firmware binaries and metadata. The tool detects devices with the Adafruit nRF bootloader and automatically 
+      installs the appropriate firmware.
+    </p>
+    <p>
+      Web Serial is available in Google Chrome and Microsoft Edge browsers. Android support is available via the Web Serial Polyfill, 
+      which implements Web Serial on top of WebUSB.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Adding nRF Web Tool to your website</h2>
+    <p>
+      To add this to your own website, you need to include the nRF Web Tool JavaScript files on your website and add the button HTML.
+    </p>
+
+    <div class="step">
+      <h3>Step 1:</h3>
+      <p>Load nRF Web Tool JavaScript on your website by adding the following HTML snippet.</p>
+      <pre><code>&lt;script src="https://opendisplay.org/nrf_web_tools/jszip.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Web Serial Polyfill for Android support (optional, must be before nrf_web_tools.js) --&gt;
+&lt;script type="module"&gt;
+  import { serial } from 'https://opendisplay.org/nrf_web_tools/web-serial-polyfill.js';
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  if (isAndroid && navigator.usb) {
+    navigator.serial = serial;
+  } else if (!navigator.serial) {
+    navigator.serial = serial;
+  }
+&lt;/script&gt;
+
+&lt;script src="https://opendisplay.org/nrf_web_tools/nrf_web_tools.js"&gt;&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="step">
+      <h3>Step 2:</h3>
+      <p>Find a place on your page where you want the button to appear and include the following bit of HTML. Update the <code>zipPath</code> to point at your DFU package.</p>
+      <pre><code>&lt;button id="install-btn"&gt;Install Firmware&lt;/button&gt;
+
+&lt;script&gt;
+  window.addEventListener('load', () => {
+    const installer = new NrfWebTools(
+      document.getElementById('install-btn'),
+      'https://example.com/firmware.zip'  // URL to your DFU package
+    );
+  });
+&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="note">
+      <strong>Note:</strong> nRF Web Tool requires that your website is served over <code>https://</code> to work. 
+      This is a Web Serial security requirement. For local development, <code>localhost</code> is also allowed.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>API Reference</h2>
+    
+    <div class="step">
+      <h3>Constructor</h3>
+      <pre><code>new NrfWebTools(buttonElement, zipPath)</code></pre>
+      <ul>
+        <li><code>buttonElement</code> - The button element to attach the installer to</li>
+        <li><code>zipPath</code> - URL string or File object pointing to the DFU package ZIP file</li>
+      </ul>
+    </div>
+    
+    <div class="step">
+      <h3>Methods</h3>
+      <ul>
+        <li><code>startInstall()</code> - Manually trigger the installation (usually called automatically on button click)</li>
+        <li><code>closeModal()</code> - Close the progress modal</li>
+      </ul>
+      </ul>
+    </div>
+  </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-links">
+      <a href="https://opendisplay.org/index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/nrf-web-tools" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/impressum.html">Impressum</a>
+      <span class="footer-separator">•</span>
+      <a href="https://opendisplay.org/datenschutz.html">Datenschutz</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/opendisplay" target="_blank" rel="noopener noreferrer" aria-label="Discord (opens in new tab)">Discord</a>
+    </div>
+  </div>
+  
+  <!-- Include JSZip -->
+  <script src="jszip.min.js"></script>
+  
+  <!-- Web Serial Polyfill for Android support (must be loaded before nrf_web_tools.js) -->
+  <script type="module">
+    // Load polyfill and apply it properly on Android
+    (async function() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      
+      // Only use polyfill on Android with WebUSB support
+      if (isAndroid && navigator.usb) {
+        try {
+          const { serial } = await import('./web-serial-polyfill.js');
+          
+          // Try to replace navigator.serial - on Android it might exist but not work
+          try {
+            // First try simple assignment
+            navigator.serial = serial;
+          } catch (e) {
+            // If that fails, try Object.defineProperty
+            try {
+              Object.defineProperty(navigator, 'serial', {
+                value: serial,
+                writable: true,
+                configurable: true
+              });
+            } catch (e2) {
+              // If that also fails, create a proxy/wrapper
+              const originalSerial = navigator.serial;
+              navigator.serial = new Proxy(serial, {
+                get(target, prop) {
+                  // For requestPort, always use polyfill version
+                  if (prop === 'requestPort') {
+                    return target.requestPort.bind(target);
+                  }
+                  // For other properties, try polyfill first, fallback to original
+                  if (prop in target) {
+                    return target[prop];
+                  }
+                  if (originalSerial && prop in originalSerial) {
+                    return originalSerial[prop];
+                  }
+                  return undefined;
+                }
+              });
+            }
+          }
+          
+          console.log('Applied web-serial-polyfill for Android');
+        } catch (e) {
+          console.error('Failed to load web-serial-polyfill:', e);
+        }
+      } else if (!navigator.serial) {
+        // On desktop, use polyfill only if native API not available
+        try {
+          const { serial } = await import('./web-serial-polyfill.js');
+          navigator.serial = serial;
+        } catch (e) {
+          console.error('Failed to load web-serial-polyfill:', e);
+        }
+      }
+      
+      // Signal that polyfill loading is complete
+      window.__nrfWebToolsPolyfillReady = true;
+      window.dispatchEvent(new Event('nrfWebToolsPolyfillReady'));
+    })();
+  </script>
+  <script>
+    // Wait for polyfill to be ready before loading the main script
+    (function() {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid && navigator.usb) {
+        // On Android with WebUSB, wait for polyfill
+        window.addEventListener('nrfWebToolsPolyfillReady', loadNrfWebTools, { once: true });
+        // Fallback timeout
+        setTimeout(function() {
+          if (document.querySelector('script[src="nrf_web_tools.js"]') === null) {
+            console.warn('Polyfill took too long to load, proceeding anyway');
+            loadNrfWebTools();
+          }
+        }, 2000);
+      } else {
+        // Desktop or no WebUSB, load immediately
+        loadNrfWebTools();
+      }
+      
+      function loadNrfWebTools() {
+        if (document.querySelector('script[src="nrf_web_tools.js"]') === null) {
+          const script = document.createElement('script');
+          script.src = 'nrf_web_tools.js';
+          document.head.appendChild(script);
+        }
+      }
+    })();
+  </script>
+  
+  <script>
+    // Check browser support
+    (function() {
+      const statusEl = document.getElementById('serial-support-check');
+      if (!navigator.serial) {
+        if (navigator.usb) {
+          statusEl.textContent = 'The demo is not available because your browser does not support Web Serial. Android support requires the web-serial-polyfill to be loaded.';
+        } else {
+          statusEl.textContent = 'The demo is not available because your browser does not support Web Serial. Open this page in Google Chrome or Microsoft Edge instead (but not on your iOS device).';
+        }
+        statusEl.style.color = 'var(--danger, #db4437)';
+      } else {
+        statusEl.textContent = 'Ready to install firmware. Connect a device with the Adafruit nRF bootloader and click the button above.';
+        statusEl.style.color = 'var(--muted-foreground)';
+      }
+    })();
+
+    // Wait for everything to be ready
+    window.addEventListener('load', () => {
+      if (typeof NrfWebTools === 'undefined') {
+        console.error('NrfWebTools not found. Make sure nrf_web_tools.js is loaded.');
+        return;
+      }
+      
+      // Demo button
+      const installer = new NrfWebTools(
+        document.getElementById('install-btn-2'),
+        'NRF52840.zip'  // Local file in same directory
+      );
+    });
+  </script>
+</body>
+</html>

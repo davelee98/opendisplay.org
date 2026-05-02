@@ -1,0 +1,216 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Open-source firmware and protocol standard for e-paper displays. Supports ESP32-C3, ESP32-C6, and nRF52840 platforms with BLE communication and low power consumption.">
+  <link rel="canonical" href="https://opendisplay.org/">
+  <meta property="og:title" content="OpenDisplay - Open-source firmware and protocol for e-paper displays">
+  <meta property="og:description" content="Open-source firmware and protocol standard for e-paper displays. Supports ESP32-C3, ESP32-C6, and nRF52840 platforms with BLE communication and low power consumption.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/">
+  <link rel="shortcut icon" href="firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay</title>
+<style>
+/* Page-specific styles */
+a > div[style*="background: var(--card-background)"]:hover {
+  border-color: var(--accent) !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06) !important;
+  transform: translateY(-2px);
+}
+
+.platform-badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.platform-badge {
+  padding: 8px 16px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .platform-badges {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .platform-badges {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <h1>OpenDisplay</h1>
+  <p style="text-align: center; color: var(--muted-foreground); font-size: 1.2rem; margin-top: -1rem; margin-bottom: 2rem;">
+    Open-source firmware and protocol standard for e-paper displays
+  </p>
+
+  <div class="col panel">
+    <h2>What is OpenDisplay?</h2>
+    <p class="intro-text">
+      OpenDisplay is both a <strong>firmware solution</strong> and a <strong>protocol standard</strong> for e-paper displays. 
+      It provides a complete ecosystem for creating smart, low-power e-paper displays that can be easily integrated 
+      with Home Assistant and other automation platforms.
+    </p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 24px;">
+      <a href="firmware/toolbox/index.html" style="text-decoration: none; color: inherit; display: block;">
+        <div style="padding: 20px; background: var(--card-background); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 8px; transition: all 0.2s; cursor: pointer;">
+          <h3 style="margin-top: 0; font-size: 1.1rem;">Get started with firmware</h3>
+          <p style="margin: 0; color: var(--muted-foreground); line-height: 1.6;">
+            Open the Toolbox to flash OpenDisplay to your device, pick a preset configuration, and adjust settings.
+            Supports ESP32-S3, ESP32-C3, ESP32-C6, and nRF52840.
+          </p>
+        </div>
+      </a>
+      <a href="protocol/index.html" style="text-decoration: none; color: inherit; display: block;">
+        <div style="padding: 20px; background: var(--card-background); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 8px; transition: all 0.2s; cursor: pointer;">
+          <h3 style="margin-top: 0; font-size: 1.1rem;">Protocol documentation</h3>
+          <p style="margin: 0; color: var(--muted-foreground); line-height: 1.6;">
+            BLE-based communication protocol with YAML-defined configuration schema. 
+            Enables interoperability between different clients and devices using a standardized interface.
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Firmware</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div>
+        <strong>Low Power</strong>
+        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Deep sleep support with microamp-level current consumption</p>
+      </div>
+      <div>
+        <strong>BLE Communication</strong>
+        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Bluetooth Low Energy for wireless updates and configuration</p>
+      </div>
+      <div>
+        <strong>Multiple Color Schemes</strong>
+        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">B/W, B/W+Red, B/W+Yellow, 6-color, and grayscale support</p>
+      </div>
+      <div>
+        <strong>Flexible Configuration</strong>
+        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">YAML-based config system with preset support</p>
+      </div>
+      <div>
+        <strong>Direct Write Mode</strong>
+        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Bufferless image transfer for efficient memory usage</p>
+      </div>
+    </div>
+    
+      <h3>Supported Platforms</h3>
+      <div class="platform-badges">
+        <span class="platform-badge">ESP32-S3</span>
+        <span class="platform-badge">ESP32-C3</span>
+        <span class="platform-badge">ESP32-C6</span>
+        <span class="platform-badge">nRF52840</span>
+        <span class="platform-badge">nRF52811</span>
+      </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Get Started</h2>
+    <div class="quick-links-grid">
+      <a href="firmware/toolbox/index.html" class="quick-link-card">
+        <div class="quick-link-title">Toolbox</div>
+        <div class="quick-link-description">
+          Install firmware through the browser, apply premade configs, and customize display size, color mode, and device options.
+        </div>
+      </a>
+      <a href="firmware/display/index.html" class="quick-link-card">
+        <div class="quick-link-title">BLE tester</div>
+        <div class="quick-link-description">
+          Upload and preview images over Bluetooth, draw on a canvas, and send buffers to your e-paper display.
+        </div>
+      </a>
+      <a href="firmware/battery/index.html" class="quick-link-card">
+        <div class="quick-link-title">Battery life calculator</div>
+        <div class="quick-link-description">
+          Estimate runtime from capacity, standby current, update energy, and interval. Load values from BLE or presets and view breakdown charts.
+        </div>
+      </a>
+      <a href="firmware/adding-displays.html" class="quick-link-card">
+        <div class="quick-link-title">Adding new displays</div>
+        <div class="quick-link-description">
+          Guide for adding panel support: finding hardware, firmware changes, presets, testing, and power measurement.
+        </div>
+      </a>
+      <a href="firmware/seeed_display_compatibility.html" class="quick-link-card">
+        <div class="quick-link-title">Seeed display compatibility</div>
+        <div class="quick-link-description">
+          Compatibility matrix for Seeed Studio ePaper panels: resolution, partial refresh, and setup notes.
+        </div>
+      </a>
+      <a href="firmware/reusing_solum_displays.html" class="quick-link-card">
+        <div class="quick-link-title">Reusing Solum displays</div>
+        <div class="quick-link-description">
+          Solum M3 prebuild tags: FCC IDs, color modes, Toolbox preset links, flashing with J-Link, and third-party firmware caveats.
+        </div>
+      </a>
+      <a href="protocol/index.html" class="quick-link-card">
+        <div class="quick-link-title">Protocol standard</div>
+        <div class="quick-link-description">
+          BLE flow, OpenDisplay Language schema, display data formats, and protocol documentation.
+        </div>
+      </a>
+      <a href="designer/index.html" class="quick-link-card">
+        <div class="quick-link-title">Layout designer</div>
+        <div class="quick-link-description">
+          Visual layout editor with live preview; export OpenDisplay Language for Home Assistant drawcustom.
+        </div>
+      </a>
+      <a href="homeassistant/index.html" class="quick-link-card">
+        <div class="quick-link-title">Home Assistant integration</div>
+        <div class="quick-link-description">
+          Entities, services, tags, and installation. Works with BLE proxies—no Wi-Fi access point required on the display.
+        </div>
+      </a>
+      <a href="https://github.com/OpenDisplay/" target="_blank" class="quick-link-card" aria-label="View source code on GitHub (opens in new tab)">
+        <div class="quick-link-title">Source code</div>
+        <div class="quick-link-description">
+          Firmware and client repos, issues, and contributions on GitHub.
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Community</h2>
+    <p class="intro-text">
+      Join the OpenDisplay community to get help, share your projects, discuss implementations, 
+      and connect with other users and developers.
+    </p>
+    <div style="margin-top: 20px;">
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" class="tool-link" aria-label="Join OpenDisplay Discord community (opens in new tab)">Join Discord</a>
+    </div>
+  </div>
+
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
+

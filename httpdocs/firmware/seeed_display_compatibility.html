@@ -1,0 +1,321 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Firmware – Seeed Display Compatibility</title>
+<style>
+/* Page-specific styles */
+:root {
+  --success: #16a34a;
+  --warning: #d97706;
+}
+h1 {
+  margin-bottom: 1rem;
+}
+.tool-description {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+thead th {
+  text-align: left;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  background: var(--card-background);
+  padding: 0.75rem 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 600;
+}
+tbody td {
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  color: var(--foreground);
+}
+tbody tr {
+  background: var(--background);
+}
+tbody tr:hover {
+  background: var(--card-background);
+}
+.product {
+  font-weight: 500;
+}
+.product a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.product a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+.resolution {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+}
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.yes {
+  background: #dcfce7;
+  color: #166534;
+}
+.no {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+.maybe {
+  background: #fef3c7;
+  color: #78350f;
+}
+.connector-24 {
+  background: #16a34a;
+  color: #ffffff;
+}
+.connector-50 {
+  background: #eab308;
+  color: #000000;
+}
+.connector-other {
+  background: #ea580c;
+  color: #ffffff;
+}
+.note {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+@media (prefers-color-scheme: dark) {
+  .yes {
+    background: #166534;
+    color: #dcfce7;
+  }
+  .no {
+    background: #7f1d1d;
+    color: #fee2e2;
+  }
+  .maybe {
+    background: #78350f;
+    color: #fef3c7;
+  }
+  .connector-24 {
+    background: #166534;
+    color: #dcfce7;
+  }
+  .connector-50 {
+    background: #854d0e;
+    color: #fef9c3;
+  }
+  .connector-other {
+    background: #9a3412;
+    color: #fed7aa;
+  }
+}
+</style>
+</head>
+<body>
+  <h1>Seeed Display Compatibility</h1>
+  
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="../../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="index.html">Firmware</a><span class="breadcrumb-separator">/</span>
+      <span>Seeed Display Compatibility</span>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Seeed Studio ePaper Display Support</h2>
+    <p class="tool-description">
+      Overview of known and expected compatibility for <strong>Seeed Studio ePaper displays</strong> when used with
+      <strong>OpenDisplay Firmware</strong>, based on current community testing and hardware constraints.
+    </p>
+    <div class="table-wrapper">
+      <table aria-label="OpenDisplay Firmware Compatibility Table">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Resolution</th>
+            <th>Display Color</th>
+            <th>Connector</th>
+            <th>Partial Refresh</th>
+            <th>OpenDisplay Support</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/1-54-Monochrome-ePaper-Display-with-200x200-Pixels-p-5776.html" target="_blank" rel="noopener">1.54" Monochrome ePaper Display</a></td>
+            <td class="resolution">200 × 200</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge maybe">Likely</span><span class="note">Untested</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/2-13-Monochrome-ePaper-Display-with-122x250-Pixels-p-5778.html" target="_blank" rel="noopener">2.13" Monochrome ePaper Display</a></td>
+            <td class="resolution">250 × 122</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">Setup as 128 × 250 ID: 3</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/2-13-Quadruple-Color-ePaper-Display-with-122x250-Pixels-p-5779.html" target="_blank" rel="noopener">2.13" Quadruple Color ePaper Display</a></td>
+            <td class="resolution">250 × 122</td>
+            <td>Quad Color</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">Setup as 128 × 250 ID: 52</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/2-9-Flexible-Monochrome-ePaper-Display-with-296x128-Pixels-p-5780.html" target="_blank" rel="noopener">2.9" Flexible Monochrome ePaper Display</a></td>
+            <td class="resolution">296 × 128</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 23</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/2-9-Monochrome-ePaper-Display-with-296x128-Pixels-p-5782.html" target="_blank" rel="noopener">2.9" Monochrome ePaper Display</a></td>
+            <td class="resolution">296 × 128</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 5</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/2-9-Quadruple-Color-ePaper-Display-with-128x296-Pixels-p-5783.html" target="_blank" rel="noopener">2.9" Quadruple Color ePaper Display</a></td>
+            <td class="resolution">296 × 128</td>
+            <td>Quad Color</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 29</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/4-2-Monochrome-ePaper-Display-with-400x300-Pixels-p-5784.html" target="_blank" rel="noopener">4.2" Monochrome ePaper Display</a></td>
+            <td class="resolution">400 × 300</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 2</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/4-26-Monochrome-SPI-ePaper-Display-p-6398.html" target="_blank" rel="noopener">4.26" Monochrome ePaper Display</a></td>
+            <td class="resolution">800 × 480</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 39</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/5-83-Monochrome-ePaper-Display-with-648x480-Pixels-p-5785.html" target="_blank" rel="noopener">5.83" Monochrome ePaper Display</a></td>
+            <td class="resolution">648 × 480</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 31</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/7-3inch-Six-Color-eInk-ePaper-Display-with-800x480-Pixels-p-6567.html" target="_blank" rel="noopener">7.3" Spectra™ 6 Color ePaper Display</a></td>
+            <td class="resolution">800 × 480</td>
+            <td>6 Color</td>
+            <td><span class="badge connector-50">50 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 35</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/7-5-Monochrome-ePaper-Display-with-800x480-Pixels-p-5788.html" target="_blank" rel="noopener">7.5" Monochrome ePaper Display</a></td>
+            <td class="resolution">800 × 480</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge yes">Yes</span><span class="note">ID: 59</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/10-3inch-Monochrome-eInk-ePaper-Display-with-1404x1872-Pixels-p-6568.html" target="_blank" rel="noopener">10.3" Monochrome ePaper Display</a></td>
+            <td class="resolution">1404 × 1872</td>
+            <td>Monochrome</td>
+            <td><span class="badge connector-other">40 pin</span></td>
+            <td><span class="badge yes">Yes</span></td>
+            <td><span class="badge no">Unlikely</span><span class="note">Other connector</span></td>
+          </tr>
+          <tr>
+            <td class="product"><a href="https://www.seeedstudio.com/13-3inch-Six-Color-eInk-ePaper-Display-with-1200x1600-Pixels-p-6569.html" target="_blank" rel="noopener">13.3" Spectra™ 6 Color ePaper Display</a></td>
+            <td class="resolution">1600 × 1200</td>
+            <td>6 Color</td>
+            <td><span class="badge connector-other">60 pin</span></td>
+            <td><span class="badge no">No</span></td>
+            <td><span class="badge maybe">Maybe</span><span class="note">Other connector</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Compatible Driver Boards</h2>
+    <p class="tool-description">
+      The following driver boards are compatible with Seeed Studio ePaper displays based on their connector type:
+    </p>
+    <div class="table-wrapper">
+      <table aria-label="Driver Board Compatibility Table">
+        <thead>
+          <tr>
+            <th>Connector Type</th>
+            <th>Compatible Driver Boards</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge connector-24">24 pin</span></td>
+            <td><a href="https://www.seeedstudio.com/XIAO-ePaper-Display-Board-nRF52840-EN04-p-6589.html" target="_blank" rel="noopener">EN04</a>, <a href="https://www.seeedstudio.com/XIAO-ePaper-Display-Board-EE04-p-6560.html" target="_blank" rel="noopener">EE04</a>, <a href="https://www.seeedstudio.com/ePaper-breakout-Board-for-XIAO-V2-p-6374.html" target="_blank" rel="noopener">ePaper Driver Board for Seeed Studio XIAO</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge connector-50">50 pin</span></td>
+            <td><a href="https://www.seeedstudio.com/XIAO-ePaper-Display-Board-nRF52840-EN04-p-6589.html" target="_blank" rel="noopener">EN04</a>, <a href="https://www.seeedstudio.com/XIAO-ePaper-Display-Board-EE04-p-6560.html" target="_blank" rel="noopener">EE04</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge connector-other">60 pin</span></td>
+            <td><a href="https://www.seeedstudio.com/XIAO-ePaper-Display-Board-ESP32-S3-EE02-p-6639.html" target="_blank" rel="noopener">EE02</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge connector-other">40 pin</span></td>
+            <td>EE03</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="footer-links">
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+</body>
+</html>

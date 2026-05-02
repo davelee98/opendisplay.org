@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenDisplay Flex - Full-featured protocol: YAML configuration, BLE GATT and optional Wi‑Fi LAN (TCP), OpenDisplay Language, and shared image format.">
+  <link rel="canonical" href="https://opendisplay.org/protocol/flex-standard.html">
+  <meta property="og:title" content="OpenDisplay Flex - OpenDisplay">
+  <meta property="og:description" content="YAML configuration, BLE and optional Wi‑Fi LAN, OpenDisplay Language, shared image format.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/protocol/flex-standard.html">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay Flex - OpenDisplay</title>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col" style="max-width: 1200px; margin-bottom: 10px;">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="index.html">Protocol</a><span class="breadcrumb-separator">/</span>
+      <span>OpenDisplay Flex</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Flex</h1>
+
+  <div class="col panel">
+    <h2>Overview</h2>
+    <p class="intro-text">
+      OpenDisplay Flex is the full-featured protocol standard with comprehensive configuration system, 
+      YAML-based schema, and advanced capabilities. This is the standard used by OpenDisplay firmware 
+      and provides complete control over device configuration, communication, and image transfer.
+    </p>
+    <p class="intro-text">
+      The Flex standard consists of <strong>three sub-standards</strong> (the communication spec covers both BLE and LAN):
+    </p>
+    <ul style="color: var(--muted-foreground); line-height: 1.8; margin-left: 20px; margin-top: 12px;">
+      <li><strong><a href="yaml-config.html" style="color: var(--accent); text-decoration: none;">Configuration</a></strong> - YAML-based schema defining device capabilities and settings</li>
+      <li><strong><a href="ble-flow.html" style="color: var(--accent); text-decoration: none;">Communication protocol</a></strong> - BLE GATT and optional Wi‑Fi LAN (TCP); same commands and responses on both transports</li>
+      <li><strong><a href="open-display-language.html" style="color: var(--accent); text-decoration: none;">OpenDisplay Language</a></strong> - Format for describing visual layouts for e-paper displays</li>
+    </ul>
+    <p class="intro-text" style="margin-top: 16px;">
+      The Flex standard uses the same <strong><a href="display-data-format.html" style="color: var(--accent); text-decoration: none;">image transmission format</a></strong> 
+      as the OpenDisplay standard, ensuring compatibility across both standards.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>1. Configuration</h2>
+      <p class="tool-description">
+        The YAML-based configuration schema that defines the BLE protocol structure. 
+        Learn about packet types, field definitions, enumerations, bitfields, and how the 
+        configuration system works. This standard defines how device capabilities and settings 
+        are structured and transmitted.
+      </p>
+      <a href="yaml-config.html" class="tool-link">View Configuration Standard</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>2. Communication protocol (BLE &amp; Wi‑Fi LAN)</h2>
+      <p class="tool-description">
+        BLE GATT connection flow, optional Wi‑Fi LAN transport (device as TCP server, length-prefixed frames), 
+        optional AES-CCM session encryption and <code>0x0050</code> authentication, configuration read/write, image transfer, 
+        command reference, and response codes. Commands and encryption behavior match across BLE and LAN.
+      </p>
+      <a href="ble-flow.html" class="tool-link">View communication protocol</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>3. OpenDisplay Language</h2>
+      <p class="tool-description">
+        The format standard for describing visual layouts for e-paper displays. Complete specification 
+        including all drawing element types, color support, font options, and template examples. 
+        This standard defines how visual content is structured and interpreted.
+      </p>
+      <a href="open-display-language.html" class="tool-link">View OpenDisplay Language</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Display Data Format</h2>
+      <p class="tool-description">
+        Learn how image data is encoded into bytes for transmission to OpenDisplay devices. 
+        Understand the encoding format for each color scheme (monochrome, bitplanes, multi-color) 
+        with visual examples showing pixel ordering and byte packing. This format is shared with 
+        the OpenDisplay standard.
+      </p>
+      <a href="display-data-format.html" class="tool-link">View Format</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Comparison with OpenDisplay Standard</h2>
+    <p class="intro-text">
+      The Flex standard provides more features than OpenDisplay, but both share the same image format:
+    </p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border-color);">
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">Feature</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">OpenDisplay</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">Flex</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);">Configuration System</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Minimal (announcement only)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Full YAML-based schema</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);">Image Format</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ OpenDisplay format</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ OpenDisplay format</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);">Communication</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Binary packets (fixed positions)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Binary packets (YAML-defined); BLE GATT + optional Wi‑Fi LAN (TCP)</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);">String Handling</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">16-bit integer IDs with mappings</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Variable-length strings</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);">Advanced Features</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Limited</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Sensors, WiFi, power management</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; color: var(--muted-foreground);">Use Case</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Products that want to show images from user's sources</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Full-featured implementations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="index.html">← Back to Protocol Overview</a>
+      <span class="footer-separator">•</span>
+      <a href="basic-standard.html">OpenDisplay</a>
+      <span class="footer-separator">•</span>
+      <a href="display-data-format.html">Display Data Format</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>

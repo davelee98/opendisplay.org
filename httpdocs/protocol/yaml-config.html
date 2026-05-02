@@ -1,0 +1,578 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Understand the YAML-based configuration schema that defines the BLE protocol structure. Learn about packet types, field definitions, enumerations, bitfields, and how the configuration system works.">
+  <link rel="canonical" href="https://opendisplay.org/protocol/yaml-config.html">
+  <meta property="og:title" content="YAML Configuration Documentation - OpenDisplay">
+  <meta property="og:description" content="Understand the YAML-based configuration schema that defines the BLE protocol structure.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/protocol/yaml-config.html">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>YAML Config Documentation - OpenDisplay</title>
+<style>
+/* Page-specific styles */
+.code-block {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  margin: 12px 0;
+  white-space: pre-wrap;
+}
+.code-block code {
+  color: var(--foreground);
+}
+.packet-type {
+  background: var(--card-background);
+  border-left: 4px solid var(--accent);
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+.packet-type h4 {
+  color: var(--foreground);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.packet-type code {
+  background: var(--card-background);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+.field-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.field-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.field-list li:last-child {
+  border-bottom: none;
+}
+.field-list strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.field-list .field-type {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-button);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.badge.required {
+  background: var(--accent);
+}
+.badge.repeatable {
+  background: #3fb950;
+}
+.breadcrumb {
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+.breadcrumb a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: var(--muted-foreground);
+}
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.back-link:hover {
+  color: var(--accent);
+}
+.back-link::before {
+  content: "← ";
+  margin-right: 4px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+}
+table th, table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+table th {
+  font-weight: 600;
+  color: var(--foreground);
+  background: #f8f9fa;
+}
+table code {
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+@media (prefers-color-scheme: dark) {
+  table th {
+    background: var(--card-background);
+  }
+  table code {
+    background: var(--card-background);
+  }
+}
+.packet-structure-diagram {
+  margin: 24px 0;
+  padding: 20px;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+.outer-packet {
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(220, 38, 38, 0.05);
+}
+.outer-packet-header {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+.outer-packet-field {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9rem;
+}
+.outer-packet-field-name {
+  font-weight: 600;
+  color: var(--foreground);
+  min-width: 100px;
+}
+.outer-packet-field-size {
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  margin-left: 12px;
+}
+.packets-container {
+  margin: 16px 0 0 0;
+  padding-left: 20px;
+  border-left: 3px dashed var(--border-color);
+}
+.single-packet {
+  border: 2px solid var(--muted-foreground);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(107, 114, 128, 0.05);
+}
+.single-packet-header {
+  font-weight: 600;
+  color: var(--muted-foreground);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+.single-packet-field {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  margin: 3px 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
+}
+.packet-payload {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+}
+</style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col" style="max-width: 1200px; margin-bottom: 10px;">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="index.html">Protocol</a><span class="breadcrumb-separator">/</span>
+      <span>YAML Configuration</span>
+    </div>
+  </div>
+  <h1>YAML Configuration</h1>
+  <p style="color: var(--muted-foreground); margin-top: -12px; margin-bottom: 24px;">
+    Part of <strong><a href="flex-standard.html" style="color: var(--accent);">OpenDisplay Flex</a></strong> standard
+  </p>
+
+  <div class="col panel">
+    <p class="intro-text">
+      The <strong><a href="flex-standard.html" style="color: var(--accent);">OpenDisplay Flex</a></strong> protocol uses a YAML-based configuration schema to define the BLE protocol structure. 
+      This schema describes all packet types, their fields, data types, and constraints. 
+      The configuration is parsed into binary bytes and saved on the device, where it serves as the complete 
+      specification of the device's capabilities and settings.
+    </p>
+    <p class="intro-text">
+      This configuration fully explains all capabilities the device has, including display specifications, 
+      power management options, communication modes, sensor support, and all other device settings. 
+      The configuration is used by tools like the Config Builder to generate and parse configuration packets, 
+      and by clients to understand what features are available on a particular device.
+    </p>
+    <p class="intro-text">
+      The configuration schema is designed to be extensible. New packet types and fields can be added to support 
+      additional features while maintaining backward compatibility through versioning and reserved fields. 
+      This allows the protocol to evolve and accommodate new device capabilities without breaking existing implementations.
+    </p>
+  </div>
+
+  <div class="col panel" id="packet-structure">
+    <h2>Packet Structure</h2>
+  
+    <p class="intro-text">
+      The configuration is organized as an outer packet containing multiple inner packets. Each inner packet represents 
+      a specific aspect of the device configuration (display, power, sensors, etc.):
+    </p>
+    
+    <div class="packet-structure-diagram">
+      <div class="outer-packet">
+        <div class="outer-packet-header">Outer Packet</div>
+        <div class="outer-packet-field">
+          <span class="outer-packet-field-name">length</span>
+          <span class="outer-packet-field-size">(2 bytes)</span>
+        </div>
+        <div class="outer-packet-field">
+          <span class="outer-packet-field-name">version</span>
+          <span class="outer-packet-field-size">(1 byte)</span>
+        </div>
+        <div class="packets-container">
+          <div class="single-packet">
+            <div class="single-packet-header">Single Packet #0</div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">number</span>
+              <span class="outer-packet-field-size">(1 byte) = 0</span>
+            </div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">id</span>
+              <span class="outer-packet-field-size">(1 byte) = 1</span>
+            </div>
+            <div class="packet-payload">Payload: system_config data</div>
+          </div>
+          <div class="single-packet">
+            <div class="single-packet-header">Single Packet #1</div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">number</span>
+              <span class="outer-packet-field-size">(1 byte) = 1</span>
+            </div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">id</span>
+              <span class="outer-packet-field-size">(1 byte) = 2</span>
+            </div>
+            <div class="packet-payload">Payload: manufacturer_data</div>
+          </div>
+          <div class="single-packet">
+            <div class="single-packet-header">Single Packet #2</div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">number</span>
+              <span class="outer-packet-field-size">(1 byte) = 2</span>
+            </div>
+            <div class="single-packet-field">
+              <span class="outer-packet-field-name">id</span>
+              <span class="outer-packet-field-size">(1 byte) = 32</span>
+            </div>
+            <div class="packet-payload">Payload: display configuration</div>
+          </div>
+          <div style="margin-top: 8px; padding: 8px; color: var(--muted-foreground); font-size: 0.85rem; font-style: italic;">
+            ... more packets ...
+          </div>
+        </div>
+        <div class="outer-packet-field" style="margin-top: 16px;">
+          <span class="outer-packet-field-name">crc</span>
+          <span class="outer-packet-field-size">(2 bytes)</span>
+        </div>
+      </div>
+    </div>
+    
+    <h3>Outer Packet</h3>
+    <p class="intro-text">
+      The outer packet wraps the entire configuration transfer:
+    </p>
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Size</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><code>length</code></td>
+        <td>2 bytes</td>
+        <td>Total length including CRC (max 4kB recommended)</td>
+      </tr>
+      <tr>
+        <td><code>version</code></td>
+        <td>1 byte</td>
+        <td>Major protocol version</td>
+      </tr>
+      <tr>
+        <td><code>packets</code></td>
+        <td>variable</td>
+        <td>Sequence of single_packet entries</td>
+      </tr>
+      <tr>
+        <td><code>crc</code></td>
+        <td>2 bytes</td>
+        <td>CRC16-CCITT checksum (excluding CRC field)</td>
+      </tr>
+    </table>
+
+    <h3>Single Packet</h3>
+    <p class="intro-text">
+      Each packet in the sequence has this structure:
+    </p>
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Size</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td><code>number</code></td>
+        <td>1 byte</td>
+        <td>Packet index (0-based, sequential)</td>
+      </tr>
+      <tr>
+        <td><code>id</code></td>
+        <td>1 byte</td>
+        <td>Packet type identifier</td>
+      </tr>
+      <tr>
+        <td><code>payload</code></td>
+        <td>variable</td>
+        <td>Packet-specific payload</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col panel">
+    <h2>Field Types</h2>
+    
+    <h3>Fixed-Size Fields</h3>
+    <p class="intro-text">
+      Fields with a fixed size are specified with a number:
+    </p>
+    <div class="code-block">- name: ic_type
+  size: 2
+  description: IC used in this device</div>
+
+    <h3>Enumerations</h3>
+    <p class="intro-text">
+      Fields can have enumerated values:
+    </p>
+    <div class="code-block">- name: ic_type
+  size: 2
+  enum:
+    1:
+      name: NRF52840
+      description: nrf52840 based boards
+    2:
+      name: ESP32S3
+      description: esp32-s3 based boards</div>
+
+    <h3>Conditional Enumerations</h3>
+    <p class="intro-text">
+      Enum values can depend on another field's value:
+    </p>
+    <div class="code-block">- name: board_type
+  size: 1
+  conditional_enum:
+    depends_on: manufacturer_id
+    values:
+      1:  # if manufacturer_id == 1 (Seeed)
+        0:
+          name: EE04
+          description: XIAO ePaper Display EE04</div>
+
+    <h3>Bitfields</h3>
+    <p class="intro-text">
+      Fields can be bitfields where each bit has a specific meaning:
+    </p>
+    <div class="code-block">- name: communication_modes
+  size: 1
+  bits:
+    0:
+      name: ble
+      description: BLE transfer supported
+    1:
+      name: oepl
+      description: OEPL based transfer supported
+    2:
+      name: wifi
+      description: WiFi LAN (TCP) transfer supported</div>
+  </div>
+
+  <div class="col panel">
+    <h2>Packet Types</h2>
+    <p class="intro-text">
+      The protocol defines multiple packet types, each representing a different aspect of device configuration. 
+      For detailed field definitions, enumerations, and constraints, use the <a href="../firmware/config/index.html" target="_blank" style="color: var(--accent); font-weight: 500;">Config Builder</a> tool, 
+      which provides an interactive interface to explore all packet types and their fields.
+    </p>
+    
+    <div class="packet-type">
+      <h4>Packet Type 1: system_config <span class="badge required">Required</span></h4>
+      <p>Contains information about the host microcontroller (IC type) and power management configuration.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 2: manufacturer_data <span class="badge required">Required</span></h4>
+      <p>Identifies the manufacturer and specific board model/revision.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 4: power_option <span class="badge required">Required</span></h4>
+      <p>Defines power supply settings, battery capacity, sleep behavior, and power consumption characteristics.</p>
+    </div>
+
+    <div class="packet-type" id="packet-type-32">
+      <h4>Packet Type 32: display <span class="badge repeatable">Repeatable</span></h4>
+      <p>Specifies display/panel configuration including dimensions, color scheme, controller type, and pin assignments. 
+      This packet is required for the protocol to function. Can appear multiple times for devices with multiple displays.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 33: led <span class="badge repeatable">Repeatable</span></h4>
+      <p>Optional LED configuration for devices with status or RGB LEDs.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 35: sensor_data <span class="badge repeatable">Repeatable</span></h4>
+      <p>Optional sensor configuration for devices with environmental or other sensors.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 36: data_bus <span class="badge repeatable">Repeatable</span></h4>
+      <p>Defines communication buses (I2C, SPI, etc.) used by sensors or other peripherals.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 37: binary_inputs <span class="badge repeatable">Repeatable</span></h4>
+      <p>Optional configuration for buttons, switches, or other binary input devices.</p>
+    </div>
+
+    <div class="packet-type">
+      <h4>Packet Type 38: wifi_config <span class="badge">Wi‑Fi LAN</span></h4>
+      <p>Station credentials for devices that use Flex <a href="ble-flow.html#lan-wifi-transport" style="color: var(--accent);">LAN (Wi‑Fi) transport</a>: 
+      32-byte SSID, 32-byte password (null-terminated, zero-padded), 1-byte encryption type enum (none, WEP, WPA, WPA2, WPA3), 
+      plus reserved bytes per schema. Required in non-volatile config (along with <code>communication_modes</code> bit <code>wifi</code>) 
+      before the device will join the network and open the TCP server.</p>
+    </div>
+
+    <div class="packet-type" id="packet-type-39">
+      <h4>Packet Type 39: security_config</h4>
+      <p>Optional <strong>application-layer encryption</strong>: 16-byte AES-128 pre-shared key, <code>encryption_enabled</code>, 
+      <code>session_timeout_seconds</code> (0 = no timeout), security flags (<code>rewrite_allowed</code> for unauthenticated config recovery), 
+      and reset-pin fields per schema. If the key is all zeros, encryption is off. See 
+      <a href="ble-flow.html#encryption-authentication" style="color: var(--accent);">Encryption and authentication</a> in the communication protocol.</p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Packet Properties</h2>
+    
+    <h3>Required Packets</h3>
+    <p class="intro-text">
+      Some packet types are marked as <span class="badge required">required</span>, meaning they must appear in every configuration </p>
+
+    <h3>Repeatable Packets</h3>
+    <p class="intro-text">
+      Some packet types are marked as <span class="badge repeatable">repeatable</span>, meaning they can appear multiple times </p>
+  </div>
+
+  <div class="col panel">
+    <h2>Using the YAML Config</h2>
+    
+    <p class="intro-text">
+      The <a href="../firmware/config/index.html" target="_blank" style="color: var(--accent); font-weight: 500;">Config Builder</a> web tool loads the YAML configuration to:
+    </p>
+    <ul>
+      <li>Generate UI forms for each packet type</li>
+      <li>Validate field values against enums and constraints</li>
+      <li>Build binary configuration packets</li>
+      <li>Parse received configuration data</li>
+    </ul>
+
+    <h3>Configuration Flow</h3>
+    <ol>
+      <li>Load YAML schema from <code>config.yaml</code></li>
+      <li>User selects/edits packet instances</li>
+      <li>Tool validates all fields</li>
+      <li>Tool builds binary packet with CRC</li>
+      <li>Packet is sent to the device (typically via BLE; LAN is available after Wi‑Fi is configured)</li>
+    </ol>
+  </div>
+
+  <div class="col panel">
+    <h2>Reserved Fields</h2>
+    <p class="intro-text">
+      Many packet types include reserved fields for future compatibility. According to the protocol specification:
+    </p>
+    <ul>
+      <li>Reserved fields MUST be set to 0 unless otherwise specified</li>
+      <li>Reserved byte blocks are provided for forward compatibility</li>
+      <li>Older parsers should ignore reserved fields they don't understand</li>
+    </ul>
+  </div>
+  
+  <div class="col panel">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>&emsp;
+      <a href="index.html">Protocol</a>&emsp;
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
+

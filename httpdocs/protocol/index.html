@@ -1,0 +1,217 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete protocol documentation for OpenDisplay including BLE flow diagrams, YAML configuration schema, display data format specifications, and guides for adding new displays.">
+  <link rel="canonical" href="https://opendisplay.org/protocol/">
+  <meta property="og:title" content="Protocol Documentation - OpenDisplay">
+  <meta property="og:description" content="Complete protocol documentation for OpenDisplay including BLE flow diagrams, YAML configuration schema, display data format specifications, and guides for adding new displays.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/protocol/">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>Protocol Documentation - OpenDisplay</title>
+  <style>
+    .protocol-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 32px 0;
+      padding: 32px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .device-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      min-width: 140px;
+    }
+    
+    .device-label {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--foreground);
+      line-height: 1.4;
+    }
+    
+    .communication-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      min-width: 180px;
+    }
+    
+    .communication-arrow svg {
+      width: 100%;
+      max-width: 250px;
+      height: auto;
+    }
+    
+    .protocol-details {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    @media (max-width: 600px) {
+      .protocol-diagram {
+        flex-direction: column;
+        padding: 24px 16px;
+      }
+      
+      .communication-arrow {
+        transform: rotate(90deg);
+        min-width: auto;
+        width: 120px;
+        height: 200px;
+      }
+      
+      .communication-arrow svg {
+        max-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <span>Protocol</span>
+    </div>
+  </div>
+  <h1>Protocol Documentation</h1>
+
+  <div class="col panel">
+    <h2>Overview</h2>
+    <p class="intro-text">
+      The OpenDisplay protocol enables communication between client applications (running on computers, 
+      smartphones, or web browsers) and e-paper display devices. <strong>OpenDisplay Flex</strong> uses Bluetooth Low Energy (BLE) 
+      and optionally the same command set over <strong>Wi‑Fi</strong> (TCP to the device on the LAN). The simplified 
+      <strong>OpenDisplay</strong> standard is BLE-first, with a separate Wi‑Fi appendix for another deployment style. 
+      Clients can configure devices, read status information, and send image data for display.
+    </p>
+    <p class="intro-text">
+      The OpenDisplay protocol consists of <strong>two standards</strong>:
+    </p>
+    <ul style="color: var(--muted-foreground); line-height: 1.8; margin-left: 20px; margin-top: 12px;">
+      <li><strong><a href="basic-standard.html" style="color: var(--accent); text-decoration: none;">OpenDisplay</a></strong> - Simplified protocol for easy manufacturer integration. Minimal configuration, single-page specification.</li>
+      <li><strong><a href="flex-standard.html" style="color: var(--accent); text-decoration: none;">OpenDisplay Flex</a></strong> - Full-featured protocol with comprehensive configuration system, YAML-based schema, and advanced capabilities.</li>
+    </ul>
+    <p class="intro-text" style="margin-top: 16px;">
+      Both standards share the same <strong><a href="open-display-language.html" style="color: var(--accent); text-decoration: none;">OpenDisplay Language</a></strong> for visual layouts. The image data format is included in the OpenDisplay standard specification.
+    </p>
+    
+    <div class="protocol-diagram">
+      <div class="device-box client-device">
+        <svg width="60" height="60" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="20" width="60" height="45" rx="3" fill="var(--card-background)" stroke="var(--border-color)" stroke-width="2"/>
+          <line x1="30" y1="35" x2="70" y2="35" stroke="var(--foreground)" stroke-width="2"/>
+          <line x1="30" y1="45" x2="65" y2="45" stroke="var(--foreground)" stroke-width="2"/>
+          <line x1="30" y1="55" x2="60" y2="55" stroke="var(--foreground)" stroke-width="2"/>
+        </svg>
+        <div class="device-label">Client</div>
+      </div>
+      
+      <div class="communication-arrow">
+        <svg width="180" height="120" viewBox="0 0 180 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 15 25 L 155 25" stroke="var(--accent)" stroke-width="3.5" fill="none" marker-end="url(#arrowhead)"/>
+          <text x="85" y="19" text-anchor="middle" font-size="11" fill="var(--foreground)" font-weight="600">BLE</text>
+          <path d="M 15 95 L 155 95" stroke="var(--muted-foreground)" stroke-width="3.5" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowhead-gray)"/>
+          <text x="85" y="89" text-anchor="middle" font-size="11" fill="var(--muted-foreground)" font-weight="600">WiFi</text>
+          <text x="85" y="110" text-anchor="middle" font-size="9" fill="var(--muted-foreground)" font-style="italic">Flex LAN</text>
+          <defs>
+            <marker id="arrowhead" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto">
+              <polygon points="0 0, 11 5.5, 0 11" fill="var(--accent)" />
+            </marker>
+            <marker id="arrowhead-gray" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto">
+              <polygon points="0 0, 11 5.5, 0 11" fill="var(--muted-foreground)" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      
+      <div class="device-box display-device">
+        <svg width="60" height="60" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="20" width="60" height="60" rx="4" fill="var(--card-background)" stroke="var(--border-color)" stroke-width="2"/>
+          <rect x="30" y="30" width="40" height="40" rx="2" fill="#ffffff"/>
+        </svg>
+        <div class="device-label">E-Paper Display</div>
+      </div>
+    </div>
+    
+    <div class="protocol-details">
+      <h3>Devices & Protocols</h3>
+      <ul style="margin: 16px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+        <li><strong>Client Devices:</strong> Computers, smartphones, tablets, web browsers, or Home Assistant running client applications. A Python module is available for easy integration.</li>
+        <li><strong>Display Devices:</strong> E-paper displays that implement the OpenDisplay BLE or OpenDisplay WiFi standard. This includes devices running OpenDisplay firmware on ESP32-S3, ESP32-C3, ESP32-C6, or nRF52840 microcontrollers, as well as other firmware implementations that speak the protocol.</li>
+        <li><strong>Communication Protocol:</strong> For Flex, BLE (GATT) plus optional Wi‑Fi LAN (TCP, device as server); see <a href="flex-standard.html" style="color: var(--accent);">OpenDisplay Flex</a> and the <a href="ble-flow.html" style="color: var(--accent);">communication protocol</a> page.</li>
+        <li><strong>Data Format:</strong> Binary packets defined by YAML configuration schema, supporting configuration, status reading, and image transfer</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>OpenDisplay</h2>
+      <p class="tool-description">
+        A simplified protocol standard designed for easy manufacturer integration. Minimal configuration, 
+        straightforward communication flow, and everything fits on a single page. Perfect for manufacturers 
+        who want to quickly add OpenDisplay compatibility to their e-paper displays.
+      </p>
+      <a href="basic-standard.html" class="tool-link">View OpenDisplay Standard</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>OpenDisplay Flex</h2>
+      <p class="tool-description">
+        The full-featured protocol standard with comprehensive configuration system. Includes YAML-based 
+        configuration schema, communication over BLE and optional Wi‑Fi LAN (same commands), and support for all device capabilities. 
+        This is the standard used by OpenDisplay firmware and advanced implementations.
+      </p>
+      <a href="flex-standard.html" class="tool-link">View Flex Standard</a>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>OpenDisplay Language</h2>
+      <p class="tool-description">
+        The format standard for describing visual layouts for e-paper displays. Complete specification 
+        including all drawing element types, color support, font options, and template examples. 
+        This format is shared by both Basic and Flex standards and defines how visual content is structured and interpreted.
+      </p>
+      <a href="open-display-language.html" class="tool-link">View OpenDisplay Language</a>
+    </div>
+  </div>
+
+  
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
+

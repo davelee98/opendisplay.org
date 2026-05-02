@@ -1,0 +1,1257 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenDisplay - Simplified protocol standard for easy manufacturer integration. Minimal configuration, single-page specification.">
+  <link rel="canonical" href="https://opendisplay.org/protocol/basic-standard.html">
+  <meta property="og:title" content="OpenDisplay - OpenDisplay">
+  <meta property="og:description" content="Simplified protocol standard for easy manufacturer integration.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://opendisplay.org/protocol/basic-standard.html">
+  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
+  <link rel="stylesheet" href="https://opendisplay.org/common.css">
+  <title>OpenDisplay - OpenDisplay</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
+    }
+    body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
+      margin: 0;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+    }
+    main {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+    .flow-step {
+      background: var(--card-background);
+      border-left: 4px solid var(--accent);
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+    }
+    .flow-step h4 {
+      color: var(--foreground);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    .flow-step p {
+      color: var(--muted-foreground);
+      margin: 0;
+      line-height: 1.6;
+    }
+    .code-block {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    .code-block code {
+      color: var(--foreground);
+    }
+    .packet-structure {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+    .packet-byte {
+      display: inline-block;
+      padding: 4px 8px;
+      margin: 2px;
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      min-width: 60px;
+      text-align: center;
+    }
+    .packet-byte-label {
+      font-size: 0.75rem;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+    }
+    .packet-field {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 100%;
+    }
+    .packet-field:last-child {
+      border-bottom: none;
+    }
+    .packet-field-offset {
+      color: var(--muted-foreground);
+      font-size: 0.8rem;
+      min-width: 60px;
+      flex-shrink: 0;
+    }
+    .packet-field-name {
+      font-weight: 600;
+      color: var(--foreground);
+      min-width: 150px;
+      flex-shrink: 0;
+    }
+    .packet-field-size {
+      color: var(--muted-foreground);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .packet-field-desc {
+      color: var(--muted-foreground);
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      .col {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0;
+      }
+      .panel {
+        padding: 12px;
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .packet-field {
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+        max-width: 100%;
+      }
+      .packet-field-offset {
+        min-width: 40px;
+        font-size: 0.7rem;
+      }
+      .packet-field-name {
+        min-width: 80px;
+        font-size: 0.85rem;
+      }
+      .packet-field-size {
+        font-size: 0.75rem;
+      }
+      .packet-field-desc {
+        width: 100%;
+        margin-top: 4px;
+        word-break: break-word;
+        font-size: 0.85rem;
+      }
+      .packet-structure {
+        padding: 10px;
+        font-size: 0.75rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .byte-visual {
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 8px;
+        width: 100%;
+        max-width: 100%;
+      }
+      .bit-visual {
+        flex-wrap: wrap;
+        gap: 1px;
+      }
+      .bit {
+        width: 20px;
+        height: 20px;
+        font-size: 9px;
+      }
+      .byte-box {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+      }
+      .pixel {
+        width: 20px;
+        height: 20px;
+        font-size: 8px;
+      }
+      .pixel-grid {
+        gap: 1px;
+        padding: 4px;
+        max-width: 100%;
+      }
+      table {
+        font-size: 0.8rem;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+      }
+      table thead,
+      table tbody,
+      table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      table th,
+      table td {
+        padding: 6px 4px;
+        word-break: break-word;
+        font-size: 0.8rem;
+      }
+      .mapping-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+      }
+      .mapping-table thead,
+      .mapping-table tbody,
+      .mapping-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .mapping-table th,
+      .mapping-table td {
+        padding: 6px 4px;
+        font-size: 0.8rem;
+        word-break: break-word;
+      }
+      .code-block {
+        padding: 10px;
+        font-size: 0.8rem;
+        word-break: break-all;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .code-block code {
+        word-break: break-all;
+        white-space: pre-wrap;
+      }
+      .flow-step {
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8rem;
+        padding: 0 8px;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+      }
+      .intro-text {
+        font-size: 1rem;
+      }
+    }
+    .highlight-box {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 4px;
+    }
+    .highlight-box strong {
+      color: #78350f;
+    }
+    @media (prefers-color-scheme: dark) {
+      .highlight-box {
+        background: #78350f;
+        border-left-color: #f59e0b;
+      }
+      .highlight-box strong {
+        color: #fef3c7;
+      }
+      .highlight-box p,
+      .highlight-box {
+        color: #fef3c7;
+      }
+    }
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    .mapping-table th {
+      background: var(--card-background);
+      color: var(--foreground);
+      font-weight: 600;
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .mapping-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--muted-foreground);
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+    }
+    .mapping-table tr:last-child td {
+      border-bottom: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    table th {
+      padding: 12px;
+      text-align: left;
+      color: var(--foreground);
+      border-bottom: 2px solid var(--border-color);
+    }
+    table td {
+      padding: 12px;
+      color: var(--muted-foreground);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .pixel-grid {
+      display: inline-grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 2px;
+      margin: 12px 0;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      background: var(--card-background);
+    }
+    .pixel {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .pixel.black { background: #000000; color: #ffffff; }
+    .pixel.white { background: #ffffff; color: #1a1a1a; }
+    .pixel.red { background: #ff0000; color: #ffffff; }
+    .pixel.yellow { background: #ffff00; color: #1a1a1a; }
+    .pixel.green { background: #00ff00; color: #1a1a1a; }
+    .pixel.blue { background: #0000ff; color: #ffffff; }
+    .pixel.gray0 { background: #000000; color: #ffffff; }
+    .pixel.gray1 { background: #555555; color: #ffffff; }
+    .pixel.gray2 { background: #aaaaaa; color: #1a1a1a; }
+    .pixel.gray3 { background: #ffffff; color: #1a1a1a; }
+    .byte-visual {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+      padding: 12px;
+      background: var(--card-background);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .byte-box {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      padding: 8px 12px;
+      background: #000000;
+      color: #ffffff;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .bit-visual {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+    }
+    .bit {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      background: var(--card-background);
+      color: var(--foreground);
+    }
+    .bit.set {
+      background: #00bfff;
+      color: #ffffff;
+    }
+    .plane-visual {
+      margin: 16px 0;
+      padding: 16px;
+      background: var(--card-background);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    .plane-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--foreground);
+    }
+    .info-box {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 4px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .info-box {
+        background: #1e3a8a;
+        border-color: #3b82f6;
+      }
+      .info-box p {
+        color: #dbeafe;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <main id="main-content">
+  <div class="col" style="max-width: 1200px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
+      <a href="index.html">Protocol</a><span class="breadcrumb-separator">/</span>
+      <span>OpenDisplay</span>
+    </div>
+  </div>
+  <h1>OpenDisplay Standard</h1>
+
+  <div class="highlight-box" style="max-width: 1200px; margin: 20px auto;">
+    <p><strong>⚠️ Work in Progress:</strong> This specification is still under development and may change. Please use with caution and check for updates regularly.</p>
+  </div>
+
+  <div class="col panel">
+    <h2>Overview</h2>
+    <p class="intro-text">
+      OpenDisplay is an open standard to get images displayed on e-Ink screens via Wi-Fi or BLE in an efficient way.
+    </p>
+    <div class="info-box" style="margin-top: 20px;">
+      <strong>Need Help or Want to Contribute?</strong> Join our <a href="https://discord.gg/XmTHz8RfJE" target="_blank" style="color: #3b82f6; text-decoration: underline;">Discord server</a> to get help with integration, ask questions, or suggest changes and improvements to the standard.
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Communication Flow</h2>
+    <p class="intro-text">
+      This standard uses binary packets with fixed byte positions. Manufacturers can choose to implement 
+      BLE, WiFi, or both communication methods. The packet format and communication flow are identical for both, 
+      with only the connection establishment differing. For more details on connection setup, see the 
+      <a href="#ble-communication" style="color: var(--accent);">BLE Communication</a> and 
+      <a href="#wifi-communication" style="color: var(--accent);">WiFi Communication</a> sections.
+    </p>
+    
+    <ol style="color: var(--muted-foreground); line-height: 1.8; margin-left: 20px; margin-top: 12px;">
+      <li><strong>Connection established</strong> (BLE: client connects to display; WiFi: display connects to server)</li>
+      <li><strong>Display → Server:</strong> Image Request Packet (0x02) when ready (includes battery status)</li>
+      <li><strong>Server → Display:</strong> Response packet:
+        <ul style="margin-top: 8px; margin-bottom: 8px;">
+          <li>No new image (0x81) - ask again in X seconds</li>
+          <li>Request configuration (0x83) - display should send announcement</li>
+          <li>New image (0x82) - image data with poll interval</li>
+        </ul>
+      </li>
+      <li><strong>Display → Server:</strong> If configuration requested, sends Announcement Packet (0x01)</li>
+      <li><strong>Display → Server:</strong> Periodic Image Request Packets (0x02) with battery status</li>
+      <li><strong>Server → Display:</strong> Response packets (no new image or new image with data)</li>
+      <li><strong>Power Saving:</strong> Between updates, the display and/or client may disconnect or enter sleep mode to save power. The connection can be re-established when the next update is needed.</li>
+      <li>Loop continues with periodic image requests (reconnecting as needed)</li>
+    </ol>
+  </div>
+
+  <div class="col panel">
+    <h2 id="ble-communication">BLE Communication</h2>
+    <p class="intro-text">
+      This standard uses BLE GATT (Generic Attribute Profile) for communication. The display acts as a BLE peripheral 
+      (server), and clients connect to it to exchange packets.
+    </p>
+    
+    <h3>GATT Service Structure</h3>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong>Service UUID:</strong> 0x2446</li>
+      <li><strong>Characteristic UUID:</strong> 0x2446</li>
+      <li><strong>Characteristic Properties:</strong> READ, NOTIFY, WRITE, WRITE_NR (write without response)</li>
+    </ul>
+    
+    <h3>Communication Mechanism</h3>
+    <p class="intro-text">
+      The display uses a single characteristic for bidirectional communication:
+    </p>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong>Display → Client:</strong> Packets are sent using BLE notifications. The display calls <code>notify()</code> 
+        on the characteristic to send response packets (0x81, 0x82, 0x83) to the connected client.</li>
+      <li><strong>Client → Display:</strong> Packets are received via BLE write operations. The client writes request packets 
+        (0x01, 0x02) to the characteristic, which triggers a write callback in the display's firmware.</li>
+    </ul>
+    
+    <h3>Packet Transmission</h3>
+    <p class="intro-text">
+      All packets are sent as raw binary data with fixed byte positions. There are no variable-length strings or padding. 
+      The BLE MTU (Maximum Transmission Unit) determines the maximum packet size per transmission:
+    </p>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong>MTU Size:</strong> Typically 512 bytes (negotiated during connection). The minimum is 23 bytes (BLE 4.0), 
+        but modern implementations negotiate higher values for better throughput.</li>
+      <li><strong>Effective Chunk Size:</strong> Each BLE notification can carry up to (MTU - 3) bytes of payload data. 
+        For a 512-byte MTU, this means approximately 509 bytes per chunk.</li>
+    </ul>
+    
+    <h3>Advertising</h3>
+    <p class="intro-text">
+      The display advertises itself as a BLE peripheral to allow clients to discover and connect:
+    </p>
+    <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+      <li><strong>Service UUID:</strong> The service UUID (0x2446) is included in the advertisement data</li>
+      <li><strong>Device Name:</strong> The display advertises with a device name (manufacturer-specific)</li>
+      <li><strong>Connection:</strong> Clients scan for the service UUID and connect to the display</li>
+    </ul>
+  </div>
+
+  <div class="col panel">
+    <h2 id="wifi-communication">WiFi Communication</h2>
+    <div class="info-box" style="margin-bottom: 16px;">
+      <strong>OpenDisplay Flex firmware</strong> uses a different Wi‑Fi model: the device joins your access point and acts as a 
+      <strong>TCP server</strong>; the client connects to it with length-prefixed frames matching BLE writes. See 
+      <a href="ble-flow.html#lan-wifi-transport" style="color: var(--accent);">Flex — LAN (Wi‑Fi) transport</a>. 
+      The sections below describe the <em>this-page</em> OpenDisplay standard’s pull-based Wi‑Fi flow (display as TCP client to a server).
+    </div>
+    <p class="intro-text">
+      This standard also supports WiFi communication via TCP. WiFi network configuration is the responsibility 
+      of the manufacturer's app, but server discovery uses mDNS (multicast DNS) to eliminate the need for 
+      manual IP address and port configuration.
+    </p>
+    
+    <div class="flow-step">
+      <h4>WiFi Configuration</h4>
+      <p>
+        Manufacturers are responsible for handling WiFi network configuration. This includes configuring 
+        WiFi credentials (SSID, password, encryption type). This protocol does not include commands for 
+        WiFi configuration - this must be handled separately by the manufacturer's app.
+      </p>
+    </div>
+
+    <div class="flow-step">
+      <h4>Server Discovery via mDNS</h4>
+      <p>
+        The display discovers the OpenDisplay server automatically using mDNS (multicast DNS) service discovery. 
+        This eliminates the need for manual IP address and port configuration:
+      </p>
+      <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+        <li><strong>Service Type:</strong> <code>_opendisplay._tcp.local</code></li>
+        <li><strong>Service Name:</strong> The server advertises with a service name (e.g., "OpenDisplay Server")</li>
+        <li><strong>Default Port:</strong> 2446 (discovered via mDNS SRV record, or defaults to 2446 if not specified)</li>
+        <li><strong>Discovery Process:</strong> The display queries the local network for OpenDisplay servers using mDNS</li>
+        <li><strong>Connection:</strong> Once discovered, the display connects to the server's IP address and port</li>
+      </ul>
+      <p style="margin-top: 12px;">
+        The server must advertise itself via mDNS with the service type <code>_opendisplay._tcp.local</code> for 
+        automatic discovery to work. Multiple servers can be advertised on the same network, and the display 
+        can connect to any available server.
+      </p>
+      <div class="info-box" style="margin-top: 16px;">
+        <strong>mDNS Service Advertisement:</strong> The server should advertise the following information:
+        <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+          <li><strong>Service Type:</strong> <code>_opendisplay._tcp.local.</code> (note the trailing dot)</li>
+          <li><strong>Service Name:</strong> Full qualified service name (e.g., <code>OpenDisplay Server._opendisplay._tcp.local.</code>)</li>
+          <li><strong>Port:</strong> TCP port number (default: 2446)</li>
+          <li><strong>IP Address:</strong> Server's IPv4 address</li>
+          <li><strong>TXT Records (optional but recommended):</strong> Include the IP address in TXT records with key <code>"ip"</code> as a workaround for devices that have difficulty resolving mDNS hostnames</li>
+        </ul>
+      </div>
+      <div class="info-box" style="margin-top: 16px;">
+        <strong>IP Address Resolution:</strong> The display should attempt to resolve the server's IP address using the following methods (in order):
+        <ol style="margin: 8px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+          <li><strong>TXT Record:</strong> Read the IP address from mDNS TXT records (key: <code>"ip"</code>) if available</li>
+          <li><strong>Hostname Resolution:</strong> Resolve the mDNS hostname to an IP address using standard DNS resolution (with or without <code>.local</code> suffix)</li>
+          <li><strong>Direct IP (if supported):</strong> Use the IP address directly from mDNS response if the platform supports it</li>
+        </ol>
+        <p style="margin-top: 8px;">
+          The TXT record method is recommended as a workaround for platforms (such as ESP32) that may have 
+          unreliable mDNS hostname resolution. Servers should include the IP address in TXT records to ensure 
+          reliable discovery across all platforms.
+        </p>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <h4>TCP Protocol</h4>
+      <p>
+        WiFi communication uses TCP with the same packet format as BLE. The device acts as a TCP client, 
+        connecting to the server discovered via mDNS.
+      </p>
+      <ul style="margin: 12px 0; padding-left: 20px; color: var(--muted-foreground); line-height: 1.8;">
+        <li><strong>Connection Model:</strong> Persistent TCP connection (device connects to server)</li>
+        <li><strong>Packet Format:</strong> Same outer packet structure as BLE (see packet format below)</li>
+        <li><strong>Reconnection:</strong> If the connection is lost, the display will rediscover the server via mDNS and reconnect</li>
+      </ul>
+    </div>
+
+    <div class="flow-step">
+      <h4>Packet Format Over TCP</h4>
+      <p>
+        TCP uses the same outer packet structure as BLE, allowing for larger packet sizes (up to 8KB vs ~200 bytes for BLE):
+      </p>
+      <div class="code-block">
+        <code>Outer Packet Format:<br>
+[length:2][version:1][packets:variable][crc:2]<br><br>
+Single Packet Format:<br>
+[number:1][id:1][payload:variable]<br><br>
+Where:<br>
+- length: Total packet size including CRC (little-endian, 2 bytes)<br>
+- version: Protocol version (0x01, 1 byte)<br>
+- packets: Sequence of single_packet entries (variable length)<br>
+- crc: CRC16-CCITT checksum (2 bytes)<br>
+- number: Packet index (0-based, 1 byte)<br>
+- id: Packet type identifier (1 byte)<br>
+- payload: Packet-specific data (variable length)</code>
+      </div>
+      <p style="margin-top: 12px;">
+        All packets (0x01, 0x02, 0x81, 0x82, 0x83) are wrapped in this outer packet format 
+        when sent over TCP. The packet structure is identical to BLE, but TCP allows for larger payloads.
+      </p>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Packet Types</h2>
+    <p class="intro-text">
+      All packets use fixed byte positions. All multi-byte values are little-endian (least significant byte first).
+    </p>
+    
+    <div class="flow-step">
+      <h4>Packet Type Values</h4>
+      <table class="mapping-table">
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Direction</th>
+            <th>Packet Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0x01</td>
+            <td>Display → Server</td>
+            <td>Display Announcement</td>
+          </tr>
+          <tr>
+            <td>0x02</td>
+            <td>Display → Server</td>
+            <td>Image Request</td>
+          </tr>
+          <tr>
+            <td>0x81</td>
+            <td>Server → Display</td>
+            <td>Response: No New Image</td>
+          </tr>
+          <tr>
+            <td>0x82</td>
+            <td>Server → Display</td>
+            <td>Response: New Image</td>
+          </tr>
+          <tr>
+            <td>0x83</td>
+            <td>Server → Display</td>
+            <td>Response: Request Configuration</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Display Announcement Packet (0x01)</h2>
+    <p class="intro-text">
+      Sent by the display when requested by the server (via packet 0x83). Contains all display specifications. 
+      The display does not send this automatically on connection.
+    </p>
+    
+    <div class="packet-structure">
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 0</span>
+        <span class="packet-field-name">packet_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Always 0x01</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 1-2</span>
+        <span class="packet-field-name">width</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Display width in pixels (little-endian)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 3-4</span>
+        <span class="packet-field-name">height</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Display height in pixels (little-endian)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 5</span>
+        <span class="packet-field-name">colour_scheme</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Color scheme enum (matches OpenDisplay Flex, see Image Data Format section)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 6-7</span>
+        <span class="packet-field-name">firmware_id</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Firmware identifier</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 8-9</span>
+        <span class="packet-field-name">firmware_version</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Firmware version number (little-endian)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 10-11</span>
+        <span class="packet-field-name">manufacturer_id</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Manufacturer identifier</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 12-13</span>
+        <span class="packet-field-name">model_id</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Model identifier</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 14-15</span>
+        <span class="packet-field-name">max_compressed_size</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Maximum compressed image size in bytes (little-endian). If 0, the display does not support compression. Compression support is optional for uploading programs.</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 16</span>
+        <span class="packet-field-name">rotation</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Image rotation in degrees: 0 = 0°, 1 = 90°, 2 = 180°, 3 = 270°. The uploading program should rotate the image data accordingly before transmission.</span>
+      </div>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Total packet size:</strong> 17 bytes
+    </p>
+    <div class="code-block">
+      <code>Example (200×200 Monochrome display, no compression, 0° rotation):<br>
+0x01 0xC8 0x00 0xC8 0x00 0x00 0x01 0x00 0x01 0x00 0x01 0x00 0x01 0x00 0x00 0x00 0x00<br>
+     ^^^  ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^<br>
+     type width=200   height=200   scheme firmware_id version=1  mfr_id=1   model_id=1  max_comp=0  rot=0</code>
+    </div>
+    
+    <p class="intro-text">
+      Manufacturer, model, and firmware names are represented as 16-bit integer IDs. These mappings are optional for clients to implement.
+    </p>
+    
+    <div class="info-box" style="margin-top: 20px;">
+      <strong>ID Mappings Repository:</strong> The official mappings for manufacturer IDs, model IDs, and firmware IDs are maintained in the 
+      <a href="https://github.com/OpenDisplay/mappings" target="_blank" style="color: #3b82f6; text-decoration: underline;">OpenDisplay Mappings repository</a>.
+      Manufacturers should open a pull request against this repository to register new displays and ensure their IDs are properly documented.
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Image Request Packet (0x02)</h2>
+    <p class="intro-text">
+      Sent by the display when a client connects and the display is ready, or periodically to request new images. 
+      Includes current power status.
+    </p>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Initial Request:</strong> When a BLE client connects, the display should send this packet as soon as 
+      it is ready to communicate. This signals to the server that the display is available.
+    </p>
+    
+    <div class="packet-structure">
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 0</span>
+        <span class="packet-field-name">packet_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Always 0x02</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 1</span>
+        <span class="packet-field-name">battery_percent</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Battery percentage (0-100), or 0xFF for AC powered</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 2</span>
+        <span class="packet-field-name">rssi</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">RSSI (Received Signal Strength Indicator) in dBm when connected over WiFi. For BLE connections, this field is not used (should be 0 or ignored).</span>
+      </div>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Total packet size:</strong> 3 bytes
+    </p>
+    <div class="code-block">
+      <code>Example (battery at 85%, WiFi RSSI -65 dBm):<br>
+0x02 0x55 0xBF<br>
+     ^^^^  ^^^^<br>
+     type battery=85% rssi=-65<br><br>
+Example (AC powered, BLE connection):<br>
+0x02 0xFF 0x00<br>
+     ^^^^  ^^^^<br>
+     type AC powered rssi=0 (BLE)</code>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Response: No New Image (0x81)</h2>
+    <p class="intro-text">
+      Sent by the server when there's no new image available. Tells the display when to poll again.
+    </p>
+    
+    <div class="packet-structure">
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 0</span>
+        <span class="packet-field-name">packet_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Always 0x81</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 1-4</span>
+        <span class="packet-field-name">poll_interval</span>
+        <span class="packet-field-size">4 bytes (uint32)</span>
+        <span class="packet-field-desc">Seconds to wait before next request (little-endian)</span>
+      </div>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Total packet size:</strong> 5 bytes
+    </p>
+    <div class="code-block">
+      <code>Example (ask again in 60 seconds):<br>
+0x81 0x3C 0x00 0x00 0x00<br>
+     ^^^^^^^^^^^^^^^^^^^^<br>
+     type interval=60</code>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Response: Request Configuration (0x83)</h2>
+    <p class="intro-text">
+      Sent by the server to request the display's configuration. The display should respond with an 
+      Announcement Packet (0x01).
+    </p>
+    
+    <div class="packet-structure">
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 0</span>
+        <span class="packet-field-name">packet_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Always 0x83</span>
+      </div>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Total packet size:</strong> 1 byte
+    </p>
+    <div class="code-block">
+      <code>Example:<br>
+0x83<br>
+^^^<br>
+type</code>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      When the display receives this packet, it should immediately send a Display Announcement Packet (0x01) 
+      containing its specifications.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <h2>Response: New Image (0x82)</h2>
+    <p class="intro-text">
+      Sent by the server when there's a new image to display. Contains the image data in OpenDisplay format.
+    </p>
+    
+    <div class="packet-structure">
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 0</span>
+        <span class="packet-field-name">packet_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Always 0x82</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 1-2</span>
+        <span class="packet-field-name">image_length</span>
+        <span class="packet-field-size">2 bytes (uint16)</span>
+        <span class="packet-field-desc">Length of image data in bytes (little-endian)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 3-6</span>
+        <span class="packet-field-name">poll_interval</span>
+        <span class="packet-field-size">4 bytes (uint32)</span>
+        <span class="packet-field-desc">Seconds to wait before next request (little-endian)</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 7</span>
+        <span class="packet-field-name">refresh_type</span>
+        <span class="packet-field-size">1 byte</span>
+        <span class="packet-field-desc">Refresh type: 0 = normal refresh, 1 = fast refresh</span>
+      </div>
+      <div class="packet-field">
+        <span class="packet-field-offset">Offset 8 to (8+image_length-1)</span>
+        <span class="packet-field-name">image_data</span>
+        <span class="packet-field-size">Variable</span>
+        <span class="packet-field-desc">Image data in OpenDisplay format (see <a href="display-data-format.html" style="color: var(--accent);">Display Data Format</a>)</span>
+      </div>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      <strong>Total packet size:</strong> 8 + image_length bytes
+    </p>
+    <div class="code-block">
+      <code>Example (image of 5000 bytes, ask again in 300 seconds, normal refresh):<br>
+0x82 0x88 0x13 0x2C 0x01 0x00 0x00 0x00 0x[5000 bytes of image data]<br>
+     ^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^<br>
+     type length=5000  interval=300      refresh image data</code>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Image Transmission</h2>
+    <p class="intro-text">
+      In this standard, image data is sent as part of the "New Image" response packet (0x82):
+    </p>
+    <div class="code-block">
+      <code>Packet Type: 0x82<br>
+Offset 0: packet_type (1 byte) = 0x82<br>
+Offset 1-2: image_length (2 bytes, uint16, little-endian)<br>
+Offset 3-6: poll_interval (4 bytes, uint32, little-endian)<br>
+Offset 7: refresh_type (1 byte) = 0 (normal) or 1 (fast)<br>
+Offset 8 to (8+image_length-1): image_data (variable)</code>
+    </div>
+    <p class="intro-text" style="margin-top: 12px;">
+      The <code>image_data</code> field contains raw encoded pixel data in OpenDisplay format. For transmission details 
+      over BLE and TCP, see the <a href="#ble-communication" style="color: var(--accent);">BLE Communication</a> and 
+      <a href="#wifi-communication" style="color: var(--accent);">WiFi Communication</a> sections.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <h2>Image Data Format</h2>
+    <p class="intro-text">
+      This section explains how image data is encoded into bytes for transmission to OpenDisplay devices. 
+      The encoding format depends on the color scheme configured for the display. Understanding this format 
+      is essential for implementing custom clients or debugging image transfer issues.
+    </p>
+    <div class="info-box">
+      <strong>Direct Writing:</strong> The image data format is designed to allow direct writing to the e-paper display (EPD) 
+      without requiring the full image to be stored in RAM or flash memory. Data can be written to the EPD controller 
+      as it is received, enabling efficient memory usage even for large displays.
+    </div>
+    
+    <h3>Pixel Ordering</h3>
+    <p class="intro-text">
+      Pixels are always processed in row-major order: from top to bottom, left to right within each row.
+    </p>
+    <p>For bitplane schemes (1 and 2), all rows of Plane 1 are sent first, then all rows of Plane 2.</p>
+    
+    <h3>Color Schemes</h3>
+    
+    <h3>Color Scheme 0x00: Monochrome (B/W)</h3>
+    <p class="intro-text">
+      <strong>Encoding:</strong> 1 bit per pixel, 8 pixels per byte<br>
+      <strong>Colors:</strong> Black (0) or White (1)<br>
+      <strong>Data Size:</strong> (width × height) ÷ 8 bytes
+    </p>
+    
+    <h3>How It Works</h3>
+    <p>Each pixel is represented by a single bit. White pixels set the bit to 1, black pixels set it to 0. 
+    Bits are packed into bytes from left to right, with the most significant bit (MSB) representing the leftmost pixel.</p>
+    
+    <p>Example: 8 pixels in a row</p>
+    <div class="pixel-grid" style="grid-template-columns: repeat(8, 1fr);">
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+      <div class="pixel white">W</div>
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+      <div class="pixel black">B</div>
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+    </div>
+    
+    <div class="byte-visual">
+      <span>Byte:</span>
+      <div class="bit-visual">
+        <div class="bit set">1</div>
+        <div class="bit">0</div>
+        <div class="bit set">1</div>
+        <div class="bit set">1</div>
+        <div class="bit">0</div>
+        <div class="bit">0</div>
+        <div class="bit set">1</div>
+        <div class="bit">0</div>
+      </div>
+      <div class="byte-box">0xB6</div>
+      <span style="color: var(--muted-foreground);">(10110110 binary = 182 decimal = 0xB6 hex)</span>
+    </div>
+    <h3>Color Scheme 0x01: B/W + Red</h3>
+    <p class="intro-text">
+      <strong>Encoding:</strong> Bitplanes, 1 bit per pixel per plane, 8 pixels per byte per plane<br>
+      <strong>Colors:</strong> Black, White, Red<br>
+      <strong>Data Size:</strong> ((width × height) ÷ 8) × 2 bytes (two planes)
+    </p>
+    
+    <h3>How It Works</h3>
+    <p>This scheme uses two bitplanes (planes). Plane 1 encodes black/white information, and Plane 2 encodes red information. 
+    The final color is determined by combining both planes:</p>
+    <ul>
+      <li><strong>Black:</strong> Plane 1 = 0, Plane 2 = 0</li>
+      <li><strong>White:</strong> Plane 1 = 1, Plane 2 = 0</li>
+      <li><strong>Red:</strong> Plane 1 = 1, Plane 2 = 1</li>
+    </ul>
+    <p>Data is sent as: <strong>All Plane 1 bytes, then all Plane 2 bytes</strong></p>
+
+    <p>Example: 8 pixels in a row</p>
+    <div class="pixel-grid" style="grid-template-columns: repeat(8, 1fr);">
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+      <div class="pixel red">R</div>
+      <div class="pixel white">W</div>
+      <div class="pixel red">R</div>
+      <div class="pixel black">B</div>
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+    </div>
+    
+    <div class="plane-visual">
+      <div class="plane-label">Plane 1 (B/W):</div>
+      <div class="byte-visual">
+        <div class="bit-visual">
+          <div class="bit set">1</div>
+          <div class="bit">0</div>
+          <div class="bit set">1</div>
+          <div class="bit set">1</div>
+          <div class="bit set">1</div>
+          <div class="bit">0</div>
+          <div class="bit set">1</div>
+          <div class="bit">0</div>
+        </div>
+        <div class="byte-box">0xB6</div>
+      </div>
+    </div>
+    
+    <div class="plane-visual">
+      <div class="plane-label">Plane 2 (Red):</div>
+      <div class="byte-visual">
+        <div class="bit-visual">
+          <div class="bit">0</div>
+          <div class="bit">0</div>
+          <div class="bit set">1</div>
+          <div class="bit">0</div>
+          <div class="bit set">1</div>
+          <div class="bit">0</div>
+          <div class="bit">0</div>
+          <div class="bit">0</div>
+        </div>
+        <div class="byte-box">0x24</div>
+      </div>
+    </div>
+    
+    <p><strong>Final Data:</strong> <code>0xB6, 0x24</code> (Plane 1 first, then Plane 2)</p>
+    <h3>Color Scheme 0x02: B/W + Yellow</h3>
+    <p class="intro-text">
+      <strong>Encoding:</strong> Bitplanes, 1 bit per pixel per plane, 8 pixels per byte per plane<br>
+      <strong>Colors:</strong> Black, White, Yellow<br>
+      <strong>Data Size:</strong> ((width × height) ÷ 8) × 2 bytes (two planes)
+    </p>
+    
+    <h3>How It Works</h3>
+    <p>Similar to Scheme 1, but Plane 2 encodes yellow instead of red:</p>
+    <ul>
+      <li><strong>Black:</strong> Plane 1 = 0, Plane 2 = 0</li>
+      <li><strong>White:</strong> Plane 1 = 1, Plane 2 = 0</li>
+      <li><strong>Yellow:</strong> Plane 1 = 0, Plane 2 = 1</li>
+    </ul>
+    <p>Data is sent as: <strong>All Plane 1 bytes, then all Plane 2 bytes</strong></p>
+    <h3>Color Scheme 0x03: B/W + Red + Yellow</h3>
+    <p class="intro-text">
+      <strong>Encoding:</strong> 2 bits per pixel, 4 pixels per byte<br>
+      <strong>Colors:</strong> Black (0), White (1), Yellow (2), Red (3)<br>
+      <strong>Data Size:</strong> (width × height) ÷ 4 bytes
+    </p>
+    
+    <h3>How It Works</h3>
+    <p>Each pixel uses 2 bits to encode one of four colors. Pixels are packed left to right, with the leftmost pixel 
+    using bits 7-6, next pixel using bits 5-4, and so on.</p>
+    
+    <p>Example: 4 pixels in a row</p>
+    <div class="pixel-grid" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="pixel white">W</div>
+      <div class="pixel black">B</div>
+      <div class="pixel yellow">Y</div>
+      <div class="pixel red">R</div>
+    </div>
+    
+    <div class="byte-visual">
+      <span>Byte:</span>
+      <div class="bit-visual">
+        <div class="bit set">1</div>
+        <div class="bit">0</div>
+        <span style="margin: 0 4px;">|</span>
+        <div class="bit">0</div>
+        <div class="bit">0</div>
+        <span style="margin: 0 4px;">|</span>
+        <div class="bit">1</div>
+        <div class="bit">0</div>
+        <span style="margin: 0 4px;">|</span>
+        <div class="bit set">1</div>
+        <div class="bit set">1</div>
+      </div>
+      <div class="byte-box">0x93</div>
+      <span style="color: var(--muted-foreground);">(W=01, B=00, Y=10, R=11 = 10010011 = 0x93)</span>
+    </div>
+    <p><strong>Bit pairs (left to right):</strong> 01 (White), 00 (Black), 10 (Yellow), 11 (Red)</p>
+    <h3>Color Scheme 0x04: 6-Color (B/W + Green + Blue + Red + Yellow)</h3>
+    <p class="intro-text">
+      <strong>Encoding:</strong> 4 bits per pixel, 2 pixels per byte<br>
+      <strong>Colors:</strong> Black (0), White (1), Yellow (2), Red (3), Blue (5), Green (6)<br>
+      <strong>Data Size:</strong> (width × height) ÷ 2 bytes
+    </p>
+    
+    <h3>How It Works</h3>
+    <p>Each pixel uses 4 bits (a nibble) to encode one of six colors. Two pixels fit in each byte, with the leftmost pixel 
+    in the upper nibble (bits 7-4) and the rightmost pixel in the lower nibble (bits 3-0).</p>
+    
+    <h3>Color Values</h3>
+    <div class="pixel-grid" style="grid-template-columns: repeat(6, 1fr); max-width: 400px;">
+      <div class="pixel black">B<br>0</div>
+      <div class="pixel white">W<br>1</div>
+      <div class="pixel yellow">Y<br>2</div>
+      <div class="pixel red">R<br>3</div>
+      <div class="pixel blue">BL<br>5</div>
+      <div class="pixel green">G<br>6</div>
+    </div>
+    
+    <h4>Example: White + Red</h4>
+    <p>2 pixels in a row</p>
+    <div class="pixel-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 100px;">
+      <div class="pixel white">W</div>
+      <div class="pixel red">R</div>
+    </div>
+    <div class="byte-visual">
+      <span>Byte:</span>
+      <div class="bit-visual">
+        <div class="bit">0</div>
+        <div class="bit">0</div>
+        <div class="bit set">0</div>
+        <div class="bit set">1</div>
+        <span style="margin: 0 4px;">|</span>
+        <div class="bit">0</div>
+        <div class="bit">0</div>
+        <div class="bit set">1</div>
+        <div class="bit set">1</div>
+      </div>
+      <div class="byte-box">0x13</div>
+      <span style="color: var(--muted-foreground);">(W=0001 upper, R=0011 lower = 00010011 = 0x13)</span>
+    </div>
+  </div>
+
+  <div class="col panel">
+    <h2>Comparison with Flex Standard</h2>
+    <p class="intro-text">
+      The OpenDisplay standard is designed to be simpler than OpenDisplay Flex, but both share the same image format:
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>OpenDisplay</th>
+          <th>OpenDisplay Flex</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Configuration System</td>
+          <td>Minimal (announcement packet only)</td>
+          <td>Full YAML-based schema</td>
+        </tr>
+        <tr>
+          <td>Image Format</td>
+          <td>✓ OpenDisplay format</td>
+          <td>✓ OpenDisplay format</td>
+        </tr>
+        <tr>
+          <td>Communication</td>
+          <td>Binary packets (fixed positions)</td>
+          <td>Binary packets (YAML-defined)</td>
+        </tr>
+        <tr>
+          <td>String Handling</td>
+          <td>16-bit integer IDs with mappings</td>
+          <td>Variable-length strings</td>
+        </tr>
+        <tr>
+          <td>Complexity</td>
+          <td>Low</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Use Case</td>
+          <td>Products that want to show images from user's sources</td>
+          <td>Full-featured implementations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col panel footer">
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span class="footer-separator">•</span>
+      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
+      <span class="footer-separator">•</span>
+      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
+      <span class="footer-separator">•</span>
+      <a href="../impressum.html">imprint (Impressum)</a>
+      <span class="footer-separator">•</span>
+      <a href="../datenschutz.html">privacy (Datenschutz)</a>
+    </div>
+  </div>
+  </main>
+</body>
+</html>
