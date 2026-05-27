@@ -1,18 +1,178 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="../../assets/brand/logo-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/colors_and_type.css">
+  <link rel="stylesheet" href="../../css/inner.css">
+  <link rel="stylesheet" href="../../css/tool-ui.css">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="/favicon.ico"> 
-  <link rel="stylesheet" href="https://opendisplay.org/common.css">
-  <title>OpenDisplay Toolbox</title>
+<title>OpenDisplay Toolbox</title>
 <style>
 /* Page-specific styles */
+.tool-page > .container > h1{
+  text-align:center;
+  margin:0 0 16px;
+  width:100%;
+}
+.toolbox-intro{
+  max-width:640px;
+  margin:0 auto 24px;
+  text-align:center;
+}
+.toolbox-requirements{
+  margin:0;
+  padding:0;
+  list-style:none;
+  font-size:0.875rem;
+  line-height:1.5;
+  color:var(--muted-foreground);
+}
+.toolbox-requirements li{margin:4px 0}
+.toolbox-requirements a{color:var(--accent);text-decoration:underline}
+.toolbox-step{
+  margin-bottom:28px;
+  padding-bottom:0;
+  scroll-margin-top:16px;
+}
+.toolbox-step:last-child{margin-bottom:0}
+.toolbox-step--more{padding-bottom:0;margin-bottom:16px}
+.toolbox-step__title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 8px;
+  font-size:1.05rem;
+  font-weight:600;
+  color:var(--foreground);
+  font-family:var(--font-sans);
+}
+.toolbox-step__num{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:var(--accent);
+  color:var(--accent-button);
+  font-size:0.8rem;
+  font-weight:700;
+  flex-shrink:0;
+}
+.toolbox-step__hint{
+  margin:0 0 14px;
+  font-size:0.875rem;
+  line-height:1.45;
+  color:var(--muted-foreground);
+}
+.toolbox-step__hint--presets{
+  font-weight:500;
+  color:var(--foreground);
+}
+.toolbox-or{
+  margin:16px 0 12px;
+  font-size:0.8rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:var(--muted-foreground);
+  text-align:center;
+}
+.toolbox-checklist{
+  margin:0 0 14px;
+  padding:10px 12px;
+  list-style:none;
+  background:var(--card-background);
+  border:1px solid var(--border-color);
+  border-radius:8px;
+  font-size:0.875rem;
+}
+.toolbox-checklist__item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 0;
+  color:var(--muted-foreground);
+}
+.toolbox-checklist__item--done{color:var(--foreground)}
+.toolbox-checklist__mark{
+  width:1.1em;
+  flex-shrink:0;
+  font-weight:700;
+  color:var(--muted-foreground);
+}
+.toolbox-checklist__item--done .toolbox-checklist__mark{color:#3fb950}
+.toolbox-status{
+  margin:0 0 12px;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:0.875rem;
+  line-height:1.45;
+  background:var(--card-background);
+  border:1px solid var(--border-color);
+  color:var(--muted-foreground);
+}
+.toolbox-status--ready{
+  border-color:var(--accent);
+  color:var(--foreground);
+  background:rgba(0,191,255,.06);
+}
+.toolbox-status--success{
+  border-color:#3fb950;
+  color:var(--foreground);
+  background:rgba(63,185,80,.08);
+}
+.toolbox-status--pending{color:var(--muted-foreground)}
+.toolbox-status--busy{
+  border-color:var(--accent);
+  color:var(--foreground);
+}
+.encryption-hint{
+  margin:8px 0 0;
+  font-size:0.8rem;
+  line-height:1.4;
+  color:var(--muted-foreground);
+}
+.toolbox-advanced{
+  margin-top:8px;
+  padding-top:0;
+}
+.toolbox-advanced__label{
+  margin:0 0 10px;
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--muted-foreground);
+  font-family:var(--font-sans);
+}
+.toolbox-advanced .ble-actions{margin-top:8px}
+.toolbox-advanced .toolbox-advanced-btn{
+  width:100%;
+  margin:0;
+  background:transparent!important;
+  color:var(--muted-foreground)!important;
+  border:1px solid var(--border-color)!important;
+  box-shadow:none!important;
+  font-size:13px!important;
+  padding:8px 14px!important;
+}
+.toolbox-advanced .toolbox-advanced-btn:hover{
+  background:var(--card-background)!important;
+  color:var(--foreground)!important;
+  border-color:var(--accent)!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+#premadeConfigSection #presetGrid{margin-top:0}
 label{font-weight:600;font-size:1.1rem;color:var(--foreground);margin-bottom:16px;display:block}
 textarea,input,select,button{
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+  font-family:var(--font-mono)
 }
 textarea{
-  width:100%;height:220px;background:var(--card-background);border:1px solid var(--border-color);border-radius:8px;
+  width:100%;height:220px;background:var(--card-background);border:1.5px solid var(--border-color);border-radius:8px;
   padding:12px;color:var(--foreground);font-size:14px;line-height:1.5;resize:vertical
 }
 textarea:focus{
@@ -33,7 +193,7 @@ button.incomplete:hover{
 }
 .status-display,.packet-length-indicator,.bytes-counter{
   background:var(--card-background);border:1px solid var(--border-color);border-radius:6px;
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+  font-family:var(--font-mono)
 }
 .bytes{
   color:var(--foreground);padding:16px;white-space:pre-wrap;font-size:13px;line-height:1.4;
@@ -69,45 +229,155 @@ button.incomplete:hover{
 .bit-label{font-size:10px;text-align:center;color:var(--muted-foreground);margin-top:4px}
 input[type=text],input[type=number],select,
 .field-row input:not([type=checkbox]):not([type=radio]),.packet-card input:not([type=checkbox]):not([type=radio]),input[style*="flex"]{
-  background:var(--card-background)!important;border:1px solid var(--border-color)!important;border-radius:6px!important;
+  background:var(--card-background)!important;border:1.5px solid var(--border-color)!important;border-radius:6px!important;
   padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace!important;
+  font-family:var(--font-mono)!important;
   min-height:40px!important;transition:.2s;appearance:none
 }
 .encryption-option{
   margin-top:12px;
-  padding:12px 14px;
-  background:var(--card-background);
-  border:1px solid var(--border-color);
-  border-radius:8px;
+  padding:0;
+  background:transparent;
+  border:none;
   color-scheme:light;
 }
-.encryption-option-label{
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  cursor:pointer;
-  font-weight:500;
-  font-size:0.95rem;
-  line-height:1.45;
-  margin:0;
-  color:var(--foreground);
+.encryption-slider-wrap{
+  position:relative;
+  width:100%;
 }
-.encryption-option-label input[type=checkbox]{
-  margin:3px 0 0 0;
+.encryption-slider-icon{
+  position:absolute;
+  top:50%;
   width:18px;
   height:18px;
-  min-width:18px;
-  min-height:18px;
-  flex-shrink:0;
-  accent-color:var(--accent);
+  pointer-events:none;
+  z-index:3;
+  transition:left .15s ease,color .2s ease,transform .15s ease;
+}
+.encryption-slider-icon--left{
+  color:var(--enc-icon-left-color,var(--muted-foreground));
+}
+.encryption-slider-icon--right{
+  color:var(--enc-icon-right-color,var(--muted-foreground));
+}
+.encryption-slider-input{
+  -webkit-appearance:none;
+  appearance:none;
+  display:block;
+  width:100%;
+  height:36px;
+  margin:0;
+  padding:0;
+  border:none;
+  background:transparent;
   cursor:pointer;
-  vertical-align:top;
+}
+.encryption-slider-input:focus{
+  outline:none;
+}
+.encryption-slider-input:focus-visible::-webkit-slider-thumb{
+  box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 0 3px rgba(0,191,255,.25);
+}
+.encryption-slider-input:focus-visible::-moz-range-thumb{
+  box-shadow:0 2px 8px rgba(0,0,0,.15),0 0 0 3px rgba(0,191,255,.25);
+}
+.encryption-slider-input::-webkit-slider-runnable-track{
+  height:36px;
+  border-radius:999px;
+  background:var(--enc-track,var(--od-paper-3,#d8d4cc));
+  transition:background .2s ease;
+}
+.encryption-slider-input::-moz-range-track{
+  height:36px;
+  border-radius:999px;
+  background:var(--enc-track,var(--od-paper-3,#d8d4cc));
+  border:none;
+  transition:background .2s ease;
+}
+.encryption-slider-input::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:32px;
+  height:32px;
+  margin-top:2px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.16);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.encryption-slider-input::-moz-range-thumb{
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.16);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.encryption-slider-input:active::-webkit-slider-thumb{
+  transform:scale(.96);
+}
+.encryption-slider-input:active::-moz-range-thumb{
+  transform:scale(.96);
 }
 @media (prefers-color-scheme:dark){
   .encryption-option{
     color-scheme:dark;
   }
+  .encryption-slider-input::-webkit-slider-thumb,
+  .encryption-slider-input::-moz-range-thumb{
+    background:#f5f5f5;
+    box-shadow:0 2px 10px rgba(0,0,0,.35);
+  }
+}
+.esp-deep-sleep-option{
+  margin-top:12px;
+  padding:12px 14px;
+  background:var(--card-background);
+  border:1px solid var(--border-color);
+  border-radius:8px;
+}
+.esp-deep-sleep-option label{
+  display:block;
+  font-weight:500;
+  font-size:0.95rem;
+  margin:0 0 10px;
+  color:var(--foreground);
+}
+.esp-deep-sleep-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.esp-deep-sleep-row input[type=range]{
+  flex:1;
+  min-width:0;
+  accent-color:var(--accent);
+}
+.esp-deep-sleep-value{
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  color:var(--foreground);
+  min-width:4.5em;
+  text-align:right;
+  cursor:pointer;
+  background:transparent;
+  border:1px solid var(--border-color);
+  border-radius:6px;
+  padding:4px 8px;
+  line-height:1.2;
+}
+.esp-deep-sleep-value:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.esp-deep-sleep-minutes{
+  width:4.5em;
+  min-width:4.5em;
+  min-height:32px;
+  padding:4px 8px!important;
+  font-family:var(--font-mono)!important;
+  font-size:0.85rem!important;
+  text-align:right;
 }
 input:focus:not([type=checkbox]):not([type=radio]),select:focus{
   outline:none!important;border-color:var(--accent)!important;
@@ -125,8 +395,8 @@ select{
   background-size:16px!important;padding-right:32px!important
 }
 select option{background:#ffffff!important;color:#1a1a1a!important;padding:8px 12px!important}
-input[type=file]{background:#ffffff!important;border:1px solid #e5e7eb!important;
-  border-radius:6px!important;padding:8px 12px!important;color:#1a1a1a!important;font-size:14px!important
+input[type=file]{background:var(--card-background)!important;border:1.5px solid var(--border-color)!important;
+  border-radius:6px!important;padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important
 }
 #versionInfo{color:#00bfff;font-weight:500}
 #crcNote,#parseResult{color:#8b949e;font-style:italic}
@@ -141,7 +411,7 @@ input[type=file]{background:#ffffff!important;border:1px solid #e5e7eb!important
 .status-text{font-weight:600;color:#f85149;margin-bottom:8px}
 .status-text.connected{color:#3fb950}
 .log-display{
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-family:var(--font-mono);
   font-size:12px;color:#8b949e;max-height:200px;overflow-y:auto;white-space:pre-wrap
 }
 .log-entry{margin-bottom:2px}
@@ -481,16 +751,41 @@ a:hover {
     })();
   </script>
 </head>
-<body>
-  <div class="col">
-    <div class="breadcrumb">
-      <a href="https://opendisplay.org/index.html">Home</a><span class="breadcrumb-separator">/</span>
-      <a href="https://opendisplay.org/firmware/index.html">Firmware</a><span class="breadcrumb-separator">/</span>
-      <span>Toolbox</span>
+<body class="page-inner tool-ui">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-bar">
+    <div class="site-bar__accent" aria-hidden="true"></div>
+    <div class="site-bar__inner">
+      <a href="../../index.html" class="site-bar__brand" aria-label="OpenDisplay home">
+        <img src="../../assets/brand/logo-mark.svg" alt="" class="site-bar__mark" width="24" height="24">
+        <span class="site-bar__wordmark">OpenDisplay</span>
+      </a>
+      <div class="site-bar__icons">
+        <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="OpenDisplay on GitHub (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="Join OpenDisplay on Discord (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+      </div>
     </div>
-  </div>
-  <h1>OpenDisplay Toolbox</h1>
-  <div class="col panel" id="bleConnectionPanel" style="display: none;">
+  </header>
+
+  <main id="main-content" class="tool-page">
+    <div class="container">
+<h1>OpenDisplay Toolbox</h1>
+
+<div class="toolbox-intro">
+  <ul class="toolbox-requirements">
+    <li>Use <strong>Chrome</strong> or <strong>Edge</strong></li>
+    <li>USB cable for firmware install</li>
+    <li>Bluetooth for configuration (device powered on and in range)</li>
+    <li>Don't have hardware yet? <a href="../../what-hardware-to-buy.html">See what to buy</a></li>
+  </ul>
+</div>
+
+    <div class="col panel" id="bleConnectionPanel" style="display: none;">
     <label>
       BLE Connection
       <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
@@ -547,11 +842,65 @@ a:hover {
       </div>
     </div>
   </div>
+
     <div class="col panel" id="simpleConfigPanel" style="display: none;">
       <div class="ble-controls">
-      <div style="background: #d29922; color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; line-height: 1.5;">
-        <strong>⚠️ Important:</strong> First, install the firmware on your device using the "Install Firmware" button below. Then configure your device using the "Configure Device" button.
+
+      <section class="toolbox-step" id="toolboxStep1">
+        <h2 class="toolbox-step__title"><span class="toolbox-step__num">1</span> Choose hardware</h2>
+        <p class="toolbox-step__hint toolbox-step__hint--presets">Not sure? Click your device below — we'll fill in the rest.</p>
+
+        <div id="premadeConfigSection">
+          <div id="presetGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div class="preset-option" data-preset="reterminal-e1001" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1001.jpg" alt="reTerminal E1001" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1001</label>
       </div>
+      <div class="preset-option" data-preset="reterminal-e1002" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1002.jpg" alt="reTerminal E1002" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1002</label>
+      </div>
+      <div class="preset-option" data-preset="reterminal-e1003" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/RTE1003.jpg" alt="reTerminal E1003" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1003</label>
+      </div>
+      <div class="preset-option" data-preset="esp32-s3-wspp" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/WSPPS3.jpg" alt="Waveshare ESP32-S3-PhotoPainter" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Waveshare ESP32-S3-PhotoPainter</label>
+      </div>
+      <div class="preset-option" data-preset="xiao-75-c3" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/75.jpg" alt="Seeed XIAO 7.5" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed XIAO 7.5"</label>
+      </div>
+      <div class="preset-option" data-preset="xiao-75-s3-og" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
+        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
+          <img src="img/75og.jpg" alt="Seeed 7.5 diy" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+        </div>
+        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed 7.5" diy</label>
+      </div>
+          </div>
+        </div>
+
+        <p class="toolbox-or">Or choose manually</p>
+
+        <ul id="toolboxChecklist" class="toolbox-checklist" aria-label="Setup progress">
+          <li id="checkDriverBoard" class="toolbox-checklist__item"><span class="toolbox-checklist__mark" aria-hidden="true">○</span> Driver board selected</li>
+          <li id="checkDisplay" class="toolbox-checklist__item"><span class="toolbox-checklist__mark" aria-hidden="true">○</span> Display selected</li>
+          <li id="checkPower" class="toolbox-checklist__item"><span class="toolbox-checklist__mark" aria-hidden="true">○</span> Power option selected</li>
+          <li id="checkFirmware" class="toolbox-checklist__item"><span class="toolbox-checklist__mark" aria-hidden="true">○</span> Firmware installed</li>
+          <li id="checkConfigured" class="toolbox-checklist__item"><span class="toolbox-checklist__mark" aria-hidden="true">○</span> Device configured</li>
+        </ul>
+
       <div class="ble-input-group">
         <label for="driverBoardSelect">
           Driver Board:
@@ -604,77 +953,58 @@ a:hover {
           <option value="">-- Select power option --</option>
         </select>
       </div>
+      </section>
+
+      <section class="toolbox-step toolbox-step--more">
+        <h2 class="toolbox-step__title">More options</h2>
       <div class="encryption-option">
-        <label class="encryption-option-label" for="initRandomEncryptionCb">
-          <input type="checkbox" id="initRandomEncryptionCb" />
-          <span>Activate encryption</span>
-        </label>
+        <div class="encryption-slider-wrap">
+          <input type="range" id="initRandomEncryptionSlider" class="encryption-slider-input" min="0" max="1" step="1" value="1" aria-label="Encryption" aria-valuetext="Locked" />
+          <svg class="encryption-slider-icon encryption-slider-icon--left" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.65 1.35-3 3-3s3 1.35 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+          <svg class="encryption-slider-icon encryption-slider-icon--right" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </div>
+        <p id="encryptionHint" class="encryption-hint">Locked (recommended) — generates a random key. Save your setup link after configuring if you need to reconnect later.</p>
       </div>
-      <div id="installButtonContainer" style="margin-top: 12px; display: none; width: 100%;">
+      <div class="esp-deep-sleep-option" id="espDeepSleepGroup" style="display: none;">
+        <label for="espDeepSleepSlider">Deep sleep between updates</label>
+        <div class="esp-deep-sleep-row">
+          <input type="range" id="espDeepSleepSlider" min="0" max="43200" step="60" value="0" />
+          <button type="button" class="esp-deep-sleep-value" id="espDeepSleepValue" title="Click to enter minutes">Off</button>
+          <input type="number" id="espDeepSleepMinutesInput" class="esp-deep-sleep-minutes" min="0" max="720" step="1" value="0" style="display: none;" aria-label="Deep sleep in minutes" />
+        </div>
+      </div>
+      </section>
+
+      <section class="toolbox-step" id="toolboxStep2">
+        <h2 class="toolbox-step__title"><span class="toolbox-step__num">2</span> Install firmware (USB)</h2>
+        <p class="toolbox-step__hint">Connect your board with a USB cable. Use Chrome or Edge when prompted.</p>
+      <div id="installButtonContainer" style="margin-top: 0; display: none; width: 100%;">
         <esp-web-install-button id="firmwareInstallButton" style="display: none; width: 100%;">
-          <button slot="activate" id="installFirmwareBtn" style="width: 100%; margin: 0;">Install Firmware</button>
+          <button slot="activate" id="installFirmwareBtn" style="width: 100%; margin: 0;">Install firmware (USB)</button>
         </esp-web-install-button>
-        <button type="button" id="installNrfBtn" style="display: none; width: 100%; margin: 0;">Install Firmware</button>
+        <button type="button" id="installNrfBtn" style="display: none; width: 100%; margin: 0;">Install firmware (USB)</button>
       </div>
-      <div class="ble-actions" style="margin-top: 12px;">
-        <button type="button" id="simpleAutoInstallBtn" style="width: 100%;" title="Automatically connect to your device and configure it with the selected settings. Make sure your device is powered on and in range.">Configure Device</button>
+      </section>
+
+      <section class="toolbox-step" id="toolboxStep3">
+        <h2 class="toolbox-step__title"><span class="toolbox-step__num">3</span> Configure over Bluetooth</h2>
+        <p class="toolbox-step__hint">Power on your device and keep it in range. Bluetooth must be enabled on this computer.</p>
+        <div id="simpleConfigStatus" class="toolbox-status toolbox-status--pending" role="status">Select your driver board, display, and power option to continue.</div>
+      <div class="ble-actions" style="margin-top: 0;">
+        <button type="button" id="simpleAutoInstallBtn" style="width: 100%;" title="Connect over Bluetooth and write your selected settings to the device">Configure over Bluetooth</button>
       </div>
-      <div class="ble-actions" style="margin-top: 12px;">
-        <button type="button" id="switchToFullModeBtn" style="width: 100%; background: #6b7280; color: #fff; opacity: 0.7;" title="Switch to advanced mode where you can edit individual BLE packets and fine-tune all configuration parameters">Switch to Full Mode</button>
+      </section>
+
+      <section class="toolbox-advanced">
+        <p class="toolbox-advanced__label">Advanced</p>
+      <div class="ble-actions" style="margin-top: 0;">
+        <button type="button" id="shareSimpleConfigBtn" class="toolbox-advanced-btn" title="Copy a link with your driver board, display, and power settings">Copy setup link</button>
       </div>
-      <div class="ble-actions" style="margin-top: 12px;">
-        <button type="button" id="shareSimpleConfigBtn" style="width: 100%; background: #6b7280; color: #fff; opacity: 1;" title="Share this simple configuration (driver board, display, and/or battery) via a link">Share Simple Config</button>
+      <div class="ble-actions">
+        <button type="button" id="switchToFullModeBtn" class="toolbox-advanced-btn" title="Edit individual BLE packets and fine-tune all configuration parameters">Advanced: edit packets</button>
       </div>
-    </div>
-  </div>
-  <div class="col panel" id="premadeConfigPanel">
-    <label>
-      Premade Configurations
-      <span class="tooltip-wrapper" tabindex="0" role="button" aria-label="Help">
-        <span class="tooltip-icon">?</span>
-        <span class="tooltip-content">
-          <strong>Premade Configurations</strong>
-          Click on a preset image to quickly configure your device. These presets automatically select the correct driver board, display, and power settings for popular hardware combinations. After selecting a preset, you can still modify the configuration if needed.
-        </span>
-      </span>
-    </label>
-    <div id="presetGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
-      <div class="preset-option" data-preset="reterminal-e1001" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/RTE1001.jpg" alt="reTerminal E1001" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1001</label>
-      </div>
-      <div class="preset-option" data-preset="reterminal-e1002" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/RTE1002.jpg" alt="reTerminal E1002" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1002</label>
-      </div>
-      <div class="preset-option" data-preset="reterminal-e1003" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/RTE1003.jpg" alt="reTerminal E1003" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">reTerminal E1003</label>
-      </div>
-      <div class="preset-option" data-preset="esp32-s3-wspp" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/WSPPS3.jpg" alt="Waveshare ESP32-S3-PhotoPainter" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Waveshare ESP32-S3-PhotoPainter</label>
-      </div>
-      <div class="preset-option" data-preset="xiao-75-c3" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/75.jpg" alt="Seeed XIAO 7.5" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed XIAO 7.5"</label>
-      </div>
-      <div class="preset-option" data-preset="xiao-75-s3-og" style="border-radius: 8px; border: 1px solid var(--border-color); padding: 0; background: var(--card-background); transition: all 0.2s ease; cursor: pointer; display: flex; flex-direction: column; align-items: stretch; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-        <div style="width: 100%; aspect-ratio: 16 / 9; background: var(--card-background); display: block; overflow: hidden; position: relative;">
-          <img src="img/75og.jpg" alt="Seeed 7.5 diy" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
-        </div>
-        <label style="font-weight: 500; font-size: 14px; margin: 0; padding: 12px; text-align: center; color: var(--foreground); cursor: pointer;">Seeed 7.5" diy</label>
-      </div>
+      </section>
+
     </div>
   </div>
   <div class="col panel" id="builderUIPanel" style="display: none;">
@@ -1197,6 +1527,9 @@ let schema = null;
 let instances = {};
 let simpleConfigMode = true;
 let simpleConfigSelections = { driverBoard: null, display: null, power: null };
+let toolboxFirmwareInstalled = false;
+let toolboxDeviceConfigured = false;
+const TOOLBOX_CONFIGURE_BTN_LABEL = 'Configure over Bluetooth';
 
 // Simple config presets database - loaded from JSON file
 let simpleConfigPresets = null;
@@ -1227,6 +1560,7 @@ function renderBuilder(){
   const versRow = document.createElement('div'); versRow.className='field-row';
   const vlabel = document.createElement('label'); vlabel.textContent='Protocol version'; versRow.appendChild(vlabel);
   const vinput = document.createElement('input'); vinput.type='number'; vinput.value = schema.version || 1; vinput.min=0; vinput.style.width='80px'; versRow.appendChild(vinput);
+  versRow.style.display = 'none';
   container.appendChild(versRow);
   const pktList = document.createElement('div'); pktList.id='pktList';
   for(const k of Object.keys(schema.packet_types)){
@@ -1418,7 +1752,7 @@ function renderBuilder(){
     }
     cont.appendChild(card);
   }
-  container._getVersion = ()=> parseInt(container.querySelector('input[type=number]').value||schema.version||1,10);
+  container._getVersion = ()=> parseInt(vinput.value || schema.version || 1, 10);
 }
 function collectPacketBytes(){ if(!schema) { alert('Load schema first'); return null; }
   // If in simple config mode and all selections are made, merge them into instances
@@ -1690,6 +2024,9 @@ function setupPresetOptions() {
           const powerSelect = document.getElementById('powerSelect');
           powerSelect.value = mapping.power;
           handlePowerChange();
+          setTimeout(function () {
+            scrollToToolboxStep('toolboxStep2');
+          }, 50);
         }, 100);
       }, 100);
     });
@@ -1852,6 +2189,7 @@ function renderBuilderFromInstances(){
   const versRow = document.createElement('div'); versRow.className='field-row';
   const vlabel = document.createElement('label'); vlabel.textContent='Protocol version'; versRow.appendChild(vlabel);
   const vinput = document.createElement('input'); vinput.type='number'; vinput.value = schema.version || 1; vinput.min=0; vinput.style.width='80px'; versRow.appendChild(vinput);
+  versRow.style.display = 'none';
   container.appendChild(versRow);
   const pktList = document.createElement('div');
   for(const k of Object.keys(schema.packet_types)){
@@ -2028,7 +2366,7 @@ function renderBuilderFromInstances(){
     pktList.appendChild(box);
   }
   container.appendChild(pktList);
-  container._getVersion = ()=> parseInt(container.querySelector('input[type=number]').value||schema.version||1,10);
+  container._getVersion = ()=> parseInt(vinput.value || schema.version || 1, 10);
   for(const k of Object.keys(schema.packet_types)){
     updateAddButtonVisibility(k);
   }
@@ -2049,12 +2387,17 @@ function renderBuilderFromInstances(){
 }
 async function loadYamlFromFile() {
   try {
-    // Load presets and YAML in parallel
+    // Load presets + YAML (prefer local config.yaml, fallback to hosted copy)
     const [presetsResponse, yamlResponse] = await Promise.all([
       loadSimpleConfigPresets(),
-      fetch('https://opendisplay.org/firmware/toolbox/config.yaml')
+      (async function () {
+        let r = await fetch('config.yaml');
+        if (r.ok) return r;
+        r = await fetch('https://opendisplay.org/firmware/toolbox/config.yaml');
+        return r;
+      })()
     ]);
-    
+
     if (!yamlResponse.ok) {
       throw new Error(`HTTP error! status: ${yamlResponse.status}`);
     }
@@ -2392,7 +2735,6 @@ function initializeSimpleConfigMode() {
   // Show simple config panel, hide builder and other panels
   // Set visibility immediately (panels already start hidden, so no flashing)
   document.getElementById('simpleConfigPanel').style.display = 'block';
-  document.getElementById('premadeConfigPanel').style.display = 'block';
   document.getElementById('builderUIPanel').style.display = 'none';
   document.getElementById('bleConnectionPanel').style.display = 'none';
   document.getElementById('finishedBytesPanel').style.display = 'none';
@@ -2405,6 +2747,70 @@ function initializeSimpleConfigMode() {
   driverBoardSelect.onchange = handleDriverBoardChange;
   document.getElementById('displaySelect').onchange = handleDisplayChange;
   powerSelect.onchange = handlePowerChange;
+  const espDeepSleepSlider = document.getElementById('espDeepSleepSlider');
+  if (espDeepSleepSlider) {
+    espDeepSleepSlider.oninput = updateEspDeepSleepLabel;
+  }
+  const encSlider = document.getElementById('initRandomEncryptionSlider');
+  if (encSlider) {
+    const encWrap = encSlider.closest('.encryption-slider-wrap');
+    const encThumbSize = 32;
+    const encTrackIconInset = 14;
+    const leftIcon = encWrap ? encWrap.querySelector('.encryption-slider-icon--left') : null;
+    const rightIcon = encWrap ? encWrap.querySelector('.encryption-slider-icon--right') : null;
+
+    function getEncThumbCenterX(slider) {
+      const min = parseFloat(slider.min);
+      const max = parseFloat(slider.max);
+      const val = parseFloat(slider.value);
+      const ratio = max === min ? 0 : (val - min) / (max - min);
+      return ratio * (slider.offsetWidth - encThumbSize) + encThumbSize / 2;
+    }
+
+    function positionEncTrackIcon(icon, side) {
+      if (!icon) return;
+      icon.style.left = side === 'left' ? encTrackIconInset + 'px' : '';
+      icon.style.right = side === 'right' ? encTrackIconInset + 'px' : '';
+      icon.style.transform = 'translateY(-50%)';
+    }
+
+    function positionEncThumbIcon(icon, slider) {
+      if (!icon) return;
+      icon.style.right = 'auto';
+      icon.style.left = getEncThumbCenterX(slider) + 'px';
+      icon.style.transform = 'translate(-50%, -50%)';
+    }
+
+    const syncEncSliderA11y = function () {
+      const locked = encSlider.value === '1';
+      encSlider.setAttribute('aria-valuetext', locked ? 'Locked' : 'Unlocked');
+      encSlider.style.setProperty('--enc-track', locked ? 'var(--accent)' : 'var(--od-paper-3, #d8d4cc)');
+      if (encWrap) {
+        encWrap.style.setProperty('--enc-icon-left-color', locked ? 'rgba(255,255,255,.92)' : 'var(--accent)');
+        encWrap.style.setProperty('--enc-icon-right-color', locked ? 'var(--accent)' : 'var(--muted-foreground)');
+      }
+      if (locked) {
+        positionEncTrackIcon(leftIcon, 'left');
+        positionEncThumbIcon(rightIcon, encSlider);
+      } else {
+        positionEncThumbIcon(leftIcon, encSlider);
+        positionEncTrackIcon(rightIcon, 'right');
+      }
+      const encHint = document.getElementById('encryptionHint');
+      if (encHint) {
+        encHint.textContent = locked
+          ? 'Locked (recommended) — generates a random key. Save your setup link after configuring if you need to reconnect later.'
+          : 'Unlocked — no BLE encryption (testing only). Most people should leave this locked.';
+      }
+    };
+    encSlider.oninput = syncEncSliderA11y;
+    encSlider.onchange = syncEncSliderA11y;
+    window.addEventListener('resize', syncEncSliderA11y);
+    syncEncSliderA11y();
+    requestAnimationFrame(syncEncSliderA11y);
+  }
+  initEspDeepSleepEditor();
+  initToolboxInstallTracking();
   document.getElementById('switchToFullModeBtn').onclick = switchToFullMode;
   document.getElementById('simpleAutoInstallBtn').onclick = startSimpleAutoInstall;
   document.getElementById('shareSimpleConfigBtn').onclick = shareSimpleConfig;
@@ -2414,6 +2820,110 @@ function initializeSimpleConfigMode() {
   
   // Check if URL has a simple config parameter
   loadSimpleConfigFromUrl();
+}
+
+const ESP_DEEP_SLEEP_MAX_SECONDS = 12 * 60 * 60;
+const ESP_DEEP_SLEEP_MAX_MINUTES = ESP_DEEP_SLEEP_MAX_SECONDS / 60;
+
+function isEsp32DriverBoard(board) {
+  return !!(board && board.installConfig && board.installConfig.type === 'esp32');
+}
+
+function espDeepSleepSecondsToMinutes(seconds) {
+  return Math.round(Math.max(0, parseInt(seconds, 10) || 0) / 60);
+}
+
+function formatEspDeepSleepLabel(seconds) {
+  const sec = Math.max(0, parseInt(seconds, 10) || 0);
+  if (sec === 0) return 'Off';
+  return espDeepSleepSecondsToMinutes(sec) + ' min';
+}
+
+function setEspDeepSleepFromMinutes(minutes) {
+  const slider = document.getElementById('espDeepSleepSlider');
+  if (!slider) return;
+  let min = parseInt(minutes, 10);
+  if (!Number.isFinite(min) || min < 0) min = 0;
+  min = Math.min(min, ESP_DEEP_SLEEP_MAX_MINUTES);
+  slider.value = String(min * 60);
+  updateEspDeepSleepLabel();
+}
+
+function updateEspDeepSleepLabel() {
+  const slider = document.getElementById('espDeepSleepSlider');
+  const btn = document.getElementById('espDeepSleepValue');
+  const input = document.getElementById('espDeepSleepMinutesInput');
+  if (!slider || !btn) return;
+  btn.textContent = formatEspDeepSleepLabel(slider.value);
+  if (input && input.style.display !== 'none') {
+    input.value = String(espDeepSleepSecondsToMinutes(slider.value));
+  }
+}
+
+function finishEspDeepSleepEdit(commit) {
+  const btn = document.getElementById('espDeepSleepValue');
+  const input = document.getElementById('espDeepSleepMinutesInput');
+  if (!btn || !input) return;
+  if (commit) {
+    setEspDeepSleepFromMinutes(input.value);
+  } else {
+    updateEspDeepSleepLabel();
+  }
+  input.style.display = 'none';
+  btn.style.display = 'inline-block';
+}
+
+function startEspDeepSleepEdit() {
+  const btn = document.getElementById('espDeepSleepValue');
+  const input = document.getElementById('espDeepSleepMinutesInput');
+  const slider = document.getElementById('espDeepSleepSlider');
+  if (!btn || !input || !slider) return;
+  input.value = String(espDeepSleepSecondsToMinutes(slider.value));
+  btn.style.display = 'none';
+  input.style.display = 'block';
+  input.focus();
+  input.select();
+}
+
+function initEspDeepSleepEditor() {
+  const btn = document.getElementById('espDeepSleepValue');
+  const input = document.getElementById('espDeepSleepMinutesInput');
+  if (!btn || !input) return;
+  btn.onclick = startEspDeepSleepEdit;
+  input.onblur = function () { finishEspDeepSleepEdit(true); };
+  input.onkeydown = function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      finishEspDeepSleepEdit(true);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      finishEspDeepSleepEdit(false);
+    }
+  };
+}
+
+function updateEspDeepSleepVisibility(board) {
+  const group = document.getElementById('espDeepSleepGroup');
+  const slider = document.getElementById('espDeepSleepSlider');
+  if (!group || !slider) return;
+  const show = isEsp32DriverBoard(board);
+  group.style.display = show ? 'block' : 'none';
+  if (!show) {
+    slider.value = '0';
+    const btn = document.getElementById('espDeepSleepValue');
+    const input = document.getElementById('espDeepSleepMinutesInput');
+    if (input) input.style.display = 'none';
+    if (btn) btn.style.display = 'inline-block';
+    updateEspDeepSleepLabel();
+  }
+}
+
+function getEspDeepSleepSeconds() {
+  const slider = document.getElementById('espDeepSleepSlider');
+  if (!slider || !isEsp32DriverBoard(simpleConfigSelections.driverBoard)) return 0;
+  const sec = parseInt(slider.value, 10);
+  if (!Number.isFinite(sec) || sec < 0) return 0;
+  return Math.min(sec, ESP_DEEP_SLEEP_MAX_SECONDS);
 }
 
 function handleDriverBoardChange() {
@@ -2433,17 +2943,28 @@ function handleDriverBoardChange() {
     displaySelect.disabled = true;
     displaySelect.innerHTML = '<option value="">-- Select display --</option>';
     simpleConfigSelections.driverBoard = null;
+    toolboxFirmwareInstalled = false;
+    toolboxDeviceConfigured = false;
     installButtonContainer.style.display = 'none';
+    updateEspDeepSleepVisibility(null);
     updateSwitchToFullModeButton();
     return;
   }
   
   const selectedBoard = simpleConfigPresets.driverBoards.find(b => b.id === selectedBoardId);
   simpleConfigSelections.driverBoard = selectedBoard;
+  toolboxFirmwareInstalled = false;
+  toolboxDeviceConfigured = false;
+  updateEspDeepSleepVisibility(selectedBoard);
   
   // Show install button if board has install config
   if (selectedBoard.installConfig) {
-    installButtonContainer.style.display = 'block';
+    const installType = selectedBoard.installConfig.type;
+    if (installType === 'esp32' || installType === 'nrf52840') {
+      installButtonContainer.style.display = 'block';
+    } else {
+      installButtonContainer.style.display = 'none';
+    }
     if (selectedBoard.installConfig.type === 'esp32') {
       firmwareInstallButton.style.display = 'block';
       installNrfBtn.style.display = 'none';
@@ -2462,7 +2983,11 @@ function handleDriverBoardChange() {
           alert('nRF Web Tools library not loaded. Please refresh the page.');
         };
       }
+    } else {
+      firmwareInstallButton.style.display = 'none';
+      installNrfBtn.style.display = 'none';
     }
+    initToolboxInstallTracking();
   } else {
     installButtonContainer.style.display = 'none';
   }
@@ -2679,6 +3204,77 @@ function loadSimpleConfigFromUrl() {
   }
 }
 
+function scrollToToolboxStep(stepId) {
+  const step = document.getElementById(stepId);
+  if (!step) return;
+  requestAnimationFrame(function () {
+    step.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+function setToolboxChecklistItem(id, done) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('toolbox-checklist__item--done', !!done);
+  const mark = el.querySelector('.toolbox-checklist__mark');
+  if (mark) mark.textContent = done ? '✓' : '○';
+}
+
+function updateToolboxChecklist() {
+  setToolboxChecklistItem('checkDriverBoard', !!simpleConfigSelections.driverBoard);
+  setToolboxChecklistItem('checkDisplay', !!simpleConfigSelections.display);
+  setToolboxChecklistItem('checkPower', !!simpleConfigSelections.power);
+  setToolboxChecklistItem('checkFirmware', toolboxFirmwareInstalled);
+  setToolboxChecklistItem('checkConfigured', toolboxDeviceConfigured);
+}
+
+function setSimpleConfigStatus(message, kind) {
+  const el = document.getElementById('simpleConfigStatus');
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'toolbox-status toolbox-status--' + (kind || 'pending');
+}
+
+function updateSimpleConfigStatus() {
+  const btn = document.getElementById('simpleAutoInstallBtn');
+  if (btn && btn.disabled && btn.textContent === 'Configuring...') return;
+
+  const missing = [];
+  if (!simpleConfigSelections.driverBoard) missing.push('driver board');
+  if (!simpleConfigSelections.display) missing.push('display');
+  if (!simpleConfigSelections.power) missing.push('power option');
+
+  if (toolboxDeviceConfigured) {
+    setSimpleConfigStatus('Done — your device is configured. Open the BLE Tester to upload images.', 'success');
+  } else if (missing.length > 0) {
+    setSimpleConfigStatus('Select ' + missing.join(', ') + ' to continue.', 'pending');
+  } else if (!toolboxFirmwareInstalled) {
+    setSimpleConfigStatus('Hardware selected. Install firmware over USB (step 2), then configure over Bluetooth.', 'pending');
+  } else {
+    setSimpleConfigStatus('Ready — power on your device and click Configure over Bluetooth.', 'ready');
+  }
+}
+
+function markToolboxFirmwareInstalled() {
+  toolboxFirmwareInstalled = true;
+  toolboxDeviceConfigured = false;
+  updateToolboxChecklist();
+  updateSimpleConfigStatus();
+}
+
+function initToolboxInstallTracking() {
+  const espBtn = document.getElementById('installFirmwareBtn');
+  const nrfBtn = document.getElementById('installNrfBtn');
+  if (espBtn && !espBtn.dataset.toolboxTracked) {
+    espBtn.dataset.toolboxTracked = '1';
+    espBtn.addEventListener('click', markToolboxFirmwareInstalled);
+  }
+  if (nrfBtn && !nrfBtn.dataset.toolboxTracked) {
+    nrfBtn.dataset.toolboxTracked = '1';
+    nrfBtn.addEventListener('click', markToolboxFirmwareInstalled);
+  }
+}
+
 function updateSwitchToFullModeButton() {
   const autoInstallBtn = document.getElementById('simpleAutoInstallBtn');
   if (!autoInstallBtn) return;
@@ -2701,6 +3297,9 @@ function updateSwitchToFullModeButton() {
     shareSimpleConfigBtn.style.opacity = '1';
     shareSimpleConfigBtn.style.cursor = 'pointer';
   }
+
+  updateToolboxChecklist();
+  updateSimpleConfigStatus();
 }
 
 function updateBleConnectionButtons() {
@@ -2753,7 +3352,6 @@ function switchToFullMode() {
   simpleConfigMode = false;
   // Set visibility immediately
   document.getElementById('simpleConfigPanel').style.display = 'none';
-  document.getElementById('premadeConfigPanel').style.display = 'none';
   document.getElementById('builderUIPanel').style.display = 'block';
   document.getElementById('bleConnectionPanel').style.display = 'block';
   document.getElementById('finishedBytesPanel').style.display = 'block';
@@ -2802,36 +3400,53 @@ async function startSimpleAutoInstall() {
   
   simpleAutoInstallBtn.disabled = true;
   simpleAutoInstallBtn.textContent = 'Configuring...';
+  setSimpleConfigStatus('Connecting to your device…', 'busy');
   try {
     updateProgressBar(0, 'Starting...');
     addLog('Starting auto-install sequence from simple config...', 'info');
     
     updateProgressBar(10, 'Connecting...');
+    setSimpleConfigStatus('Connecting to your device…', 'busy');
     addLog('Step 1: Connecting to BLE device...', 'info');
     await connectToBleDevice();
     
     updateProgressBar(30, 'Stabilizing...');
+    setSimpleConfigStatus('Connection established. Preparing to write settings…', 'busy');
     addLog('Step 2: Waiting for connection to stabilize...', 'info');
     await bleLib.delay(2000);
     
     updateProgressBar(50, 'Writing config...');
+    setSimpleConfigStatus('Writing configuration to your device…', 'busy');
     addLog('Step 3: Writing config to device...', 'info');
     await writeConfigToDevice();
     
+    addLog('Step 4: Waiting before reboot...', 'info');
+    setSimpleConfigStatus('Finishing write. Waiting before reboot…', 'busy');
+    await bleLib.delay(2500);
+    
     updateProgressBar(90, 'Rebooting...');
+    setSimpleConfigStatus('Rebooting device…', 'busy');
     addLog('Step 5: Rebooting device...', 'info');
-    reboot();
+    await reboot();
+    
+    addLog('Step 6: Waiting after reboot...', 'info');
+    setSimpleConfigStatus('Reboot sent. Waiting for device to restart…', 'busy');
+    await bleLib.delay(2500);
     
     updateProgressBar(100, 'Complete!');
     addLog('Auto-install sequence completed!', 'success');
+    toolboxDeviceConfigured = true;
     simpleAutoInstallBtn.disabled = false;
-    simpleAutoInstallBtn.textContent = 'Configure Device';
+    simpleAutoInstallBtn.textContent = TOOLBOX_CONFIGURE_BTN_LABEL;
+    updateToolboxChecklist();
+    setSimpleConfigStatus('Done — your device is configured. Open the BLE Tester to upload images.', 'success');
     redirectToDisplayTesterAfterAutoInstall();
   } catch (error) {
     updateProgressBar(0, 'Failed');
     addLog(`Auto-install failed: ${error.message}`, 'error');
     simpleAutoInstallBtn.disabled = false;
-    simpleAutoInstallBtn.textContent = 'Configure Device';
+    simpleAutoInstallBtn.textContent = TOOLBOX_CONFIGURE_BTN_LABEL;
+    updateSimpleConfigStatus();
     alert('Auto-install failed: ' + error.message);
   }
 }
@@ -3025,6 +3640,35 @@ async function uploadTestImageAfterReboot() {
   }
 }
 
+function simpleConfigPresetIndex(item, list) {
+  if (!item || !list) return 0;
+  if (item.index != null && item.index !== '') return Number(item.index);
+  const i = list.findIndex(x => x.id === item.id);
+  return i >= 0 ? i + 1 : 0;
+}
+
+function applySimpleConfigManufacturerFields(baseFields, driverBoard, display, power) {
+  const fields = { ...baseFields };
+  delete fields.reserved;
+  if (driverBoard && simpleConfigPresets) {
+    fields.simple_config_driver_index = String(
+      simpleConfigPresetIndex(driverBoard, simpleConfigPresets.driverBoards)
+    );
+  }
+  if (display && simpleConfigPresets) {
+    fields.simple_config_display_index = String(
+      simpleConfigPresetIndex(display, simpleConfigPresets.displays)
+    );
+    fields.simple_config_configured_at = String(Math.floor(Date.now() / 1000));
+  }
+  if (power && simpleConfigPresets) {
+    fields.simple_config_power_index = String(
+      simpleConfigPresetIndex(power, simpleConfigPresets.powerOptions)
+    );
+  }
+  return fields;
+}
+
 function mergeSimpleConfigToFull() {
   if (!schema) {
     alert('Schema not loaded. Cannot merge config.');
@@ -3049,14 +3693,20 @@ function mergeSimpleConfigToFull() {
     }
     
     // Add manufacturer_data packet if driver board is selected
+    const manufacturerFields = applySimpleConfigManufacturerFields(
+      simpleConfigSelections.driverBoard.manufacturerData,
+      simpleConfigSelections.driverBoard,
+      simpleConfigSelections.display,
+      simpleConfigSelections.power
+    );
     const existingManufacturerData = instances.packets.find(p => p.pid === '2');
     if (existingManufacturerData) {
-      existingManufacturerData.fields = { ...simpleConfigSelections.driverBoard.manufacturerData };
+      existingManufacturerData.fields = manufacturerFields;
     } else {
       const manufacturerDataInst = {
         uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
         pid: '2',
-        fields: { ...simpleConfigSelections.driverBoard.manufacturerData }
+        fields: manufacturerFields
       };
       instances.packets.push(manufacturerDataInst);
     }
@@ -3077,6 +3727,9 @@ function mergeSimpleConfigToFull() {
       if (simpleConfigSelections.driverBoard.powerDefaults.deep_sleep_current_ua !== undefined) {
         powerOptionFields.deep_sleep_current_ua = simpleConfigSelections.driverBoard.powerDefaults.deep_sleep_current_ua;
       }
+    }
+    if (isEsp32DriverBoard(simpleConfigSelections.driverBoard)) {
+      powerOptionFields.deep_sleep_time_seconds = String(getEspDeepSleepSeconds());
     }
     
     const existingPowerOption = instances.packets.find(p => p.pid === '4');
@@ -3158,6 +3811,36 @@ function mergeSimpleConfigToFull() {
     }
   }
 
+  // Add nfc_config packet if driver board has NFC configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.nfcConfig) {
+    const existingNfc = instances.packets.find(p => p.pid === '42' && p.fields.instance_number === '0x0');
+    if (existingNfc) {
+      existingNfc.fields = { ...simpleConfigSelections.driverBoard.nfcConfig };
+    } else {
+      const nfcInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '42',
+        fields: { ...simpleConfigSelections.driverBoard.nfcConfig }
+      };
+      instances.packets.push(nfcInst);
+    }
+  }
+
+  // Add flash_config packet if driver board has flash configuration
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.flashConfig) {
+    const existingFlash = instances.packets.find(p => p.pid === '43' && p.fields.instance_number === '0x0');
+    if (existingFlash) {
+      existingFlash.fields = { ...simpleConfigSelections.driverBoard.flashConfig };
+    } else {
+      const flashInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '43',
+        fields: { ...simpleConfigSelections.driverBoard.flashConfig }
+      };
+      instances.packets.push(flashInst);
+    }
+  }
+
   if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.touchController) {
     const existingTouch = instances.packets.find(p => p.pid === '40' && p.fields.instance_number === '0x0');
     if (existingTouch) {
@@ -3169,6 +3852,20 @@ function mergeSimpleConfigToFull() {
         fields: { ...simpleConfigSelections.driverBoard.touchController }
       };
       instances.packets.push(touchInst);
+    }
+  }
+
+  if (simpleConfigSelections.driverBoard && simpleConfigSelections.driverBoard.buzzerConfig) {
+    const existingBuzzer = instances.packets.find(p => p.pid === '41' && p.fields.instance_number === '0x0');
+    if (existingBuzzer) {
+      existingBuzzer.fields = { ...simpleConfigSelections.driverBoard.buzzerConfig };
+    } else {
+      const buzzerInst = {
+        uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        pid: '41',
+        fields: { ...simpleConfigSelections.driverBoard.buzzerConfig }
+      };
+      instances.packets.push(buzzerInst);
     }
   }
   
@@ -3190,8 +3887,8 @@ function mergeSimpleConfigToFull() {
   instances.packets = instances.packets.filter(function (p) {
     return !(p.pid === '39' && p._autoToolboxSecurity);
   });
-  const encCb = document.getElementById('initRandomEncryptionCb');
-  if (encCb && encCb.checked) {
+  const encSlider = document.getElementById('initRandomEncryptionSlider');
+  if (encSlider && encSlider.value === '1') {
     const keyBytes = new Uint8Array(16);
     crypto.getRandomValues(keyBytes);
     const keyHex = Array.from(keyBytes, function (b) {
@@ -3281,19 +3978,54 @@ function createDisplayConfig(display, driverBoardId) {
 
 loadYamlFromFile();
 </script>
-  <div class="col panel footer">
-    <div class="footer-links">
-      <a href="https://opendisplay.org/index.html">Home</a>
-      <span class="footer-separator">•</span>
-      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
-      <span class="footer-separator">•</span>
-      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
-      <span class="footer-separator">•</span>
-      <a href="https://opendisplay.org/impressum.html">imprint (Impressum)</a>
-      <span class="footer-separator">•</span>
-      <a href="https://opendisplay.org/datenschutz.html">privacy (Datenschutz)</a>
+
     </div>
-  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <a href="../../index.html" class="site-footer__lockup" aria-label="OpenDisplay home">
+            <img src="../../assets/brand/logo_dark.svg" alt="OpenDisplay" class="site-footer__logo-full" width="140" height="41">
+          </a>
+          <span class="site-footer__tag">The open e-paper standard</span>
+          <p class="site-footer__lead">An open standard that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.</p>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Build</span>
+          <a href="../../what-hardware-to-buy.html" class="od-foot-link">What hardware to buy</a>
+          <a href="../../firmware/display/index.html" class="od-foot-link">BLE Tester</a>
+          <a href="../../firmware/battery/index.html" class="od-foot-link">Battery calculator</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Reference</span>
+          <a href="../../protocol/index.html" class="od-foot-link">Protocol spec</a>
+          <a href="../../protocol/display-data-format.html" class="od-foot-link">Display data format</a>
+          <a href="../../protocol/flex-standard.html" class="od-foot-link">OpenDisplay Flex</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Flex tools</span>
+          <a href="../../protocol/flex-tools.html" class="od-foot-link">Overview</a>
+          <a href="../../firmware/toolbox/index.html" class="od-foot-link">Toolbox</a>
+          <a href="../../protocol/adding-displays.html" class="od-foot-link">Adding a new panel</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Community</span>
+          <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="od-foot-link">GitHub</a>
+          <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="od-foot-link">Discord</a>
+          <a href="https://www.openhomefoundation.org/" target="_blank" rel="noreferrer" class="od-foot-link">Open Home Foundation</a>
+        </div>
+      </div>
+      <div class="site-footer__bot">
+        <span>© 2026 OpenDisplay</span>
+        <div class="site-footer__legal">
+          <a href="../../impressum.html" class="od-foot-link">Legal notice</a>
+          <a href="../../datenschutz.html" class="od-foot-link">Privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
 

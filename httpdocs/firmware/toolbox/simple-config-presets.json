@@ -65,9 +65,12 @@
          },
          "installConfig": {
             "type": "nrf52840",
-            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2"
+            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 1
       },
       {
          "id": "ee04",
@@ -101,7 +104,7 @@
             "battery_sense_pin": "0x1",
             "battery_sense_enable_pin": "0x6",
             "voltage_scaling_factor": "0xb1",
-            "deep_sleep_current_ua": "0x64"
+            "deep_sleep_current_ua": "0"
          },
          "led": {
             "instance_number": "0x0",
@@ -134,9 +137,12 @@
          },
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 2
       },
       {
          "id": "en05",
@@ -202,9 +208,12 @@
          },
          "installConfig": {
             "type": "nrf52840",
-            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2"
+            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 3
       },
       {
          "id": "ee05",
@@ -237,7 +246,7 @@
             "battery_sense_pin": "0x1",
             "battery_sense_enable_pin": "0x6",
             "voltage_scaling_factor": "0xb1",
-            "deep_sleep_current_ua": "0x64"
+            "deep_sleep_current_ua": "0"
          },
          "led": {
             "instance_number": "0x0",
@@ -270,9 +279,12 @@
          },
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 4
       },
       {
          "id": "reterminal-e1001",
@@ -301,19 +313,69 @@
             "data": "9",
             "clk": "7"
          },
+         "led": {
+            "instance_number": "0x0",
+            "led_type": "0",
+            "led_1_r": "38",
+            "led_2_g": "6",
+            "led_3_b": "16",
+            "led_flags": 2
+         },
+         "buzzerConfig": {
+            "instance_number": "0x0",
+            "drive_pin": "45",
+            "enable_pin": "0xff",
+            "flags": 1,
+            "duty_percent": "0x32"
+         },
+         "dataBus": {
+            "instance_number": "0x0",
+            "bus_type": "1",
+            "pin_1": "20",
+            "pin_2": "19"
+         },
+         "sensorData": {
+            "sensor_type": "4",
+            "instance_number": "0",
+            "bus_id": "0x0",
+            "i2c_addr_7bit": "0x44",
+            "msd_data_start_byte": "1"
+         },
          "powerDefaults": {
             "battery_sense_pin": "1",
             "battery_sense_enable_pin": "21",
-            "voltage_scaling_factor": "0x64",
-            "deep_sleep_current_ua": "0x0"
+            "voltage_scaling_factor": "0xb1",
+            "deep_sleep_current_ua": "0"
+         },
+         "buttons": {
+            "instance_number": "0x0",
+            "input_type": "1",
+            "display_as": "1",
+            "inputpin1": "0x3",
+            "inputpin2": "0x4",
+            "inputpin3": "0x5",
+            "inputpin4": "0xff",
+            "inputpin5": "0xff",
+            "inputpin6": "0xff",
+            "inputpin7": "0xff",
+            "inputpin8": "0xff",
+            "isused": "0x7",
+            "invert": "0x7",
+            "pullups": "0x0",
+            "pulldowns": "0x0",
+            "button_data_byte_index": "0",
+            "reserved": "0x0"
          },
          "defaultDisplay": "ep75-800x480",
          "defaultPower": "battery-2000",
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 5
       },
       {
          "id": "reterminal-e1002",
@@ -345,14 +407,18 @@
          },
          "led": {
             "instance_number": "0x0",
-            "led_type": "1",
-            "led_1_r": "0x1a",
-            "led_flags": "0x1"
+            "led_type": "0",
+            "led_1_r": "38",
+            "led_2_g": "6",
+            "led_3_b": "16",
+            "led_flags": 2
          },
-         "passiveBuzzer": {
+         "buzzerConfig": {
             "instance_number": "0x0",
             "drive_pin": "45",
-            "flags": 1
+            "enable_pin": "0xff",
+            "flags": 1,
+            "duty_percent": "0x32"
          },
          "dataBus": {
             "instance_number": "0x0",
@@ -364,180 +430,44 @@
             "sensor_type": "4",
             "instance_number": "0",
             "bus_id": "0x0",
-            "i2c_addr_7bit": "0x44"
+            "i2c_addr_7bit": "0x44",
+            "msd_data_start_byte": "1"
          },
          "powerDefaults": {
             "battery_sense_pin": "1",
             "battery_sense_enable_pin": "21",
-            "voltage_scaling_factor": "0x64",
-            "deep_sleep_current_ua": "0x0"
+            "voltage_scaling_factor": "0xb1",
+            "deep_sleep_current_ua": "0"
          },
-         "defaultDisplay": "ep73-spectra-800x480",
-         "defaultPower": "battery-2000",
-         "installConfig": {
-            "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json"
-         },
-         "transmission_modes": "10"
-      },
-      {
-         "id": "esp32-s3-wspp",
-         "name": "Waveshare ESP32-S3-PhotoPainter",
-         "connectorPins": [
-            24,
-            50
-         ],
-         "systemConfig": {
-            "ic_type": "0x2",
-            "communication_modes": "0x1",
-            "device_flags": "0x1",
-            "pwr_pin": "0x0",
-            "reserved": "0x0"
-         },
-         "manufacturerData": {
-            "manufacturer_id": "0x2",
-            "board_type": "0x0",
-            "board_revision": "0x1",
-            "reserved": "0x0"
-         },
-         "displayPins": {
-            "reset": "0xc",
-            "busy": "0xd",
-            "dc": "0x8",
-            "cs": "0x9",
-            "data": "0xb",
-            "clk": "0xa"
-         },
-         "powerDefaults": {
-            "battery_sense_pin": "0xFF",
-            "battery_sense_enable_pin": "0xFF",
-            "voltage_scaling_factor": "0x0",
-            "deep_sleep_current_ua": "0x0"
-         },
-         "defaultDisplay": "ep73-spectra-800x480",
-         "defaultPower": "battery-2000",
-         "dataBus": {
+         "buttons": {
             "instance_number": "0x0",
-            "bus_type": "0x1",
-            "pin_1": "0x30",
-            "pin_2": "0x2f",
-            "pin_3": "0x0",
-            "pin_4": "0x0",
-            "pin_5": "0x0",
-            "pin_6": "0x0",
-            "pin_7": "0x0",
-            "bus_speed_hz": "0x0",
-            "bus_flags": "0x0",
+            "input_type": "1",
+            "display_as": "1",
+            "inputpin1": "0x3",
+            "inputpin2": "0x4",
+            "inputpin3": "0x5",
+            "inputpin4": "0xff",
+            "inputpin5": "0xff",
+            "inputpin6": "0xff",
+            "inputpin7": "0xff",
+            "inputpin8": "0xff",
+            "isused": "0x7",
+            "invert": "0x7",
             "pullups": "0x0",
             "pulldowns": "0x0",
+            "button_data_byte_index": "0",
             "reserved": "0x0"
          },
-         "sensorData": {
-            "sensor_type": "3",
-            "bus_id": "0",
-            "instance_number": "0"
-         },
+         "defaultDisplay": "ep73-spectra-800x480",
+         "defaultPower": "battery-2000",
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
-      },
-      {
-         "id": "nrf52840-xiao",
-         "name": "Seeed XIAO NRF52840",
-         "connectorPins": [
-            24
-         ],
-         "systemConfig": {
-            "ic_type": "1",
-            "communication_modes": "0x1",
-            "device_flags": "0x1",
-            "pwr_pin": "0xff",
-            "reserved": "0x0"
-         },
-         "manufacturerData": {
-            "manufacturer_id": "1",
-            "board_type": "5",
-            "board_revision": "1",
-            "reserved": "0x0"
-         },
-         "displayPins": {
-            "reset": "0x2",
-            "busy": "0x5",
-            "dc": "0x1d",
-            "cs": "0x3",
-            "data": "0x2f",
-            "clk": "0x2d"
-         },
-         "powerDefaults": {
-            "battery_sense_pin": "0xFF",
-            "battery_sense_enable_pin": "0xFF",
-            "voltage_scaling_factor": "0x0"
-         },
-         "led": {
-            "instance_number": "0x0",
-            "led_type": "0",
-            "led_1_r": "0x1a",
-            "led_2_g": "0x1e",
-            "led_3_b": "0x6",
-            "led_4": "0x0",
-            "led_flags": "0x0",
-            "reserved": "0x0"
-         },
-         "installConfig": {
-            "type": "nrf52840",
-            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2"
-         },
-         "transmission_modes": "10"
-      },
-      {
-         "id": "esp32s3-xiao",
-         "name": "Seeed XIAO ESP32-S3",
-         "connectorPins": [
-            24
-         ],
-         "systemConfig": {
-            "ic_type": "2",
-            "communication_modes": "0x1",
-            "device_flags": "0x0",
-            "pwr_pin": "0xFF",
-            "reserved": "0x0"
-         },
-         "manufacturerData": {
-            "manufacturer_id": "1",
-            "board_type": "2",
-            "board_revision": "1",
-            "reserved": "0x0"
-         },
-         "displayPins": {
-            "reset": "1",
-            "busy": "6",
-            "dc": "4",
-            "cs": "2",
-            "data": "9",
-            "clk": "7"
-         },
-         "powerDefaults": {
-            "battery_sense_pin": "0xFF",
-            "battery_sense_enable_pin": "0xFF",
-            "voltage_scaling_factor": "0x0"
-         },
-         "led": {
-            "instance_number": "0x0",
-            "led_type": "0",
-            "led_1_r": "21",
-            "led_2_g": "21",
-            "led_3_b": "21",
-            "led_4": "0x0",
-            "led_flags": "0x0",
-            "reserved": "0x0"
-         },
-         "installConfig": {
-            "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N8R8_full.json"
-         },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 6
       },
       {
          "id": "reterminal-e1003",
@@ -612,7 +542,7 @@
             "pin_5": "0x0",
             "pin_6": "0x0",
             "pin_7": "0x0",
-            "bus_speed_hz": "0x0",
+            "bus_speed_hz": "0x61a80",
             "bus_flags": "0x0",
             "pullups": "0x3",
             "pulldowns": "0x0",
@@ -627,21 +557,174 @@
             "rst_pin": "0x30",
             "display_instance": "0x0",
             "flags": "0x0",
-            "poll_interval_ms": "0x0",
+            "poll_interval_ms": "0x64",
             "touch_data_start_byte": "1",
             "reserved": "0x0"
+         },
+         "buzzerConfig": {
+            "instance_number": "0x0",
+            "drive_pin": "0x2d",
+            "enable_pin": "0xff",
+            "flags": "0x1",
+            "duty_percent": "0x32",
+            "reserved": "000000000000000000000000000000000000000000000000000000"
          },
          "defaultDisplay": "seeed-ed103-1872x1404",
          "defaultPower": "battery-3000",
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8-extuart_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8-extuart_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "11"
+         "transmission_modes": "11",
+         "index": 7
+      },
+      {
+         "id": "ee03",
+         "name": "Seeed EE03 (ESP32-S3)",
+         "connectorPins": [
+            40
+         ],
+         "systemConfig": {
+            "ic_type": "2",
+            "communication_modes": "0x1",
+            "device_flags": "0x0",
+            "pwr_pin": "0x2b",
+            "reserved": "000000000000000000000000000000",
+            "pwr_pin_2": "0x2b",
+            "pwr_pin_3": "0xfe"
+         },
+         "manufacturerData": {
+            "manufacturer_id": "1",
+            "board_type": "8",
+            "board_revision": "0x1",
+            "reserved": "000000000000000000000000000000000000"
+         },
+         "displayPins": {
+            "reset": "0x26",
+            "busy": "0x4",
+            "dc": "0x8",
+            "cs": "0x2c",
+            "data": "0x9",
+            "clk": "0x7"
+         },
+         "defaultDisplay": "seeed-ed103-1872x1404",
+         "defaultPower": "battery-3000",
+         "installConfig": {
+            "type": "esp32",
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8-extuart_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
+         },
+         "transmission_modes": "11",
+         "index": 8
+      },
+      {
+         "id": "nrf52840-xiao",
+         "name": "Seeed XIAO ePaper Breakout NRF52840",
+         "connectorPins": [
+            24
+         ],
+         "systemConfig": {
+            "ic_type": "1",
+            "communication_modes": "0x1",
+            "device_flags": "0x1",
+            "pwr_pin": "0xff",
+            "reserved": "0x0"
+         },
+         "manufacturerData": {
+            "manufacturer_id": "1",
+            "board_type": "5",
+            "board_revision": "1",
+            "reserved": "0x0"
+         },
+         "displayPins": {
+            "reset": "0x2",
+            "busy": "0x5",
+            "dc": "0x1d",
+            "cs": "0x3",
+            "data": "0x2f",
+            "clk": "0x2d"
+         },
+         "powerDefaults": {
+            "battery_sense_pin": "0xFF",
+            "battery_sense_enable_pin": "0xFF",
+            "voltage_scaling_factor": "0x0"
+         },
+         "led": {
+            "instance_number": "0x0",
+            "led_type": "0",
+            "led_1_r": "0x1a",
+            "led_2_g": "0x1e",
+            "led_3_b": "0x6",
+            "led_4": "0x0",
+            "led_flags": "0x0",
+            "reserved": "0x0"
+         },
+         "installConfig": {
+            "type": "nrf52840",
+            "downloadFile": "https://opendisplay.org/firmware/toolbox/bin/NRF52840.uf2",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
+         },
+         "transmission_modes": "10",
+         "index": 9
+      },
+      {
+         "id": "esp32s3-xiao",
+         "name": "Seeed XIAO ePaper Breakout ESP32-S3",
+         "connectorPins": [
+            24
+         ],
+         "systemConfig": {
+            "ic_type": "2",
+            "communication_modes": "0x1",
+            "device_flags": "0x0",
+            "pwr_pin": "0xFF",
+            "reserved": "0x0"
+         },
+         "manufacturerData": {
+            "manufacturer_id": "1",
+            "board_type": "2",
+            "board_revision": "1",
+            "reserved": "0x0"
+         },
+         "displayPins": {
+            "reset": "1",
+            "busy": "6",
+            "dc": "4",
+            "cs": "2",
+            "data": "9",
+            "clk": "7"
+         },
+         "powerDefaults": {
+            "battery_sense_pin": "0xFF",
+            "battery_sense_enable_pin": "0xFF",
+            "voltage_scaling_factor": "0x0"
+         },
+         "led": {
+            "instance_number": "0x0",
+            "led_type": "0",
+            "led_1_r": "21",
+            "led_2_g": "21",
+            "led_3_b": "21",
+            "led_4": "0x0",
+            "led_flags": "0x0",
+            "reserved": "0x0"
+         },
+         "installConfig": {
+            "type": "esp32",
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N8R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
+         },
+         "transmission_modes": "10",
+         "index": 10
       },
       {
          "id": "esp32c3-xiao",
-         "name": "Seeed XIAO ESP32-C3",
+         "name": "Seeed XIAO ePaper Breakout ESP32-C3",
          "connectorPins": [
             24
          ],
@@ -673,13 +756,16 @@
          },
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c3-N4_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c3-N4_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 11
       },
       {
          "id": "xiao-75-c3",
-         "name": "Seeed XIAO 7.5 C3",
+         "name": "Seeed XIAO ePaper Breakout 7.5 C3",
          "connectorPins": [
             24
          ],
@@ -698,7 +784,7 @@
          },
          "displayPins": {
             "reset": "0x2",
-            "busy": "0x7",
+            "busy": "0x4",
             "dc": "0x5",
             "cs": "0x3",
             "data": "0xa",
@@ -711,13 +797,16 @@
          },
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c3-N4_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c3-N4_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 12
       },
       {
          "id": "esp32c6-xiao",
-         "name": "Seeed XIAO ESP32-C6",
+         "name": "Seeed XIAO ePaper Breakout ESP32-C6",
          "connectorPins": [
             24
          ],
@@ -749,9 +838,12 @@
          },
          "installConfig": {
             "type": "esp32",
-            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c6-N4_full.json"
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-c6-N4_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
          },
-         "transmission_modes": "10"
+         "transmission_modes": "10",
+         "index": 13
       },
       {
          "id": "m3-nrf",
@@ -784,7 +876,7 @@
             "battery_sense_pin": "0xFF",
             "battery_sense_enable_pin": "0xFF",
             "voltage_scaling_factor": "0x0",
-            "deep_sleep_current_ua": "0x0"
+            "deep_sleep_current_ua": "0"
          },
          "led": {
             "instance_number": "0x0",
@@ -815,7 +907,13 @@
             "button_data_byte_index": "0",
             "reserved": "0x0"
          },
-         "transmission_modes": "8"
+         "transmission_modes": "8",
+         "installConfig": {
+            "firmwareLetter": "N",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware_NRF",
+            "type": "nrf52811"
+         },
+         "index": 14
       },
       {
          "id": "m3-lite-nrf",
@@ -860,7 +958,13 @@
             "led_flags": "0x7",
             "reserved": "0x0"
          },
-         "transmission_modes": "8"
+         "transmission_modes": "8",
+         "installConfig": {
+            "firmwareLetter": "N",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware_NRF",
+            "type": "nrf52811"
+         },
+         "index": 15
       },
       {
          "id": "m3-pro-silabs",
@@ -926,7 +1030,63 @@
             "button_data_byte_index": "0",
             "reserved": "0x0"
          },
-         "transmission_modes": "8"
+         "dataBus": {
+            "instance_number": "0x0",
+            "bus_type": "1",
+            "pin_1": "0x31",
+            "pin_2": "0x33",
+            "pin_3": "0x0",
+            "pin_4": "0x0",
+            "pin_5": "0x0",
+            "pin_6": "0x0",
+            "pin_7": "0x0",
+            "bus_speed_hz": "0x61a80",
+            "bus_flags": "0x0",
+            "pullups": "0x0",
+            "pulldowns": "0x0",
+            "reserved": "0000000000000000000000000000"
+         },
+         "nfcConfig": {
+            "instance_number": "0x0",
+            "nfc_ic_type": "1",
+            "bus_instance": "0x0",
+            "flags": "0x1",
+            "field_detect_pin": "0x32",
+            "field_detect_mode": "2",
+            "field_detect_active": "1",
+            "field_detect_debounce_ms": "0x0",
+            "power_pin": "0x30",
+            "power_active": "1",
+            "power_on_delay_ms": "0x28",
+            "power_off_delay_ms": "0x0",
+            "adv_button_byte_index": "1",
+            "adv_button_button_id": "0x7",
+            "reserved_pin_1": "0x0",
+            "reserved_pin_2": "0x0",
+            "reserved": "00000000000000000000000000000000"
+         },
+         "flashConfig": {
+            "instance_number": "0x0",
+            "flash_ic_type": "0",
+            "bus_instance": "0x0",
+            "flags": "0x1",
+            "mosi_pin": "0x21",
+            "sck_pin": "0x22",
+            "cs_pin": "0x23",
+            "power_pin": "0xff",
+            "power_active": "0x1",
+            "power_on_delay_ms": "0x0",
+            "power_off_delay_ms": "0x0",
+            "mode": "0x0",
+            "reserved": "0000000000000000000000000000000000000000"
+         },
+         "transmission_modes": "8",
+         "installConfig": {
+            "firmwareLetter": "S",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware_Silabs",
+            "type": "silabs_bg22"
+         },
+         "index": 16
       },
       {
          "id": "m3-core-silabs",
@@ -973,13 +1133,135 @@
             "led_flags": "0x7",
             "reserved": "0x0"
          },
-         "transmission_modes": "8"
+         "dataBus": {
+            "instance_number": "0x0",
+            "bus_type": "1",
+            "pin_1": "0x31",
+            "pin_2": "0x33",
+            "pin_3": "0x0",
+            "pin_4": "0x0",
+            "pin_5": "0x0",
+            "pin_6": "0x0",
+            "pin_7": "0x0",
+            "bus_speed_hz": "0x61a80",
+            "bus_flags": "0x0",
+            "pullups": "0x0",
+            "pulldowns": "0x0",
+            "reserved": "0000000000000000000000000000"
+         },
+         "nfcConfig": {
+            "instance_number": "0x0",
+            "nfc_ic_type": "1",
+            "bus_instance": "0x0",
+            "flags": "0x1",
+            "field_detect_pin": "0x32",
+            "field_detect_mode": "2",
+            "field_detect_active": "1",
+            "field_detect_debounce_ms": "0x0",
+            "power_pin": "0x30",
+            "power_active": "1",
+            "power_on_delay_ms": "0x28",
+            "power_off_delay_ms": "0x0",
+            "adv_button_byte_index": "1",
+            "adv_button_button_id": "0x7",
+            "reserved_pin_1": "0x0",
+            "reserved_pin_2": "0x0",
+            "reserved": "00000000000000000000000000000000"
+         },
+         "flashConfig": {
+            "instance_number": "0x0",
+            "flash_ic_type": "0",
+            "bus_instance": "0x0",
+            "flags": "0x1",
+            "mosi_pin": "0x21",
+            "sck_pin": "0x22",
+            "cs_pin": "0x23",
+            "power_pin": "0xff",
+            "power_active": "0x1",
+            "power_on_delay_ms": "0x0",
+            "power_off_delay_ms": "0x0",
+            "mode": "0x0",
+            "reserved": "0000000000000000000000000000000000000000"
+         },
+         "transmission_modes": "8",
+         "installConfig": {
+            "firmwareLetter": "S",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware_Silabs",
+            "type": "silabs_bg22"
+         },
+         "index": 17
+      },
+      {
+         "id": "esp32-s3-wspp",
+         "name": "Waveshare ESP32-S3-PhotoPainter",
+         "connectorPins": [
+            24,
+            50
+         ],
+         "systemConfig": {
+            "ic_type": "0x2",
+            "communication_modes": "0x1",
+            "device_flags": "0x1",
+            "pwr_pin": "0x0",
+            "reserved": "0x0"
+         },
+         "manufacturerData": {
+            "manufacturer_id": "0x2",
+            "board_type": "0x0",
+            "board_revision": "0x1",
+            "reserved": "0x0"
+         },
+         "displayPins": {
+            "reset": "0xc",
+            "busy": "0xd",
+            "dc": "0x8",
+            "cs": "0x9",
+            "data": "0xb",
+            "clk": "0xa"
+         },
+         "powerDefaults": {
+            "battery_sense_pin": "0xFF",
+            "battery_sense_enable_pin": "0xFF",
+            "voltage_scaling_factor": "0x0",
+            "deep_sleep_current_ua": "0"
+         },
+         "defaultDisplay": "ep73-spectra-800x480",
+         "defaultPower": "battery-2000",
+         "dataBus": {
+            "instance_number": "0x0",
+            "bus_type": "0x1",
+            "pin_1": "0x30",
+            "pin_2": "0x2f",
+            "pin_3": "0x0",
+            "pin_4": "0x0",
+            "pin_5": "0x0",
+            "pin_6": "0x0",
+            "pin_7": "0x0",
+            "bus_speed_hz": "0x0",
+            "bus_flags": "0x0",
+            "pullups": "0x0",
+            "pulldowns": "0x0",
+            "reserved": "0x0"
+         },
+         "sensorData": {
+            "sensor_type": "3",
+            "bus_id": "0",
+            "instance_number": "0"
+         },
+         "installConfig": {
+            "type": "esp32",
+            "manifest": "https://opendisplay.org/firmware/toolbox/bin/esp32-s3-N16R8_full.json",
+            "firmwareLetter": "O",
+            "githubRepo": "https://github.com/OpenDisplay/Firmware"
+         },
+         "transmission_modes": "10",
+         "index": 18
       }
    ],
    "displays": [
       {
          "id": "ep154-200x200",
-         "name": "1.54\" Monochrome (200\u00d7200)",
+         "name": "1.54\" Monochrome (200×200)",
          "connectorPins": [
             24
          ],
@@ -992,11 +1274,12 @@
             "partial_update_support": "1",
             "color_scheme": "0",
             "full_update_mC": "0"
-         }
+         },
+         "index": 1
       },
       {
          "id": "ep154-152x152",
-         "name": "1.54\" BWR (152\u00d7152)",
+         "name": "1.54\" BWR (152×152)",
          "connectorPins": [
             24
          ],
@@ -1008,12 +1291,33 @@
             "active_height_mm": "27",
             "partial_update_support": "0",
             "color_scheme": "1",
-            "full_update_mC": "0"
-         }
+            "full_update_mC": "64",
+            "rotation": "0"
+         },
+         "index": 2
+      },
+      {
+         "id": "ep154yr-200x200",
+         "name": "1.54\" BWRY (200×200)",
+         "connectorPins": [
+            24
+         ],
+         "panelIcType": "56",
+         "config": {
+            "pixel_width": "200",
+            "pixel_height": "200",
+            "active_width_mm": "26",
+            "active_height_mm": "26",
+            "partial_update_support": "0",
+            "color_scheme": "3",
+            "full_update_mC": "76",
+            "rotation": "0"
+         },
+         "index": 3
       },
       {
          "id": "ep213-122x250",
-         "name": "2.13\" Monochrome (122\u00d7250)",
+         "name": "2.13\" Monochrome (122×250)",
          "connectorPins": [
             24
          ],
@@ -1025,12 +1329,13 @@
             "active_height_mm": "61",
             "partial_update_support": "1",
             "color_scheme": "0",
-            "full_update_mC": "38"
-         }
+            "full_update_mC": "0"
+         },
+         "index": 4
       },
       {
          "id": "ep213r-122x250",
-         "name": "2.13\" Quad Color (122\u00d7250)",
+         "name": "2.13\" BWRY (122×250)",
          "connectorPins": [
             24
          ],
@@ -1043,11 +1348,31 @@
             "partial_update_support": "0",
             "color_scheme": "3",
             "full_update_mC": "0"
-         }
+         },
+         "index": 5
+      },
+      {
+         "id": "ep266yr-184x360",
+         "name": "2.66\" BWRY (184×360)",
+         "connectorPins": [
+            24
+         ],
+         "panelIcType": "28",
+         "config": {
+            "pixel_width": "0xb8",
+            "pixel_height": "0x168",
+            "active_width_mm": "0x17",
+            "active_height_mm": "0x3d",
+            "partial_update_support": "0",
+            "color_scheme": "3",
+            "full_update_mC": "140",
+            "rotation": "0"
+         },
+         "index": 6
       },
       {
          "id": "ep29-128x296",
-         "name": "2.9\" Flexible Monochrome (296\u00d7128)",
+         "name": "2.9\" Flexible Monochrome (296×128)",
          "connectorPins": [
             24
          ],
@@ -1060,11 +1385,12 @@
             "partial_update_support": "0",
             "color_scheme": "0",
             "full_update_mC": "0"
-         }
+         },
+         "index": 7
       },
       {
          "id": "ep29r-128x296",
-         "name": "2.9\" Quad Color (128\u00d7296)",
+         "name": "2.9\" BWRY (128×296)",
          "connectorPins": [
             24
          ],
@@ -1077,11 +1403,31 @@
             "partial_update_support": "0",
             "color_scheme": "3",
             "full_update_mC": "0"
-         }
+         },
+         "index": 8
+      },
+      {
+         "id": "ep35yr-184x384",
+         "name": "3.5\" BWRY (184×384)",
+         "connectorPins": [
+            24
+         ],
+         "panelIcType": "54",
+         "config": {
+            "pixel_width": "184",
+            "pixel_height": "384",
+            "active_width_mm": "38",
+            "active_height_mm": "80",
+            "partial_update_support": "0",
+            "color_scheme": "3",
+            "full_update_mC": "107",
+            "rotation": "0"
+         },
+         "index": 9
       },
       {
          "id": "ep42-400x300",
-         "name": "4.2\" Monochrome (400\u00d7300)",
+         "name": "4.2\" Monochrome (400×300)",
          "connectorPins": [
             24
          ],
@@ -1094,11 +1440,31 @@
             "partial_update_support": "1",
             "color_scheme": "0",
             "full_update_mC": "0"
-         }
+         },
+         "index": 10
+      },
+      {
+         "id": "ep42yr-400x300",
+         "name": "4.2\" BWRY (400×300)",
+         "connectorPins": [
+            24
+         ],
+         "panelIcType": "58",
+         "config": {
+            "pixel_width": "400",
+            "pixel_height": "300",
+            "active_width_mm": "84",
+            "active_height_mm": "63",
+            "partial_update_support": "0",
+            "color_scheme": "3",
+            "full_update_mC": "165",
+            "rotation": "0"
+         },
+         "index": 11
       },
       {
          "id": "ep426-800x480",
-         "name": "4.26\" Monochrome (800\u00d7480)",
+         "name": "4.26\" Monochrome (800×480)",
          "connectorPins": [
             24
          ],
@@ -1111,11 +1477,12 @@
             "partial_update_support": "1",
             "color_scheme": "0",
             "full_update_mC": "38"
-         }
+         },
+         "index": 12
       },
       {
          "id": "ep583-648x480",
-         "name": "5.83\" Monochrome (648\u00d7480)",
+         "name": "5.83\" Monochrome (648×480)",
          "connectorPins": [
             24
          ],
@@ -1128,11 +1495,12 @@
             "partial_update_support": "1",
             "color_scheme": "0",
             "full_update_mC": "0"
-         }
+         },
+         "index": 13
       },
       {
          "id": "ep75-800x480",
-         "name": "7.5\" Monochrome (800\u00d7480)",
+         "name": "7.5\" Monochrome (800×480)",
          "connectorPins": [
             24
          ],
@@ -1144,12 +1512,13 @@
             "active_height_mm": "98",
             "partial_update_support": "1",
             "color_scheme": "0",
-            "full_update_mC": "38"
-         }
+            "full_update_mC": "0"
+         },
+         "index": 14
       },
       {
          "id": "ep73-spectra-800x480",
-         "name": "7.3\" Spectra 6 Color (800\u00d7480)",
+         "name": "7.3\" Spectra 6 Color (800×480)",
          "connectorPins": [
             50
          ],
@@ -1162,11 +1531,12 @@
             "partial_update_support": "1",
             "color_scheme": "4",
             "full_update_mC": "400"
-         }
+         },
+         "index": 15
       },
       {
          "id": "ep75-bwry-800x480",
-         "name": "7.5\" BWRY (800\u00d7480)",
+         "name": "7.5\" BWRY (800×480)",
          "connectorPins": [
             24
          ],
@@ -1178,12 +1548,13 @@
             "active_height_mm": "56",
             "partial_update_support": "0",
             "color_scheme": "3",
-            "full_update_mC": "0"
-         }
+            "full_update_mC": "310"
+         },
+         "index": 16
       },
       {
          "id": "seeed-ed103-1872x1404",
-         "name": "10.3\" Seeed ED103TC2 monochrome (1872\u00d71404)",
+         "name": "10.3\" Seeed ED103TC2 monochrome (1872×1404)",
          "connectorPins": [
             40
          ],
@@ -1195,12 +1566,13 @@
             "active_height_mm": "157",
             "partial_update_support": "0",
             "color_scheme": "0",
-            "full_update_mC": "400"
-         }
+            "full_update_mC": "0"
+         },
+         "index": 17
       },
       {
          "id": "seeed-ed103-1872x1404-4gray",
-         "name": "10.3\" Seeed ED103TC2 4bpp gray (1872\u00d71404)",
+         "name": "10.3\" Seeed ED103TC2 4bpp gray (1872×1404)",
          "connectorPins": [
             40
          ],
@@ -1212,8 +1584,9 @@
             "active_height_mm": "157",
             "partial_update_support": "0",
             "color_scheme": "6",
-            "full_update_mC": "400"
-         }
+            "full_update_mC": "0"
+         },
+         "index": 18
       },
       {
          "id": "ssd1619-420-bwr",
@@ -1227,10 +1600,11 @@
             "pixel_height": "300",
             "active_width_mm": "84",
             "active_height_mm": "63",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 19
       },
       {
          "id": "uc8176-420-bwr",
@@ -1244,10 +1618,11 @@
             "pixel_height": "300",
             "active_width_mm": "84",
             "active_height_mm": "63",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 20
       },
       {
          "id": "uc8179-750-bwr",
@@ -1261,10 +1636,11 @@
             "pixel_height": "480",
             "active_width_mm": "160",
             "active_height_mm": "96",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 21
       },
       {
          "id": "uc8159-750-low-bwr",
@@ -1278,10 +1654,11 @@
             "pixel_height": "480",
             "active_width_mm": "160",
             "active_height_mm": "96",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 22
       },
       {
          "id": "ssd1677-750-hd-bwr",
@@ -1295,14 +1672,15 @@
             "pixel_height": "480",
             "active_width_mm": "160",
             "active_height_mm": "96",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 23
       },
       {
          "id": "uc8151-029-bwr",
-         "name": "UC8151 2.9\" 168\u00d7384 B/W/R",
+         "name": "UC8151 2.9\" 168×384 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1315,11 +1693,12 @@
             "partial_update_support": "1",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 24
       },
       {
          "id": "ssd1619-029-bwr",
-         "name": "SSD1619 2.9\" 168\u00d7384 B/W/R",
+         "name": "SSD1619 2.9\" 168×384 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1329,14 +1708,15 @@
             "pixel_height": "384",
             "active_width_mm": "29",
             "active_height_mm": "62",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 25
       },
       {
          "id": "ssd1619-016-bwr",
-         "name": "SSD1619 1.6\" 200\u00d7200 B/W/R",
+         "name": "SSD1619 1.6\" 200×200 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1346,14 +1726,15 @@
             "pixel_height": "200",
             "active_width_mm": "27",
             "active_height_mm": "27",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 26
       },
       {
          "id": "ssd1619-022-bwr",
-         "name": "SSD1619 2.2\" 240\u00d7320 B/W/R",
+         "name": "SSD1619 2.2\" 240×320 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1363,14 +1744,15 @@
             "pixel_height": "320",
             "active_width_mm": "48",
             "active_height_mm": "64",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 27
       },
       {
          "id": "ssd1619-026-bwr",
-         "name": "SSD1619 2.6\" 296\u00d7152 B/W/R",
+         "name": "SSD1619 2.6\" 296×152 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1380,14 +1762,15 @@
             "pixel_height": "152",
             "active_width_mm": "66",
             "active_height_mm": "29",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 28
       },
       {
          "id": "uc8151-027-bwr",
-         "name": "UC8151 2.7\" 200\u00d7300 B/W/R",
+         "name": "UC8151 2.7\" 200×300 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1397,15 +1780,16 @@
             "pixel_height": "300",
             "active_width_mm": "54",
             "active_height_mm": "81",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0",
             "rotation": "1"
-         }
+         },
+         "index": 29
       },
       {
          "id": "uc43-430-bwr",
-         "name": "UC variant 4.3\" 152\u00d7522 B/W/R",
+         "name": "UC variant 4.3\" 152×522 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1415,14 +1799,15 @@
             "pixel_height": "522",
             "active_width_mm": "33",
             "active_height_mm": "112",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 30
       },
       {
          "id": "ssd1619-013-bwr",
-         "name": "SSD1619 1.3\" 144\u00d7200 B/W/R",
+         "name": "SSD1619 1.3\" 144×200 B/W/R",
          "connectorPins": [
             124
          ],
@@ -1432,46 +1817,29 @@
             "pixel_height": "200",
             "active_width_mm": "19",
             "active_height_mm": "27",
-            "partial_update_support": "1",
+            "partial_update_support": "0",
             "color_scheme": "1",
             "full_update_mC": "0"
-         }
+         },
+         "index": 31
       },
       {
-         "id": "ep266yr-184x360",
-         "name": "2.66\" B/W/R/Y (184\u00d7360)",
+         "id": "ssd1619-022-lite-bwr",
+         "name": "SSD1619 2.2 lite \" 128×250 B/W/R",
          "connectorPins": [
-            24
+            124
          ],
-         "panelIcType": "28",
+         "panelIcType": "1030",
          "config": {
-            "pixel_width": "0xb8",
-            "pixel_height": "0x168",
-            "active_width_mm": "0x17",
-            "active_height_mm": "0x3d",
+            "pixel_width": "128",
+            "pixel_height": "250",
+            "active_width_mm": "48",
+            "active_height_mm": "64",
             "partial_update_support": "0",
-            "color_scheme": "3",
-            "full_update_mC": "0",
-            "rotation": "0"
-         }
-      },
-      {
-         "id": "ep35yr-184x384",
-         "name": "3.5\" B/W/R/Y (184\u00d7384)",
-         "connectorPins": [
-            24
-         ],
-         "panelIcType": "54",
-         "config": {
-            "pixel_width": "184",
-            "pixel_height": "384",
-            "active_width_mm": "38",
-            "active_height_mm": "80",
-            "partial_update_support": "0",
-            "color_scheme": "3",
-            "full_update_mC": "0",
-            "rotation": "0"
-         }
+            "color_scheme": "1",
+            "full_update_mC": "0"
+         },
+         "index": 32
       }
    ],
    "powerOptions": [
@@ -1489,10 +1857,10 @@
             "battery_sense_flags": "0x0",
             "capacity_estimator": "0",
             "voltage_scaling_factor": "0x0",
-            "deep_sleep_current_ua": "0x0",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 1
       },
       {
          "id": "battery-2000",
@@ -1505,10 +1873,10 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "1",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 2
       },
       {
          "id": "battery-3000",
@@ -1521,10 +1889,10 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "1",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 3
       },
       {
          "id": "battery-4000",
@@ -1537,10 +1905,10 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "1",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 4
       },
       {
          "id": "battery-prim-1p",
@@ -1553,10 +1921,10 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "4",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 5
       },
       {
          "id": "battery-prim-2p",
@@ -1569,10 +1937,26 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "4",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 6
+      },
+      {
+         "id": "battery-prim-4p",
+         "name": "4 CR2450",
+         "powerOption": {
+            "power_mode": "1",
+            "battery_capacity_mah": "2400",
+            "sleep_timeout_ms": "40000",
+            "tx_power": "0x8",
+            "sleep_flags": "0x0",
+            "battery_sense_flags": "0x0",
+            "capacity_estimator": "4",
+            "deep_sleep_time_seconds": "0",
+            "reserved": "0x0"
+         },
+         "index": 7
       },
       {
          "id": "solar",
@@ -1585,10 +1969,10 @@
             "sleep_flags": "0x0",
             "battery_sense_flags": "0x0",
             "capacity_estimator": "3",
-            "deep_sleep_current_ua": "300",
             "deep_sleep_time_seconds": "0",
             "reserved": "0x0"
-         }
+         },
+         "index": 8
       }
    ]
 }

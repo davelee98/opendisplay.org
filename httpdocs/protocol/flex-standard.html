@@ -1,20 +1,43 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="../assets/brand/logo-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/colors_and_type.css">
+  <link rel="stylesheet" href="../css/inner.css">
+  <link rel="stylesheet" href="../css/doc.css">
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="OpenDisplay Flex - Full-featured protocol: YAML configuration, BLE GATT and optional Wi‑Fi LAN (TCP), OpenDisplay Language, and shared image format.">
+  <meta name="description" content="OpenDisplay Flex — YAML configuration extension used by the reference firmware on development boards with different screens. Not a separate communication protocol.">
   <link rel="canonical" href="https://opendisplay.org/protocol/flex-standard.html">
   <meta property="og:title" content="OpenDisplay Flex - OpenDisplay">
-  <meta property="og:description" content="YAML configuration, BLE and optional Wi‑Fi LAN, OpenDisplay Language, shared image format.">
+  <meta property="og:description" content="Configuration extension for reference firmware on dev boards. Describes panels, pins, and device capabilities as a binary TLV blob.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://opendisplay.org/protocol/flex-standard.html">
-  <link rel="shortcut icon" href="../firmware/install/favicon.ico"> 
-  <link rel="stylesheet" href="https://opendisplay.org/common.css">
-  <title>OpenDisplay Flex - OpenDisplay</title>
+<title>OpenDisplay Flex - OpenDisplay</title>
 </head>
-<body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-  <main id="main-content">
+<body class="page-inner doc-page">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-bar">
+    <div class="site-bar__accent" aria-hidden="true"></div>
+    <div class="site-bar__inner">
+      <a href="../index.html" class="site-bar__brand" aria-label="OpenDisplay home">
+        <img src="../assets/brand/logo-mark.svg" alt="" class="site-bar__mark" width="24" height="24">
+        <span class="site-bar__wordmark">OpenDisplay</span>
+      </a>
+      <div class="site-bar__icons">
+        <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="OpenDisplay on GitHub (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="Join OpenDisplay on Discord (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+<main id="main-content" class="tool-page">
+    <div class="container">
   <div class="col" style="max-width: 1200px; margin-bottom: 10px;">
     <div class="breadcrumb">
       <a href="../index.html">Home</a><span class="breadcrumb-separator">/</span>
@@ -23,135 +46,258 @@
     </div>
   </div>
   <h1>OpenDisplay Flex</h1>
+  <p style="color: var(--muted-foreground); margin-top: -12px; margin-bottom: 24px;">
+    Configuration extension for the <strong>reference firmware</strong> — not a separate communication protocol.
+  </p>
 
   <div class="col panel">
-    <h2>Overview</h2>
+    <h2>What Flex is</h2>
     <p class="intro-text">
-      OpenDisplay Flex is the full-featured protocol standard with comprehensive configuration system, 
-      YAML-based schema, and advanced capabilities. This is the standard used by OpenDisplay firmware 
-      and provides complete control over device configuration, communication, and image transfer.
+      <strong>OpenDisplay Flex</strong> is a YAML-based configuration schema. Tools compile it into a binary TLV blob 
+      that describes a specific board: host MCU, display panel(s), pin wiring, power options, optional Wi‑Fi credentials, 
+      encryption keys, sensors, and other peripherals.
     </p>
     <p class="intro-text">
-      The Flex standard consists of <strong>three sub-standards</strong> (the communication spec covers both BLE and LAN):
+      The <a href="https://github.com/OpenDisplay/Firmware" style="color: var(--accent);">reference firmware</a> uses Flex 
+      so one firmware binary can support many development boards and e-paper panels. Flash a preset from the 
+      <a href="../firmware/toolbox/index.html" style="color: var(--accent);">Toolbox</a> (a Flex tool), and the device 
+      advertises the correct capabilities to any OpenDisplay client.
     </p>
-    <ul style="color: var(--muted-foreground); line-height: 1.8; margin-left: 20px; margin-top: 12px;">
-      <li><strong><a href="yaml-config.html" style="color: var(--accent); text-decoration: none;">Configuration</a></strong> - YAML-based schema defining device capabilities and settings</li>
-      <li><strong><a href="ble-flow.html" style="color: var(--accent); text-decoration: none;">Communication protocol</a></strong> - BLE GATT and optional Wi‑Fi LAN (TCP); same commands and responses on both transports</li>
-      <li><strong><a href="open-display-language.html" style="color: var(--accent); text-decoration: none;">OpenDisplay Language</a></strong> - Format for describing visual layouts for e-paper displays</li>
-    </ul>
-    <p class="intro-text" style="margin-top: 16px;">
-      The Flex standard uses the same <strong><a href="display-data-format.html" style="color: var(--accent); text-decoration: none;">image transmission format</a></strong> 
-      as the OpenDisplay standard, ensuring compatibility across both standards.
-    </p>
-  </div>
-
-  <div class="col panel">
-    <div class="tool-card">
-      <h2>1. Configuration</h2>
-      <p class="tool-description">
-        The YAML-based configuration schema that defines the BLE protocol structure. 
-        Learn about packet types, field definitions, enumerations, bitfields, and how the 
-        configuration system works. This standard defines how device capabilities and settings 
-        are structured and transmitted.
-      </p>
-      <a href="yaml-config.html" class="tool-link">View Configuration Standard</a>
-    </div>
-  </div>
-
-  <div class="col panel">
-    <div class="tool-card">
-      <h2>2. Communication protocol (BLE &amp; Wi‑Fi LAN)</h2>
-      <p class="tool-description">
-        BLE GATT connection flow, optional Wi‑Fi LAN transport (device as TCP server, length-prefixed frames), 
-        optional AES-CCM session encryption and <code>0x0050</code> authentication, configuration read/write, image transfer, 
-        command reference, and response codes. Commands and encryption behavior match across BLE and LAN.
-      </p>
-      <a href="ble-flow.html" class="tool-link">View communication protocol</a>
-    </div>
-  </div>
-
-  <div class="col panel">
-    <div class="tool-card">
-      <h2>3. OpenDisplay Language</h2>
-      <p class="tool-description">
-        The format standard for describing visual layouts for e-paper displays. Complete specification 
-        including all drawing element types, color support, font options, and template examples. 
-        This standard defines how visual content is structured and interpreted.
-      </p>
-      <a href="open-display-language.html" class="tool-link">View OpenDisplay Language</a>
-    </div>
-  </div>
-
-  <div class="col panel">
-    <div class="tool-card">
-      <h2>Display Data Format</h2>
-      <p class="tool-description">
-        Learn how image data is encoded into bytes for transmission to OpenDisplay devices. 
-        Understand the encoding format for each color scheme (monochrome, bitplanes, multi-color) 
-        with visual examples showing pixel ordering and byte packing. This format is shared with 
-        the OpenDisplay standard.
-      </p>
-      <a href="display-data-format.html" class="tool-link">View Format</a>
-    </div>
-  </div>
-
-  <div class="col panel">
-    <h2>Comparison with OpenDisplay Standard</h2>
     <p class="intro-text">
-      The Flex standard provides more features than OpenDisplay, but both share the same image format:
+      Clients still speak the <strong><a href="basic-standard.html" style="color: var(--accent);">OpenDisplay</a></strong> protocol 
+      for configuration read/write, image transfer, and encryption. Flex only defines <em>what</em> is stored in the 
+      configuration blob — see the <a href="ble-flow.html" style="color: var(--accent);">communication protocol</a> for 
+      <em>how</em> bytes move over BLE and optional LAN.
     </p>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+  </div>
+
+  <div class="col panel">
+    <h2>Who needs Flex</h2>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
       <thead>
         <tr style="border-bottom: 2px solid var(--border-color);">
-          <th style="padding: 12px; text-align: left; color: var(--foreground);">Feature</th>
-          <th style="padding: 12px; text-align: left; color: var(--foreground);">OpenDisplay</th>
-          <th style="padding: 12px; text-align: left; color: var(--foreground);">Flex</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">You are…</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">Read this</th>
         </tr>
       </thead>
       <tbody>
         <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 12px; color: var(--muted-foreground);">Configuration System</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">Minimal (announcement only)</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ Full YAML-based schema</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Building with reference firmware on a dev board</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Flex config + <a href="flex-tools.html" style="color: var(--accent);">Flex tools</a></td>
         </tr>
         <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 12px; color: var(--muted-foreground);">Image Format</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ OpenDisplay format</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ OpenDisplay format</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Adding a new panel to reference firmware</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><a href="adding-displays.html" style="color: var(--accent);">Adding a new panel</a> + <a href="yaml-config.html" style="color: var(--accent);">YAML schema</a></td>
         </tr>
         <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 12px; color: var(--muted-foreground);">Communication</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">Binary packets (fixed positions)</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ Binary packets (YAML-defined); BLE GATT + optional Wi‑Fi LAN (TCP)</td>
-        </tr>
-        <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 12px; color: var(--muted-foreground);">String Handling</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">16-bit integer IDs with mappings</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ Variable-length strings</td>
-        </tr>
-        <tr style="border-bottom: 1px solid var(--border-color);">
-          <td style="padding: 12px; color: var(--muted-foreground);">Advanced Features</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">Limited</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ Sensors, WiFi, power management</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Implementing OpenDisplay on a fixed product</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><a href="basic-standard.html" style="color: var(--accent);">OpenDisplay spec</a> only — Flex is optional</td>
         </tr>
         <tr>
-          <td style="padding: 12px; color: var(--muted-foreground);">Use Case</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">Products that want to show images from user's sources</td>
-          <td style="padding: 12px; color: var(--muted-foreground);">✓ Full-featured implementations</td>
+          <td style="padding: 12px; color: var(--muted-foreground);">Writing a sender (Python, HA, custom app)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><a href="basic-standard.html" style="color: var(--accent);">OpenDisplay spec</a> + <a href="ble-flow.html" style="color: var(--accent);">communication protocol</a></td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="col panel footer">
-    <div class="footer-links">
-      <a href="index.html">← Back to Protocol Overview</a>
-      <span class="footer-separator">•</span>
-      <a href="basic-standard.html">OpenDisplay</a>
-      <span class="footer-separator">•</span>
-      <a href="display-data-format.html">Display Data Format</a>
+  <div class="col panel">
+    <h2>Schema and binary format</h2>
+    <p class="intro-text">
+      Canonical schema: <code>firmware/toolbox/config.yaml</code> (version <strong>1.2</strong> — major 1, minor 2). 
+      The Toolbox and reference firmware share this file.
+    </p>
+    <p class="intro-text">
+      Configuration is transferred as an <strong>outer packet</strong>: 2-byte length, 1-byte version, a sequence of 
+      inner packets, then CRC16-CCITT. Each inner packet has a sequential <code>number</code>, a type <code>id</code>, 
+      and a typed payload. Full field definitions: <a href="yaml-config.html" style="color: var(--accent);">YAML configuration reference</a>.
+    </p>
+    <p class="intro-text">
+      On the wire, configuration uses OpenDisplay commands <code>0x0040</code> (read), <code>0x0041</code> (write / first chunk), 
+      and <code>0x0042</code> (subsequent chunks). After a successful write, send <code>0x000F</code> to reboot and apply.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <h2>Packet types in reference firmware</h2>
+    <p class="intro-text">
+      The table below lists Flex packet type IDs from the schema and whether the current reference firmware parses them 
+      at boot (<code>config_parser.cpp</code>).
+    </p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border-color);">
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">ID</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">Name</th>
+          <th style="padding: 12px; text-align: left; color: var(--foreground);">Reference firmware</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>1</code> (<code>0x01</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>system_config</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Required — MCU type, pins, communication modes</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>2</code> (<code>0x02</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>manufacturer_data</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Manufacturer ID and product strings</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>4</code> (<code>0x04</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>power_option</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Battery, deep sleep, power pins</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>32</code> (<code>0x20</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>display</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Up to 4 panels — resolution, color scheme, bus</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>33</code> (<code>0x21</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>led</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Up to 4 RGB/status LEDs</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>35</code> (<code>0x23</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>sensor_data</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Up to 4 sensors (e.g. SHT40)</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>36</code> (<code>0x24</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>data_bus</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ SPI / I2C bus instances</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>37</code> (<code>0x25</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>binary_inputs</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Buttons and GPIO inputs</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>38</code> (<code>0x26</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>wifi_config</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ ESP32 STA credentials + optional server URL/port</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>39</code> (<code>0x27</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>security_config</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ AES-128 PSK and encryption flag</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>40</code> (<code>0x28</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>touch_controller</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Touch IC + MSD slot mapping</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>41</code> (<code>0x29</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>passive_buzzer</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">✓ Buzzer instances</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--border-color);">
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>42</code> (<code>0x2A</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>nfc_config</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">In schema only — not parsed by reference firmware yet</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>43</code> (<code>0x2B</code>)</td>
+          <td style="padding: 12px; color: var(--muted-foreground);"><code>flash_config</code></td>
+          <td style="padding: 12px; color: var(--muted-foreground);">In schema only — not parsed by reference firmware yet</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col panel">
+    <h2>BLE advertising and discovery</h2>
+    <p class="intro-text">
+      Reference firmware uses BLE service and characteristic UUID <strong>0x2446</strong> (128-bit form 
+      <code>00002446-0000-1000-8000-00805F9B34FB</code>). Manufacturer Specific Data uses company identifier 
+      <strong>0x2446</strong> with a <strong>16-byte</strong> payload (dynamic status, touch, sensor slots, etc.). 
+      Clients can read the live MSD with command <code>0x0044</code>.
+    </p>
+    <p class="intro-text">
+      When <code>communication_modes</code> includes Wi‑Fi, the device joins the configured access point and listens on 
+      TCP port <strong>2446</strong> by default, advertising <code>_opendisplay._tcp</code> via mDNS. LAN uses the same 
+      command bytes as BLE — see <a href="ble-flow.html#lan-wifi-transport" style="color: var(--accent);">LAN transport</a>.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <h2>Image transfer (OpenDisplay protocol)</h2>
+    <p class="intro-text">
+      Flex configuration tells the device display dimensions and color scheme (packet type 32). Image bytes use the shared 
+      <a href="display-data-format.html" style="color: var(--accent);">display data format</a>. Reference firmware implements 
+      <strong>Direct Write</strong> (<code>0x0070</code> start, <code>0x0071</code> data chunks, <code>0x0072</code> end). 
+      Block upload commands <code>0x0064</code> / <code>0x0065</code> are defined in the OpenDisplay spec but are 
+      <strong>not implemented</strong> in reference firmware today.
+    </p>
+  </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Full schema reference</h2>
+      <p class="tool-description">
+        Every field, enum, and bit in the Flex configuration schema — packet types 1 through 43, CRC rules, and examples.
+      </p>
+      <a href="yaml-config.html" class="tool-link">YAML configuration reference</a>
     </div>
   </div>
+
+  <div class="col panel">
+    <div class="tool-card">
+      <h2>Flex tools</h2>
+      <p class="tool-description">
+        Browser tools for flashing reference firmware and editing Flex presets. Not needed if you only implement 
+        or talk to a fixed OpenDisplay product.
+      </p>
+      <a href="flex-tools.html" class="tool-link">Flex tools overview</a>
+    </div>
+  </div>
+    </div>
   </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <a href="../index.html" class="site-footer__lockup" aria-label="OpenDisplay home">
+            <img src="../assets/brand/logo_dark.svg" alt="OpenDisplay" class="site-footer__logo-full" width="140" height="41">
+          </a>
+          <span class="site-footer__tag">The open e-paper standard</span>
+          <p class="site-footer__lead">An open standard that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.</p>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Build</span>
+          <a href="../firmware/display/index.html" class="od-foot-link">BLE Tester</a>
+          <a href="../firmware/battery/index.html" class="od-foot-link">Battery calculator</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Reference</span>
+          <a href="../protocol/index.html" class="od-foot-link">Protocol spec</a>
+          <a href="../protocol/display-data-format.html" class="od-foot-link">Display data format</a>
+          <a href="../protocol/flex-standard.html" class="od-foot-link">OpenDisplay Flex</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Flex tools</span>
+          <a href="../protocol/flex-tools.html" class="od-foot-link">Overview</a>
+          <a href="../firmware/toolbox/index.html" class="od-foot-link">Toolbox</a>
+          <a href="../protocol/adding-displays.html" class="od-foot-link">Adding a new panel</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Community</span>
+          <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="od-foot-link">GitHub</a>
+          <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="od-foot-link">Discord</a>
+          <a href="https://www.openhomefoundation.org/" target="_blank" rel="noreferrer" class="od-foot-link">Open Home Foundation</a>
+        </div>
+      </div>
+      <div class="site-footer__bot">
+        <span>© 2026 OpenDisplay</span>
+        <div class="site-footer__legal">
+          <a href="../impressum.html" class="od-foot-link">Legal notice</a>
+          <a href="../datenschutz.html" class="od-foot-link">Privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

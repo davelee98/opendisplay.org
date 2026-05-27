@@ -233,8 +233,20 @@ ble_proto:
       - name: board_revision
         size: 1
         description: Board revision number
+      - name: simple_config_driver_index
+        size: 2
+        description: Simple-config driver board preset index (1-based; 0 = not set)
+      - name: simple_config_display_index
+        size: 2
+        description: Simple-config display preset index (1-based; 0 = not set)
+      - name: simple_config_power_index
+        size: 2
+        description: Simple-config power preset index (1-based; 0 = not set)
+      - name: simple_config_configured_at
+        size: 6
+        description: Unix timestamp in seconds (48-bit LE) when simple config was last applied
       - name: reserved
-        size: 18
+        size: 6
         description: Reserved bytes for future use
     4:
       name: power_option
@@ -1364,3 +1376,174 @@ ble_proto:
       - name: reserved
         size: 27
         description: Reserved bytes for future use (includes internal frequency/time scaling fields)
+    42:
+      name: nfc_config
+      required: false
+      repeatable: true
+      description: NFC config. Explicitly enables NFC init, selects NFC IC and data_bus, optional field-detect GPIO mapping into dynamicreturndata for BLE advertising button-like state.
+      fields:
+      - name: instance_number
+        size: 1
+        description: Unique index (0-based)
+      - name: nfc_ic_type
+        size: 1
+        description: NFC IC type enum
+        enum:
+          0:
+            name: auto
+            description: Auto (currently resolves to TNB132M flow in firmware)
+          1:
+            name: tnb132m
+            description: TNB132M / Type-3 flow
+      - name: bus_instance
+        size: 1
+        description: data_bus instance to use (I2C)
+      - name: flags
+        size: 1
+        description: NFC flags (bitfield)
+        bits:
+          0:
+            name: enabled
+            description: Must be set to enable NFC init (no fallback init if clear)
+          1:
+            name: reserved_1
+          2:
+            name: reserved_2
+          3:
+            name: reserved_3
+          4:
+            name: reserved_4
+          5:
+            name: reserved_5
+          6:
+            name: reserved_6
+          7:
+            name: reserved_7
+      - name: field_detect_pin
+        size: 1
+        description: GPIO pin for field detect input, 0xFF = disabled
+      - name: field_detect_mode
+        size: 1
+        description: Field detect mode enum
+        enum:
+          0:
+            name: disabled
+            description: Field-detect logic disabled
+          1:
+            name: gpio_level
+            description: GPIO level sampled/polled
+          2:
+            name: irq_latched
+            description: Reserved for interrupt-latched mode
+      - name: field_detect_active
+        size: 1
+        description: Active level enum for field_detect_pin
+        enum:
+          0:
+            name: active_low
+            description: Field present when GPIO is LOW
+          1:
+            name: active_high
+            description: Field present when GPIO is HIGH
+      - name: field_detect_debounce_ms
+        size: 1
+        description: Debounce time in milliseconds (0 = no debounce)
+      - name: power_pin
+        size: 1
+        description: NFC rail enable pin (0xFF = use data_bus pin_3 if present, else none)
+      - name: power_active
+        size: 1
+        description: Power pin polarity (reserved in current firmware)
+        enum:
+          0:
+            name: active_low
+          1:
+            name: active_high
+      - name: power_on_delay_ms
+        size: 1
+        description: Delay after enabling power before NFC access (ms)
+      - name: power_off_delay_ms
+        size: 1
+        description: Delay before power-off/park (reserved in current firmware)
+      - name: adv_button_byte_index
+        size: 1
+        description: dynamicreturndata byte index (0-10) for field-detect button-like state
+      - name: adv_button_button_id
+        size: 1
+        description: 3-bit button id (stored in lower bits)
+      - name: reserved_pin_1
+        size: 1
+        description: Reserved pin field
+      - name: reserved_pin_2
+        size: 1
+        description: Reserved pin field
+      - name: reserved
+        size: 16
+        description: Reserved bytes for future NFC IC-specific extensions
+    43:
+      name: flash_config
+      required: false
+      repeatable: true
+      description: External flash config. Enables flash deep-sleep pin sequencing using configured SPI-like pins; ignored when disabled.
+      fields:
+      - name: instance_number
+        size: 1
+        description: Unique index (0-based)
+      - name: flash_ic_type
+        size: 1
+        description: Flash IC type enum (reserved for future)
+        enum:
+          0:
+            name: auto
+            description: Generic SPI flash deep-sleep command flow
+      - name: bus_instance
+        size: 1
+        description: Reserved for future bus binding
+      - name: flags
+        size: 1
+        description: Flash flags (bitfield)
+        bits:
+          0:
+            name: enabled
+            description: Must be set to enable flash pin config/deep-sleep sequence
+          1:
+            name: reserved_1
+          2:
+            name: reserved_2
+          3:
+            name: reserved_3
+          4:
+            name: reserved_4
+          5:
+            name: reserved_5
+          6:
+            name: reserved_6
+          7:
+            name: reserved_7
+      - name: mosi_pin
+        size: 1
+        description: SPI MOSI pin (0xPN)
+      - name: sck_pin
+        size: 1
+        description: SPI SCK pin (0xPN)
+      - name: cs_pin
+        size: 1
+        description: SPI CS pin (0xPN)
+      - name: power_pin
+        size: 1
+        description: Optional power enable pin (reserved in current firmware)
+      - name: power_active
+        size: 1
+        description: Power pin polarity (reserved in current firmware)
+      - name: power_on_delay_ms
+        size: 1
+        description: Power-on delay before first command (reserved in current firmware)
+      - name: power_off_delay_ms
+        size: 1
+        description: Power-off delay after command (reserved in current firmware)
+      - name: mode
+        size: 1
+        description: Flash mode selector (reserved for future)
+      - name: reserved
+        size: 20
+        description: Reserved bytes for future flash extensions

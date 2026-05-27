@@ -2560,10 +2560,12 @@ class OpenDisplayBLE {
     
     const batteryCapacityOffset = getOffset('battery_capacity_mah');
     const deepSleepCurrentOffset = getOffset('deep_sleep_current_ua');
+    const capacityEstimatorOffset = getOffset('capacity_estimator');
     
     const result = {
       powerMode: packetData[getOffset('power_mode')],
       batteryCapacity: batteryCapacityOffset !== null ? readUint24(batteryCapacityOffset) : null,
+      capacityEstimator: capacityEstimatorOffset !== null ? packetData[capacityEstimatorOffset] : null,
       deepSleepCurrent: deepSleepCurrentOffset !== null && packetData.length >= deepSleepCurrentOffset + 4 ? 
                        readUint32(deepSleepCurrentOffset) : null
     };

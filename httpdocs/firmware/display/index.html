@@ -1,18 +1,22 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" href="../../assets/brand/logo-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/colors_and_type.css">
+  <link rel="stylesheet" href="../../css/inner.css">
+  <link rel="stylesheet" href="../../css/tool-ui.css">
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="../install/favicon.ico"> 
-    <link rel="stylesheet" href="https://opendisplay.org/common.css">
-    <title>OpenDisplay BLE Tester</title>
+<title>OpenDisplay BLE Tester</title>
     <style>
 /* Page-specific styles */
 label{font-weight:600;font-size:1.1rem;color:var(--foreground);margin-bottom:16px;display:block}
 textarea,input,select,button{
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace
+  font-family:var(--font-mono)
 }
 textarea{
-  width:100%;height:220px;background:var(--card-background);border:1px solid var(--border-color);border-radius:8px;
+  width:100%;height:220px;background:var(--card-background);border:1.5px solid var(--border-color);border-radius:8px;
   padding:12px;color:var(--foreground);font-size:14px;line-height:1.5;resize:vertical
 }
 textarea:focus{
@@ -27,9 +31,9 @@ button:hover{background:var(--accent-hover);transform:translateY(-1px);box-shado
 button:active{transform:none}
 input[type=text],select,
 .field-row input,input[style*="flex"]{
-  background:var(--card-background)!important;border:1px solid var(--border-color)!important;border-radius:6px!important;
+  background:var(--card-background)!important;border:1.5px solid var(--border-color)!important;border-radius:6px!important;
   padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace!important;
+  font-family:var(--font-mono)!important;
   min-height:40px!important;transition:.2s;appearance:none
 }
 input:focus,select:focus{
@@ -45,7 +49,7 @@ select{
 }
 select option{background:var(--card-background)!important;color:var(--foreground)!important;padding:8px 12px!important}
 input[type=file]{
-  background:var(--card-background)!important;border:1px solid var(--border-color)!important;
+  background:var(--card-background)!important;border:1.5px solid var(--border-color)!important;
   border-radius:6px!important;padding:8px 12px!important;color:var(--foreground)!important;font-size:14px!important;
   cursor:pointer!important;transition:.2s
 }
@@ -60,7 +64,7 @@ input[type=file]::file-selector-button{
   background:var(--accent);
   color:var(--accent-button);border:none;border-radius:6px;padding:6px 12px;
   margin-right:12px;font-weight:500;cursor:pointer;transition:.2s;
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:13px
+  font-family:var(--font-mono);font-size:13px
 }
 input[type=file]::file-selector-button:hover{
   background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,191,255,.3)
@@ -68,28 +72,64 @@ input[type=file]::file-selector-button:hover{
 input[type=file]::file-selector-button:active{
   transform:none
 }
-.ble-controls{display:flex;flex-direction:column;gap:16px}
+.ble-controls{display:flex;flex-direction:column;gap:10px}
 .ble-input-group,.ble-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .ble-input-group label{font-size:.9rem;margin:0;min-width:120px}
 .ble-input-group input[type=text]{flex:1;min-width:200px}
 .ble-actions button{flex:1;min-width:120px}
-.status-display{padding:12px;min-height:auto;text-align:center}
-.status-text{font-weight:600;color:var(--foreground);margin:0 0 8px}
+.status-display{padding:8px 10px;min-height:auto;text-align:left}
+.status-display .log-display{text-align:left}
+.status-text{font-weight:600;color:var(--foreground);margin:0 0 8px;text-align:center}
 .status-text.error{color:#f85149}
-.upload-progress-wrap{display:none;margin-top:8px;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden}
-.upload-progress-wrap.visible{display:block}
-.upload-progress-wrap progress{width:100%;height:100%;border:0;accent-color:var(--accent);color:var(--accent)}
-.upload-progress-wrap progress::-webkit-progress-value{background:var(--accent)}
-.upload-progress-wrap progress::-webkit-progress-bar{background:var(--border-color)}
-.upload-progress-wrap progress::-moz-progress-bar{background:var(--accent)}
-.connection-actions{display:flex;justify-content:center;flex-wrap:nowrap;gap:10px;margin-top:12px;width:100%}
+.page-inner.tool-ui .status-text{color:var(--foreground)}
+.page-inner.tool-ui .status-text.error{color:#f85149}
+.upload-progress-wrap{display:block;margin:0 0 12px;height:10px;background:var(--od-paper-3,#d8d4cc);border-radius:999px;overflow:hidden;border:1px solid var(--border-color)}
+.upload-progress-fill{height:100%;width:0;background:var(--od-blue);border-radius:999px;transition:width .2s ease}
+.preview-battery{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
+.preview-battery[hidden]{display:none!important}
+.preview-battery-icon{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+#nfcContentInput{
+  height:40px!important;min-height:40px!important;max-height:40px!important;
+  resize:none!important;padding:8px 12px!important;line-height:1.25!important
+}
+.nfc-actions{display:flex;flex-direction:column;gap:8px;width:100%;flex:1 1 100%;align-items:stretch;margin-bottom:0}
+.nfc-write-btn{width:100%;margin:0!important;box-sizing:border-box}
+.advertising-read-btn{width:100%;margin:0!important}
+.device-control-wrap{margin-top:8px}
+.device-actions{display:flex;gap:10px;width:100%;margin:0}
+.device-actions > button{flex:1 1 33%;min-width:0;margin:0!important}
+.debug-cmd-row{margin-top:8px;margin-bottom:0}
+.led-viz{margin:0 0 10px;padding:10px 12px;background:var(--card-background);border:1px solid var(--border-color);border-radius:10px}
+.led-viz-lamp-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:8px}
+.led-viz-lamp{width:48px;height:48px;border-radius:50%;background:#141414;border:2px solid var(--border-color);transition:background .08s,box-shadow .12s}
+.led-viz-lamp.active{box-shadow:0 0 18px color-mix(in srgb,currentColor 55%,transparent),0 0 6px color-mix(in srgb,currentColor 35%,transparent)}
+.led-viz-timeline{display:flex;width:100%;height:32px;border-radius:8px;overflow:hidden;border:1px solid var(--border-color);background:var(--od-paper-3,#e8e4dc);margin-bottom:6px}
+.led-viz-seg{height:100%;min-width:4px;box-sizing:border-box;border-right:1px solid rgba(0,0,0,.06)}
+.led-viz-seg:last-child{border-right:0}
+.led-viz-seg--pause{background:repeating-linear-gradient(-45deg,rgba(0,0,0,.04),rgba(0,0,0,.04) 4px,rgba(0,0,0,.1) 4px,rgba(0,0,0,.1) 8px)}
+.led-viz-seg--gap{background:repeating-linear-gradient(-45deg,rgba(0,0,0,.06),rgba(0,0,0,.06) 5px,rgba(0,0,0,.16) 5px,rgba(0,0,0,.16) 10px)}
+.led-viz-meta{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:.75rem;color:var(--muted-foreground);margin-bottom:4px}
+.led-viz-key{display:inline-block;width:10px;text-align:center;margin-right:4px;font-size:.7rem}
+.led-viz-key--pause{opacity:.55}
+.led-viz-key--gap{opacity:.75}
+.led-viz-help{margin:0;font-size:.78rem;line-height:1.45}
+.led-viz-timeline--empty{display:flex;align-items:center;justify-content:center;min-height:40px;height:auto}
+.led-viz-empty{font-size:.8rem;color:var(--muted-foreground);padding:4px 8px;text-align:center}
+.led-instance-row{margin-bottom:4px}
+.led-actions{display:flex;gap:10px;margin-top:10px;width:100%}
+.led-actions > button{flex:1 1 50%;min-width:0;margin:0!important}
+.led-actions > .led-stop-btn{background:var(--card-background)!important;color:var(--foreground)!important;border:1.5px solid var(--border-color)!important;box-shadow:none!important}
+.led-actions > .led-stop-btn:hover{background:var(--od-paper-3,#e8e4dc)!important;color:var(--foreground)!important;transform:translateY(-1px)}
+.connection-actions{display:flex;justify-content:center;flex-wrap:nowrap;gap:10px;margin-top:0;width:100%}
+.display-container{display:none}
+.display-container.visible{display:block}
 .connection-actions > button{min-width:120px}
 .connection-actions > #connectbutton{flex:1 1 100%}
 .connection-actions > button.connected-only{flex:1 1 50%;min-width:0}
 .connected-only{display:none}
 .connected-only.visible{display:block}
 .log-display{
-  font-family:'JetBrains Mono','Fira Code','Consolas',monospace;
+  font-family:var(--font-mono);
   font-size:12px;color:#8b949e;max-height:200px;overflow-y:auto;white-space:pre-wrap
 }
 .log-entry{margin-bottom:2px}
@@ -100,21 +140,40 @@ input[type=file]::file-selector-button:active{
   border: 1px solid var(--border-color);
   background: var(--background);
   display: block;
-  margin: 10px auto;
+  margin: 0 auto;
   border-radius: 8px;
   touch-action: none;
   cursor: crosshair;
+  aspect-ratio: var(--canvas-ar-w, 800) / var(--canvas-ar-h, 480);
+  width: min(800px, 100%, calc(44dvh * var(--canvas-ar-w, 800) / var(--canvas-ar-h, 480)));
+  height: auto;
 }
-.draw-tools{margin-top:12px}
+.draw-tools{margin-top:4px}
 .draw-tools .field-row{align-items:center}
 .draw-label{font-size:.9rem;margin:0 8px 0 0;font-weight:500}
-.color-swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.color-swatch{width:28px;height:28px;border:2px solid var(--border-color);border-radius:6px;padding:0;cursor:pointer;flex-shrink:0}
-.color-swatch:hover{border-color:var(--accent);transform:scale(1.05)}
-.color-swatch.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.color-swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center}
+.color-swatch{width:36px;height:36px;border:2px solid var(--border-color);border-radius:8px;padding:0;cursor:pointer;flex-shrink:0;box-sizing:border-box}
+button.color-swatch{
+  width:36px!important;height:36px!important;min-height:36px!important;
+  padding:0!important;margin:0!important;border:2px solid var(--border-color)!important;
+  border-radius:8px!important;box-shadow:none!important;font-size:0!important;line-height:0!important
+}
+button.color-swatch--light{border:2px solid var(--od-ink-3,#5A6470)!important}
+button.color-swatch.selected{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent)!important}
+button.color-swatch:hover{border-color:var(--accent)!important;transform:scale(1.05);box-shadow:none!important}
+button.color-swatch.selected:hover{box-shadow:0 0 0 2px var(--accent)!important}
+.tool-ui button.color-swatch:hover,.tool-ui button.color-swatch:active{transform:scale(1.05)}
 .draw-hint{font-size:.8rem;color:var(--muted-foreground);margin-left:8px}
 .selected-text-wrap{flex-wrap:wrap;align-items:center;gap:8px}
-.draw-mode-bar{display:flex;justify-content:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.draw-tools .color-row{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;width:100%;margin-bottom:4px}
+.draw-mode-bar{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.draw-mode-bar__tools{display:flex;gap:8px;align-items:center}
+.draw-mode-bar__edit{display:flex;gap:8px;align-items:center}
+.draw-mode-bar__edit button{
+  margin:0!important;height:48px!important;min-height:48px!important;
+  padding:0 14px!important;border-radius:10px!important;box-sizing:border-box;
+  display:inline-flex;align-items:center;justify-content:center
+}
 .draw-mode-btn{
   display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;
   padding:0;margin:0;border:2px solid var(--border-color);border-radius:10px;
@@ -125,12 +184,12 @@ input[type=file]::file-selector-button:active{
 .draw-mode-btn.active{border-color:var(--accent);background:rgba(0,191,255,.08);color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .draw-mode-panel{display:none}
 .draw-mode-panel.active{display:block}
-.preview-header{text-align:center;margin-top:24px;margin-bottom:8px}
+.preview-header{text-align:center;margin:0;line-height:1.25}
 .preview-header label{display:inline;margin-bottom:0}
-.preview-meta{display:inline;font-size:0.9rem;color:var(--muted-foreground);font-weight:normal;margin-left:0.25em}
+.preview-meta{display:inline;font-size:0.875rem;color:var(--muted-foreground);font-weight:normal;margin-left:0.25em}
 .preview-meta svg{vertical-align:middle;width:1em;height:1em;fill:currentColor}
 .canvas-container{
-  text-align:center;padding:16px 0
+  text-align:center;padding:2px 0 4px;overflow:hidden;-webkit-overflow-scrolling:touch
 }
 .checkbox-group{
   display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px
@@ -141,7 +200,26 @@ input[type=file]::file-selector-button:active{
 .checkbox-group label{
   font-weight:normal;font-size:.9rem;margin:0;display:inline-flex;align-items:center;gap:6px
 }
-.field-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.field-row{display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+/* Compact page layout — beat inner.css / tool-ui.css on this page */
+.page-inner.tool-ui .tool-page{padding-top:24px;padding-bottom:48px}
+.page-inner.tool-ui .tool-page > .container > .col{margin-bottom:8px}
+.page-inner.tool-ui .tool-page .panel{padding:14px 16px}
+.page-inner.tool-ui .tool-page .panel > label{margin-bottom:6px;font-size:1rem}
+.page-inner.tool-ui .tool-page .field-row{margin-bottom:6px;gap:10px}
+.page-inner.tool-ui .tool-page .ble-controls{gap:8px}
+.page-inner.tool-ui .tool-page .ble-controls[style*="margin-top"]{margin-top:4px!important}
+#displayPanel{padding:6px 14px 10px}
+#displayPanel .field-row{margin-bottom:6px}
+#displayPanel #canvasOptions{margin-top:2px}
+#displayPanel #canvasOptions .field-row{margin-top:0!important;margin-bottom:6px}
+#displayPanel #canvasOptions .field-row + .field-row{margin-top:0!important}
+#connectionPanel .status-text{margin:0 0 6px}
+#connectionPanel .upload-progress-wrap{margin:0 0 8px}
+.page-inner.tool-ui .tool-page .status-display{margin-top:6px!important}
+.advertising-read-btn,.nfc-write-btn{margin-top:0!important}
+.field-row.nfc-actions{margin-bottom:0}
+.led-viz-help{margin-top:2px}
 /* Responsive */
 .col{min-width:0}
 .ble-input-group input[type=text]{min-width:0}
@@ -153,33 +231,51 @@ input[type=file]::file-selector-button:active{
   .field-row label{min-width:0}
   .field-row input,.field-row select,.field-row div{flex:1 1 auto;min-width:0}
 }
-#myCanvas{width:min(800px,100%);height:auto;display:block;margin:10px auto}
-.canvas-container{overflow:hidden;padding:16px 0;-webkit-overflow-scrolling:touch}
 .log-display{word-break:break-word;overflow-wrap:anywhere}
 .status-display{min-width:0;overflow-wrap:break-word}
-/* Link styles are in common.css */
+/* Link styles use design tokens from doc.css */
         </style>
 </head>
-<body>
-    <div class="col">
-      <div class="breadcrumb">
-        <a href="../../index.html">Home</a><span class="breadcrumb-separator">/</span>
-        <a href="../index.html">Firmware</a><span class="breadcrumb-separator">/</span>
-        <span>BLE Tester</span>
+<body class="page-inner tool-ui">
+      <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-bar">
+    <div class="site-bar__accent" aria-hidden="true"></div>
+    <div class="site-bar__inner">
+      <a href="../../index.html" class="site-bar__brand" aria-label="OpenDisplay home">
+        <img src="../../assets/brand/logo-mark.svg" alt="" class="site-bar__mark" width="24" height="24">
+        <span class="site-bar__wordmark">OpenDisplay</span>
+      </a>
+      <div class="site-bar__icons">
+        <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="OpenDisplay on GitHub (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="site-bar__icon" aria-label="Join OpenDisplay on Discord (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
       </div>
     </div>
-    <div class="col panel">
-        <div class="status-display">
+  </header>
+
+  <main id="main-content" class="tool-page">
+    <div class="container">
+<div class="col panel">
+        <div id="connectionPanel" class="connection-panel">
             <div id="statusText" class="status-text">Not connected</div>
-            <div id="uploadProgressWrap" class="upload-progress-wrap"><progress id="uploadProgress" max="100" value="0"></progress></div>
+            <div id="uploadProgressWrap" class="upload-progress-wrap"><div id="uploadProgressBar" class="upload-progress-fill"></div></div>
+            <div class="connection-actions">
+                <button id="connectbutton" type="button" onclick="preConnect();">Connect</button>
+                <button id="uploadButton" type="button" onclick="sendDirectWriteAuto();" class="connected-only">Upload image</button>
+                <button id="disconnectbutton" type="button" onclick="preConnect();" class="connected-only">Disconnect</button>
+            </div>
         </div>
-        <div class="connection-actions">
-            <button id="connectbutton" type="button" onclick="preConnect();">Connect</button>
-            <button id="uploadButton" type="button" onclick="sendDirectWriteAuto();" class="connected-only">Upload image</button>
-            <button id="disconnectbutton" type="button" onclick="preConnect();" class="connected-only">Disconnect</button>
-        </div>
+    </div>
+    <div id="displayPanel" class="col panel display-container connected-only">
         <div class="preview-header">
-            <label>Preview</label>
+            <span id="previewBatterySoc" class="preview-meta preview-battery" hidden>
+                <svg class="preview-battery-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M20 10v4"/><path d="M6 11v2" opacity=".45"/></svg>
+                <span id="previewBatterySocText"></span>
+            </span>
             <span id="previewMeta" class="preview-meta"></span>
             <span id="previewLockIcon" class="preview-meta" style="display:none;"></span>
         </div>
@@ -189,27 +285,29 @@ input[type=file]::file-selector-button:active{
         <div id="drawTools" class="draw-tools">
             <!-- New tool: add <button class="draw-mode-btn" data-draw-mode="id">…</button> and <div class="draw-mode-panel" data-draw-mode-panel="id">…</div>; setDrawMode only toggles panels that exist. -->
             <div class="draw-mode-bar" role="tablist" aria-label="Canvas tools">
-                <button type="button" class="draw-mode-btn active" data-draw-mode="draw" role="tab" aria-selected="true" title="Draw" aria-label="Draw">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-                </button>
-                <button type="button" class="draw-mode-btn" data-draw-mode="text" role="tab" aria-selected="false" title="Text" aria-label="Text">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h16v2"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
-                </button>
-                <button type="button" class="draw-mode-btn" data-draw-mode="qr" role="tab" aria-selected="false" title="QR code" aria-label="QR code">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3zm2 2h4v4H5zm9-2h8v8h-8zm2 2h4v4h-4zM3 14h8v8H3zm2 2h4v4H5zm9-2h2v2h-2v2h2v2h-2m2-6h2v2h2v2h-2v2h2m-6 2h2v2m4 0h2v2h2v2h-2v2"/></svg>
-                </button>
-            </div>
-            <div id="drawModePanelDraw" class="draw-mode-panel active" data-draw-mode-panel="draw">
-                <div class="field-row">
+                <div class="draw-mode-bar__tools">
+                    <button type="button" class="draw-mode-btn active" data-draw-mode="draw" role="tab" aria-selected="true" title="Draw" aria-label="Draw">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    </button>
+                    <button type="button" class="draw-mode-btn" data-draw-mode="text" role="tab" aria-selected="false" title="Text" aria-label="Text">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h16v2"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                    </button>
+                    <button type="button" class="draw-mode-btn" data-draw-mode="qr" role="tab" aria-selected="false" title="QR code" aria-label="QR code">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3zm2 2h4v4H5zm9-2h8v8h-8zm2 2h4v4h-4zM3 14h8v8H3zm2 2h4v4H5zm9-2h2v2h-2v2h2v2h-2m2-6h2v2h2v2h-2v2h2m-6 2h2v2m4 0h2v2h2v2h-2v2"/></svg>
+                    </button>
+                </div>
+                <div class="draw-mode-bar__edit">
                     <button type="button" id="clearCanvasBtn" onclick="clearDrawingCanvas()">Clear</button>
                     <button type="button" id="undoBtn" onclick="undoLast()">Undo</button>
-                    <span class="draw-label">Draw color:</span>
+                </div>
+            </div>
+            <div id="drawModePanelDraw" class="draw-mode-panel active" data-draw-mode-panel="draw">
+                <div class="color-row">
                     <div id="drawColorSwatches" class="color-swatches"></div>
                 </div>
             </div>
             <div id="drawModePanelText" class="draw-mode-panel" data-draw-mode-panel="text">
-                <div class="field-row">
-                    <span class="draw-label">Color:</span>
+                <div class="color-row">
                     <div id="textColorSwatches" class="color-swatches"></div>
                 </div>
                 <div class="field-row">
@@ -229,8 +327,7 @@ input[type=file]::file-selector-button:active{
                 </div>
             </div>
             <div id="drawModePanelQr" class="draw-mode-panel" data-draw-mode-panel="qr">
-                <div class="field-row">
-                    <span class="draw-label">Color:</span>
+                <div class="color-row">
                     <div id="qrColorSwatches" class="color-swatches"></div>
                 </div>
                 <div class="field-row">
@@ -250,8 +347,8 @@ input[type=file]::file-selector-button:active{
                 </div>
             </div>
         </div>
-        <div id="canvasOptions" class="connected-only">
-            <div class="field-row" style="margin-top: 12px;">
+        <div id="canvasOptions">
+            <div class="field-row">
                 <label for="ditheringSelect" style="margin: 0; min-width: 120px;">Dithering:</label>
                 <select id="ditheringSelect" onchange="getPixelData()" style="flex: 1;">
                     <option value="none" selected>None</option>
@@ -264,15 +361,9 @@ input[type=file]::file-selector-button:active{
                     <option value="jarvis-judice-ninke">Jarvis-Judice-Ninke</option>
                 </select>
             </div>
-            <div class="field-row" style="margin-top: 16px;">
+            <div class="field-row">
                 <label for="imageUpload" style="margin: 0; min-width: 120px;">Select image:</label>
                 <input type="file" id="imageUpload" accept="image/*" onclick="resetImageSelector()" onchange="uploadImage()" style="flex: 1;" />
-            </div>
-            <div class="checkbox-group">
-                <label style="margin: 0; display: inline-flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" id="fastRefreshToggle" />
-                    <span>Use fast/partial refresh (if supported)</span>
-                </label>
             </div>
             <div class="field-row" style="margin-top: 12px;display:none">
                 <label for="colorSchemeSelect" style="margin: 0; min-width: 120px;">Color Scheme:</label>
@@ -291,51 +382,64 @@ input[type=file]::file-selector-button:active{
     <div id="ledControlPanel" class="col panel" style="display: none;">
         <label>LED</label>
         <div class="ble-controls" style="margin-top: 8px;">
-            <div class="field-row" style="align-items: center;">
-                <span id="ledInstanceLabel" style="display: none; margin-right: 8px;">Instance:</span>
-                <select id="ledInstanceSelect" style="display: none; min-width: 80px;"></select>
-                <button type="button" onclick="applyLedPreset('single');">Single</button>
-                <button type="button" onclick="applyLedPreset('double');">Double</button>
-                <button type="button" onclick="applyLedPreset('rgb');">RGB</button>
-                <button type="button" id="ledSendBtn" onclick="sendLedPattern();">Send</button>
+            <div id="ledInstanceRow" class="field-row led-instance-row" style="display: none; align-items: center;">
+                <span id="ledInstanceLabel" class="draw-label" style="min-width: 88px;">Instance</span>
+                <select id="ledInstanceSelect" style="flex: 1; min-width: 0;"></select>
+            </div>
+            <div class="led-viz">
+                <div class="led-viz-lamp-wrap">
+                    <div id="ledVizLamp" class="led-viz-lamp" aria-hidden="true"></div>
+                    <span id="ledVizPhase" class="draw-hint">Pattern preview</span>
+                </div>
+                <div id="ledVizTimeline" class="led-viz-timeline" role="img" aria-label="LED pattern timeline"></div>
+                <div class="led-viz-meta">
+                    <span><span class="led-viz-key">■</span> flash</span>
+                    <span><span class="led-viz-key led-viz-key--pause">▨</span> pause (on)</span>
+                    <span><span class="led-viz-key led-viz-key--gap">▥</span> gap</span>
+                    <span id="ledVizRepeatLabel">Repeats: 1×</span>
+                </div>
+                <p class="draw-hint led-viz-help">Each color blinks × count, waits <strong>on</strong> ms between blinks, then <strong>gap</strong> ms before the next color. The whole sequence repeats.</p>
             </div>
             <div class="field-row" style="margin-top: 8px; align-items: center;">
                 <span class="draw-label" style="min-width: 88px;">Brightness</span>
-                <input id="ledBrightness" type="range" min="1" max="16" value="8" oninput="syncLedBrightnessLabel();" style="width: 120px; accent-color: var(--accent);" />
-                <span id="ledBrightnessVal" class="draw-label" style="min-width: 24px;">8</span>
+                <input id="ledBrightness" type="range" min="1" max="16" value="12" oninput="syncLedBrightnessLabel();" style="flex: 1; min-width: 0; accent-color: var(--accent);" />
+                <span id="ledBrightnessVal" class="draw-label" style="min-width: 24px;">12</span>
                 <span class="draw-label" style="min-width: 70px;">Repeats</span>
                 <input id="ledRepeats" type="number" min="1" max="254" value="1" style="width: 92px;" />
-                <span class="draw-hint">Units are 100ms steps on-device</span>
             </div>
             <div class="field-row" style="margin-top: 8px; align-items: center;">
                 <span class="draw-label" style="min-width: 88px;">Color 1</span>
-                <input id="ledColor1" type="color" value="#ffffff" style="width: 64px; padding: 0 6px!important;" />
+                <input id="ledColor1" type="color" value="#ff0000" style="width: 64px; padding: 0 6px!important;" />
                 <span class="draw-label">x</span>
                 <input id="ledCount1" type="number" min="0" max="15" value="1" style="width: 76px;" />
                 <span class="draw-label">on</span>
-                <input id="ledOn1" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <input id="ledOn1" type="number" min="0" max="1500" value="150" style="width: 86px;" />
                 <span class="draw-label">gap</span>
-                <input id="ledGap1" type="number" min="0" max="25500" value="200" style="width: 92px;" />
+                <input id="ledGap1" type="number" min="0" max="25500" value="80" style="width: 92px;" />
             </div>
             <div class="field-row" style="margin-top: 8px; align-items: center;">
                 <span class="draw-label" style="min-width: 88px;">Color 2</span>
-                <input id="ledColor2" type="color" value="#000000" style="width: 64px; padding: 0 6px!important;" />
+                <input id="ledColor2" type="color" value="#00ff00" style="width: 64px; padding: 0 6px!important;" />
                 <span class="draw-label">x</span>
-                <input id="ledCount2" type="number" min="0" max="15" value="0" style="width: 76px;" />
+                <input id="ledCount2" type="number" min="0" max="15" value="1" style="width: 76px;" />
                 <span class="draw-label">on</span>
-                <input id="ledOn2" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <input id="ledOn2" type="number" min="0" max="1500" value="150" style="width: 86px;" />
                 <span class="draw-label">gap</span>
-                <input id="ledGap2" type="number" min="0" max="25500" value="0" style="width: 92px;" />
+                <input id="ledGap2" type="number" min="0" max="25500" value="80" style="width: 92px;" />
             </div>
             <div class="field-row" style="margin-top: 8px; align-items: center;">
                 <span class="draw-label" style="min-width: 88px;">Color 3</span>
-                <input id="ledColor3" type="color" value="#000000" style="width: 64px; padding: 0 6px!important;" />
+                <input id="ledColor3" type="color" value="#0000ff" style="width: 64px; padding: 0 6px!important;" />
                 <span class="draw-label">x</span>
-                <input id="ledCount3" type="number" min="0" max="15" value="0" style="width: 76px;" />
+                <input id="ledCount3" type="number" min="0" max="15" value="1" style="width: 76px;" />
                 <span class="draw-label">on</span>
-                <input id="ledOn3" type="number" min="0" max="1500" value="200" style="width: 86px;" />
+                <input id="ledOn3" type="number" min="0" max="1500" value="150" style="width: 86px;" />
                 <span class="draw-label">gap</span>
-                <input id="ledGap3" type="number" min="0" max="25500" value="0" style="width: 92px;" />
+                <input id="ledGap3" type="number" min="0" max="25500" value="200" style="width: 92px;" />
+            </div>
+            <div class="led-actions">
+                <button type="button" id="ledStartBtn" onclick="sendLedPattern();">Start</button>
+                <button type="button" id="ledStopBtn" class="led-stop-btn" onclick="sendLedStop();">Stop</button>
             </div>
         </div>
     </div>
@@ -385,6 +489,45 @@ input[type=file]::file-selector-button:active{
             </div>
         </div>
     </div>
+    <div id="nfcPanelWrap" class="col panel connected-only">
+        <label>NFC</label>
+        <div class="ble-controls" style="margin-top: 8px;">
+            <div class="field-row">
+                <label for="nfcTypeSelect" style="margin: 0; min-width: 120px;">NFC type:</label>
+                <select id="nfcTypeSelect" style="flex: 1;" onchange="onNfcTypeChanged();">
+                    <option value="uri" selected>URI</option>
+                    <option value="text">Text</option>
+                    <option value="mime">MIME (e.g. vCard)</option>
+                    <option value="rawndef">Raw NDEF (hex)</option>
+                    <option value="wellknown">Well-known (raw)</option>
+                </select>
+            </div>
+            <div class="field-row" id="nfcMimeTypeRow" style="display: none;">
+                <label for="nfcMimeTypeInput" style="margin: 0; min-width: 120px;">MIME type:</label>
+                <input type="text" id="nfcMimeTypeInput" value="text/vcard" style="flex: 1;" />
+            </div>
+            <div class="field-row" id="nfcWellKnownTypeRow" style="display: none;">
+                <label for="nfcWellKnownTypeInput" style="margin: 0; min-width: 120px;">Type (ASCII):</label>
+                <input type="text" id="nfcWellKnownTypeInput" placeholder="Sp, ac, Hr, Hs, ..." style="flex: 1;" />
+            </div>
+            <div class="field-row">
+                <label for="nfcContentInput" style="margin: 0; min-width: 120px;">NFC content:</label>
+                <textarea id="nfcContentInput" rows="1" placeholder="https://opendisplay.org" style="flex: 1; width: 100%; box-sizing: border-box;">https://opendisplay.org</textarea>
+            </div>
+            <div class="field-row nfc-actions">
+                <button type="button" class="nfc-write-btn" onclick="writeNfcOverBle();">Write NFC</button>
+            </div>
+        </div>
+    </div>
+    <div id="advertisingPanelWrap" class="col panel connected-only">
+        <label>Advertising data</label>
+        <div class="ble-controls" style="margin-top: 8px;">
+            <pre id="advertisingDecodeOut" class="log-display" style="min-height: 72px; max-height: 260px; overflow: auto; white-space: pre-wrap; margin: 0 0 6px; width: 100%; box-sizing: border-box; font-size: 12px;"></pre>
+            <div class="field-row" style="margin-bottom: 0;">
+                <button type="button" id="advertisingReadBtn" class="advertising-read-btn" onclick="readAdvertisingData();">Read advertising data</button>
+            </div>
+        </div>
+    </div>
     <div class="col panel">
         <label>Device filter &amp; log</label>
         <div class="ble-controls">
@@ -392,28 +535,20 @@ input[type=file]::file-selector-button:active{
                 <label for="namePrefix">OD Device filter:</label>
                 <input type="text" id="namePrefix" value="OD" placeholder="OD (comma separated)" />
             </div>
-            <div id="deviceControlWrap" class="connected-only" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
-                <label style="margin-bottom: 8px;">Device</label>
-                <div class="field-row" style="align-items: center;">
-                    <button type="button" onclick="deviceReboot();">Reboot</button>
-                    <button type="button" onclick="deviceDeepSleep();">Deep sleep</button>
-                    <button type="button" onclick="deviceRebootBootloader();">Reboot to bootloader</button>
-                </div>
-            </div>
-            <div id="msdPanelWrap" class="connected-only" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
-                <label style="margin-bottom: 8px;">Manufacturer data (same as BLE advertising)</label>
-                <div class="field-row" style="align-items: flex-start; flex-direction: column; gap: 8px;">
-                    <button type="button" id="msdReadBtn" onclick="readMsdAdvertisingDecode();">Read &amp; decode MSD</button>
-                    <pre id="msdDecodeOut" class="log-display" style="min-height: 72px; max-height: 260px; overflow: auto; white-space: pre-wrap; margin: 0; width: 100%; box-sizing: border-box; font-size: 12px;"></pre>
-                </div>
+            <div class="field-row debug-cmd-row">
+                <label for="cmdTXT" style="margin: 0; min-width: 120px;">Debug CMD (Hex):</label>
+                <input type="text" id="cmdTXT" value="0001" style="flex: 1;" />
+                <button type="button" onclick="if(bleLib)bleLib.sendHexCommand(document.getElementById('cmdTXT').value).catch(e=>addLog('Error: '+e.message,'error'));">Send</button>
             </div>
             <div class="status-display" style="margin-top: 12px;">
                 <div id="logDisplay" class="log-display"></div>
             </div>
-            <div class="field-row" style="margin-top: 12px;">
-                <label for="cmdTXT" style="margin: 0; min-width: 120px;">Debug CMD (Hex):</label>
-                <input type="text" id="cmdTXT" value="0001" style="flex: 1;" />
-                <button type="button" onclick="if(bleLib)bleLib.sendHexCommand(document.getElementById('cmdTXT').value).catch(e=>addLog('Error: '+e.message,'error'));">Send</button>
+            <div id="deviceControlWrap" class="connected-only device-control-wrap">
+                <div class="device-actions">
+                    <button type="button" onclick="deviceReboot();">Reboot</button>
+                    <button type="button" onclick="deviceDeepSleep();">Deep sleep</button>
+                    <button type="button" onclick="deviceRebootBootloader();">Bootloader</button>
+                </div>
             </div>
         </div>
     </div>
@@ -422,6 +557,7 @@ input[type=file]::file-selector-button:active{
       <script src="../../l/qrcode.js"></script>
       <script src="../../js/ble-common.js"></script>
       <script src="../../js/opendisplay-msd.js"></script>
+      <script src="../../js/opendisplay-battery.js"></script>
     <script>
         let bleLib;
         widthInput = 800;
@@ -452,6 +588,8 @@ input[type=file]::file-selector-button:active{
         let drawToolMode = 'draw';
         let deviceLedCount = 0;
         let deviceBuzzerCount = 0;
+        let deviceHasNfcConfig = false;
+        let deviceCapacityEstimator = null;
         let lastDeviceParsedConfigForMsd = null;
         const buzzerScale = { freqMinHz: 200, freqMaxHz: 4000, durationUnitMs: 5 };
         function setDrawMode(mode) {
@@ -488,30 +626,69 @@ input[type=file]::file-selector-button:active{
             const connectBtn = document.getElementById('connectbutton');
             const uploadBtn = document.getElementById('uploadButton');
             const disconnectBtn = document.getElementById('disconnectbutton');
-            const canvasOptions = document.getElementById('canvasOptions');
+            const displayPanel = document.getElementById('displayPanel');
             const deviceControlWrap = document.getElementById('deviceControlWrap');
-            const msdPanelWrap = document.getElementById('msdPanelWrap');
+            const advertisingPanelWrap = document.getElementById('advertisingPanelWrap');
+            const nfcPanelWrap = document.getElementById('nfcPanelWrap');
             if (connectBtn) connectBtn.style.display = connected ? 'none' : '';
             if (uploadBtn) uploadBtn.classList.toggle('visible', connected);
             if (disconnectBtn) disconnectBtn.classList.toggle('visible', connected);
-            if (canvasOptions) canvasOptions.classList.toggle('visible', connected);
+            if (displayPanel) displayPanel.classList.toggle('visible', connected);
             if (deviceControlWrap) deviceControlWrap.classList.toggle('visible', connected);
-            if (msdPanelWrap) msdPanelWrap.classList.toggle('visible', connected);
+            if (advertisingPanelWrap) advertisingPanelWrap.classList.toggle('visible', connected);
+            if (nfcPanelWrap) nfcPanelWrap.classList.toggle('visible', connected && deviceHasNfcConfig);
             if (!connected) {
-                const msdOut = document.getElementById('msdDecodeOut');
-                if (msdOut) msdOut.textContent = '';
+                const advertisingOut = document.getElementById('advertisingDecodeOut');
+                if (advertisingOut) advertisingOut.textContent = '';
+                clearPreviewBatterySoc();
                 lastDeviceParsedConfigForMsd = null;
+                deviceCapacityEstimator = null;
+                deviceHasNfcConfig = false;
                 setLedUI(false);
                 setBuzzerUI(false);
             }
         }
-        function readMsdAdvertisingDecode() {
-            const out = document.getElementById('msdDecodeOut');
-            const btn = document.getElementById('msdReadBtn');
+        function extractPowerOptionFromParsedConfig(parsedConfig) {
+            if (!parsedConfig || !Array.isArray(parsedConfig.packets)) return null;
+            for (let i = 0; i < parsedConfig.packets.length; i++) {
+                const packet = parsedConfig.packets[i];
+                if (packet.id === 0x04 && packet.powerOption) return packet.powerOption;
+            }
+            return null;
+        }
+        function clearPreviewBatterySoc() {
+            const wrap = document.getElementById('previewBatterySoc');
+            const text = document.getElementById('previewBatterySocText');
+            if (text) text.textContent = '';
+            if (wrap) wrap.hidden = true;
+        }
+        function updateBatterySocDisplay(decoded) {
+            const wrap = document.getElementById('previewBatterySoc');
+            const text = document.getElementById('previewBatterySocText');
+            const B = typeof OpenDisplayBattery !== 'undefined' ? OpenDisplayBattery : null;
+            if (!wrap || !text) return;
+            if (!decoded || decoded.error || !decoded.batteryVoltage10mV || decoded.batteryVoltage10mV <= 0) {
+                clearPreviewBatterySoc();
+                return;
+            }
+            const voltageMv = decoded.batteryVoltage10mV * 10;
+            const soc = B && deviceCapacityEstimator && typeof B.voltageToPercent === 'function'
+                ? B.voltageToPercent(voltageMv, deviceCapacityEstimator)
+                : null;
+            if (soc == null) {
+                clearPreviewBatterySoc();
+                return;
+            }
+            text.textContent = soc + '%';
+            wrap.hidden = false;
+        }
+        function readAdvertisingData(autoRead) {
+            const out = document.getElementById('advertisingDecodeOut');
+            const btn = document.getElementById('advertisingReadBtn');
             const M = typeof OpenDisplayMsd !== 'undefined' ? OpenDisplayMsd : null;
             if (!bleLib || !bleLib.isConnected) {
                 if (out) out.textContent = 'Not connected.';
-                addLog('MSD: not connected', 'error');
+                if (!autoRead) addLog('Advertising data: not connected', 'error');
                 return;
             }
             if (!M) {
@@ -525,12 +702,14 @@ input[type=file]::file-selector-button:active{
                 : {};
             M.readAndDecodeFromBle(bleLib, msdOpts)
                 .then((d) => {
+                    updateBatterySocDisplay(d);
                     if (out) out.textContent = M.formatDecoded(d);
+                    if (!autoRead) addLog('Advertising data read complete', 'success');
                 })
                 .catch((e) => {
                     const msg = e && e.message ? e.message : String(e);
                     if (out) out.textContent = 'Error: ' + msg;
-                    addLog('MSD read: ' + msg, 'error');
+                    addLog('Advertising data read: ' + msg, 'error');
                 })
                 .finally(() => {
                     if (btn) btn.disabled = false;
@@ -622,20 +801,166 @@ input[type=file]::file-selector-button:active{
             const nsteps = body.length / 2;
             const patternCount = 1;
             const payloadHex = hexByte(instance) + hexByte(outer) + hexByte(patternCount) + hexByte(nsteps) + body.map(hexByte).join('');
-            const cmdHex = '0075' + payloadHex;
+            const cmdHex = '0077' + payloadHex;
             bleLib.sendHexCommand(cmdHex).catch(function(e) { addLog('Buzzer command error: ' + e.message, 'error'); });
+        }
+        let ledVizAnimToken = 0;
+        const LED_FLASH_US_PER_BRIGHTNESS = 700;
+        const LED_VIZ_MIN_FLASH_MS = 120;
+        function estimateLedFlashMs() {
+            const brightness = clampInt(document.getElementById('ledBrightness')?.value, 1, 16, 12);
+            return Math.max(1, Math.round((brightness * LED_FLASH_US_PER_BRIGHTNESS) / 1000));
+        }
+        function readLedGroup(index) {
+            const color = document.getElementById('ledColor' + index)?.value || '#000000';
+            const count = clampInt(document.getElementById('ledCount' + index)?.value, 0, 15, 0);
+            const onMs = clampInt(document.getElementById('ledOn' + index)?.value, 0, 1500, 0);
+            const gapMs = clampInt(document.getElementById('ledGap' + index)?.value, 0, 25500, 0);
+            return { color: color, count: count, onMs: onMs, gapMs: gapMs };
+        }
+        function buildLedTimelineSegments() {
+            const flashMs = estimateLedFlashMs();
+            const groups = [1, 2, 3].map(readLedGroup);
+            const segments = [];
+            for (let gi = 0; gi < groups.length; gi++) {
+                const g = groups[gi];
+                if (g.count <= 0) continue;
+                for (let i = 0; i < g.count; i++) {
+                    segments.push({ type: 'flash', color: g.color, ms: flashMs, group: gi + 1 });
+                    if (i < g.count - 1 && g.onMs > 0) {
+                        segments.push({ type: 'pause', ms: g.onMs, group: gi + 1 });
+                    }
+                }
+                const hasFollowing = groups.slice(gi + 1).some(function(x) { return x.count > 0; });
+                if (g.gapMs > 0 && hasFollowing) {
+                    segments.push({ type: 'gap', ms: g.gapMs, group: gi + 1 });
+                }
+            }
+            return segments;
+        }
+        function stopLedVizAnimation() {
+            ledVizAnimToken++;
+            const lamp = document.getElementById('ledVizLamp');
+            const phase = document.getElementById('ledVizPhase');
+            if (lamp) {
+                lamp.classList.remove('active');
+                lamp.style.background = '#141414';
+                lamp.style.color = '';
+            }
+            if (phase) phase.textContent = 'Pattern preview';
+        }
+        function playLedVizAnimation() {
+            stopLedVizAnimation();
+            const token = ledVizAnimToken;
+            const segments = buildLedTimelineSegments();
+            const repeats = clampInt(document.getElementById('ledRepeats')?.value, 1, 254, 1);
+            const panel = document.getElementById('ledControlPanel');
+            if (!segments.length || !panel || panel.style.display === 'none') return;
+            const lamp = document.getElementById('ledVizLamp');
+            const phase = document.getElementById('ledVizPhase');
+            function runCycle(repeatIndex) {
+                if (token !== ledVizAnimToken) return;
+                if (repeatIndex >= repeats) {
+                    if (lamp) {
+                        lamp.classList.remove('active');
+                        lamp.style.background = '#141414';
+                    }
+                    if (phase) phase.textContent = 'Pattern preview';
+                    setTimeout(function() { runCycle(0); }, 500);
+                    return;
+                }
+                let idx = 0;
+                function step() {
+                    if (token !== ledVizAnimToken) return;
+                    if (idx >= segments.length) {
+                        if (lamp) {
+                            lamp.classList.remove('active');
+                            lamp.style.background = '#141414';
+                        }
+                        if (phase) phase.textContent = repeats > 1 ? ('Cycle ' + (repeatIndex + 1) + '/' + repeats) : 'Off';
+                        setTimeout(function() { runCycle(repeatIndex + 1); }, 0);
+                        return;
+                    }
+                    const seg = segments[idx++];
+                    const dur = seg.type === 'flash' ? Math.max(LED_VIZ_MIN_FLASH_MS, seg.ms) : seg.ms;
+                    if (seg.type === 'flash') {
+                        if (lamp) {
+                            lamp.style.background = seg.color;
+                            lamp.style.color = seg.color;
+                            lamp.classList.add('active');
+                        }
+                        if (phase) phase.textContent = 'Color ' + seg.group + ' flash';
+                    } else {
+                        if (lamp) {
+                            lamp.classList.remove('active');
+                            lamp.style.background = '#141414';
+                        }
+                        if (phase) phase.textContent = seg.type === 'gap' ? ('Gap after color ' + seg.group) : ('Pause (color ' + seg.group + ')');
+                    }
+                    setTimeout(step, dur);
+                }
+                step();
+            }
+            runCycle(0);
+        }
+        function renderLedTimeline() {
+            const timeline = document.getElementById('ledVizTimeline');
+            const repeatLabel = document.getElementById('ledVizRepeatLabel');
+            if (!timeline) return;
+            const segments = buildLedTimelineSegments();
+            const repeats = clampInt(document.getElementById('ledRepeats')?.value, 1, 254, 1);
+            if (repeatLabel) repeatLabel.textContent = 'Repeats: ' + repeats + '×';
+            timeline.innerHTML = '';
+            if (!segments.length) {
+                timeline.classList.add('led-viz-timeline--empty');
+                timeline.innerHTML = '<span class="led-viz-empty">Set a color count above 0 to build a pattern</span>';
+                return;
+            }
+            timeline.classList.remove('led-viz-timeline--empty');
+            const totalMs = segments.reduce(function(sum, seg) { return sum + seg.ms; }, 0) || 1;
+            segments.forEach(function(seg) {
+                const el = document.createElement('div');
+                el.className = 'led-viz-seg led-viz-seg--' + seg.type;
+                el.style.flex = seg.ms + ' 1 0';
+                el.title = seg.type === 'flash'
+                    ? ('Color ' + seg.group + ' flash')
+                    : (seg.type === 'gap' ? ('Gap ' + seg.ms + ' ms') : ('Pause ' + seg.ms + ' ms'));
+                if (seg.type === 'flash') {
+                    el.style.background = seg.color;
+                    el.style.minWidth = '6px';
+                }
+                timeline.appendChild(el);
+            });
+            timeline.setAttribute('aria-label', 'LED pattern timeline, one cycle ~' + Math.round(totalMs) + ' ms, repeats ' + repeats + ' times');
+        }
+        function updateLedVisualization() {
+            renderLedTimeline();
+            playLedVizAnimation();
+        }
+        function initLedVizListeners() {
+            if (window._ledVizListeners) return;
+            window._ledVizListeners = true;
+            const panel = document.getElementById('ledControlPanel');
+            if (!panel) return;
+            panel.addEventListener('input', function(e) {
+                const id = e.target && e.target.id;
+                if (!id || !/^led(Brightness|Repeats|Color[123]|Count[123]|On[123]|Gap[123])$/.test(id)) return;
+                updateLedVisualization();
+            });
         }
         function setLedUI(show) {
             const wrap = document.getElementById('ledControlPanel');
-            const instanceLabel = document.getElementById('ledInstanceLabel');
+            const instanceRow = document.getElementById('ledInstanceRow');
             const instanceSelect = document.getElementById('ledInstanceSelect');
             if (!wrap) return;
             wrap.style.display = show ? 'block' : 'none';
-            if (!show) return;
+            if (!show) {
+                stopLedVizAnimation();
+                return;
+            }
             const multi = deviceLedCount > 1;
-            if (instanceLabel) instanceLabel.style.display = multi ? '' : 'none';
+            if (instanceRow) instanceRow.style.display = multi ? 'flex' : 'none';
             if (instanceSelect) {
-                instanceSelect.style.display = multi ? '' : 'none';
                 instanceSelect.innerHTML = '';
                 for (let i = 0; i < deviceLedCount; i++) {
                     const opt = document.createElement('option');
@@ -645,6 +970,8 @@ input[type=file]::file-selector-button:active{
                 }
             }
             syncLedBrightnessLabel();
+            initLedVizListeners();
+            updateLedVisualization();
         }
         function syncLedBrightnessLabel() {
             const s = document.getElementById('ledBrightness');
@@ -658,6 +985,120 @@ input[type=file]::file-selector-button:active{
         }
         function hexByte(n) {
             return (n & 0xFF).toString(16).padStart(2, '0').toUpperCase();
+        }
+        function utf8ToHex(text) {
+            const bytes = new TextEncoder().encode(text || '');
+            let out = '';
+            for (let i = 0; i < bytes.length; i++) out += hexByte(bytes[i]);
+            return out;
+        }
+        function bytesToUtf8(bytes) {
+            try {
+                return new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+            } catch (e) {
+                return '';
+            }
+        }
+        async function readNfcOverBle() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog('Not connected', 'error');
+                return;
+            }
+            addLog('Requesting NFC content (0x0082/read)...', 'info');
+            try {
+                await bleLib.sendHexCommand('008200');
+            } catch (e) {
+                addLog('NFC read error: ' + e.message, 'error');
+            }
+        }
+        async function writeNfcOverBle() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog('Not connected', 'error');
+                return;
+            }
+            const typeEl = document.getElementById('nfcTypeSelect');
+            const contentEl = document.getElementById('nfcContentInput');
+            const mimeTypeEl = document.getElementById('nfcMimeTypeInput');
+            const wkTypeEl = document.getElementById('nfcWellKnownTypeInput');
+            const selectedType = typeEl ? typeEl.value : 'text';
+            let typeValue = 0x00;
+            if (selectedType === 'uri') typeValue = 0x01;
+            else if (selectedType === 'wellknown') typeValue = 0x02;
+            else if (selectedType === 'mime') typeValue = 0x03;
+            else if (selectedType === 'rawndef') typeValue = 0x04;
+            const content = contentEl ? contentEl.value : '';
+            let payloadHex = '';
+            if (typeValue === 0x04) {
+                let hex = (content || '').replace(/\s+/g, '');
+                if (hex.length % 2 !== 0) {
+                    addLog('Raw NDEF: even number of hex digits required', 'error');
+                    return;
+                }
+                payloadHex = hex.toUpperCase();
+            } else {
+                payloadHex = utf8ToHex(content);
+            }
+            if (typeValue === 0x02) {
+                const wkTypeAscii = wkTypeEl ? wkTypeEl.value : '';
+                const wkTypeHex = utf8ToHex(wkTypeAscii);
+                const wkTypeLen = wkTypeHex.length / 2;
+                if (wkTypeLen <= 0 || wkTypeLen > 255) {
+                    addLog('Well-known type must be 1..255 ASCII bytes', 'error');
+                    return;
+                }
+                payloadHex = hexByte(wkTypeLen) + wkTypeHex + payloadHex;
+            }
+            if (typeValue === 0x03) {
+                const mt = mimeTypeEl ? mimeTypeEl.value.trim() : 'text/vcard';
+                const mimeTypeHex = utf8ToHex(mt);
+                const mtLen = mimeTypeHex.length / 2;
+                if (mtLen <= 0 || mtLen > 255) {
+                    addLog('MIME type must be 1..255 UTF-8 bytes', 'error');
+                    return;
+                }
+                payloadHex = hexByte(mtLen) + mimeTypeHex + payloadHex;
+            }
+            const payloadLen = payloadHex.length / 2;
+            if (payloadLen > 65535) {
+                addLog('NFC content too long (max 65535 bytes UTF-8)', 'error');
+                return;
+            }
+            const lenHi = (payloadLen >> 8) & 0xFF;
+            const lenLo = payloadLen & 0xFF;
+            const typeLabels = ['Text', 'URI', 'Well-known', 'MIME', 'Raw_NDEF'];
+            const typeLabel = typeLabels[typeValue] || 'NFC';
+            addLog('Writing NFC via 0x0082 (' + typeLabel + ', ' + payloadLen + ' bytes)...', 'info');
+            try {
+                const MAX_NFC_CHUNK = 120;
+                if (payloadLen <= MAX_NFC_CHUNK) {
+                    const cmdHex = '008201' + hexByte(typeValue) + hexByte(lenHi) + hexByte(lenLo) + payloadHex;
+                    await bleLib.sendHexCommand(cmdHex);
+                    return;
+                }
+                await bleLib.sendHexCommand('008210' + hexByte(typeValue) + hexByte(lenHi) + hexByte(lenLo));
+                for (let i = 0; i < payloadHex.length; i += (MAX_NFC_CHUNK * 2)) {
+                    const chunkHex = payloadHex.slice(i, i + (MAX_NFC_CHUNK * 2));
+                    await bleLib.sendHexCommand('008211' + chunkHex);
+                }
+                await bleLib.sendHexCommand('008212');
+            } catch (e) {
+                addLog('NFC write error: ' + e.message, 'error');
+            }
+        }
+        function onNfcTypeChanged() {
+            const sel = document.getElementById('nfcTypeSelect');
+            const rowMime = document.getElementById('nfcMimeTypeRow');
+            const rowWk = document.getElementById('nfcWellKnownTypeRow');
+            const input = document.getElementById('nfcContentInput');
+            const v = sel ? sel.value : 'text';
+            if (rowWk) rowWk.style.display = v === 'wellknown' ? 'flex' : 'none';
+            if (rowMime) rowMime.style.display = v === 'mime' ? 'flex' : 'none';
+            if (input) {
+                if (v === 'rawndef') input.placeholder = 'Hex NDEF bytes, e.g. D101075402656E48656C6C6F';
+                else if (v === 'mime') input.placeholder = 'vCard (UTF-8), lines: BEGIN:VCARD ... END:VCARD';
+                else if (v === 'wellknown') input.placeholder = 'Raw payload after type (UTF-8)';
+                else input.placeholder = 'URI (https://... / tel:...) or plain Text';
+            }
         }
         function rgbTo332(hex) {
             if (!hex || hex[0] !== '#' || hex.length !== 7) return 0x00;
@@ -710,36 +1151,31 @@ input[type=file]::file-selector-button:active{
             ];
             return bytes;
         }
-        function applyLedPreset(name) {
-            const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
-            if (name === 'single') {
-                set('ledBrightness', 8); set('ledRepeats', 1);
-                set('ledColor1', '#ffffff'); set('ledCount1', 1); set('ledOn1', 200); set('ledGap1', 200);
-                set('ledColor2', '#000000'); set('ledCount2', 0); set('ledOn2', 200); set('ledGap2', 0);
-                set('ledColor3', '#000000'); set('ledCount3', 0); set('ledOn3', 200); set('ledGap3', 0);
-            } else if (name === 'double') {
-                set('ledBrightness', 10); set('ledRepeats', 1);
-                set('ledColor1', '#ffffff'); set('ledCount1', 2); set('ledOn1', 150); set('ledGap1', 250);
-                set('ledColor2', '#000000'); set('ledCount2', 0); set('ledOn2', 200); set('ledGap2', 0);
-                set('ledColor3', '#000000'); set('ledCount3', 0); set('ledOn3', 200); set('ledGap3', 0);
-            } else if (name === 'rgb') {
-                set('ledBrightness', 12); set('ledRepeats', 1);
-                set('ledColor1', '#ff0000'); set('ledCount1', 1); set('ledOn1', 150); set('ledGap1', 80);
-                set('ledColor2', '#00ff00'); set('ledCount2', 1); set('ledOn2', 150); set('ledGap2', 80);
-                set('ledColor3', '#0000ff'); set('ledCount3', 1); set('ledOn3', 150); set('ledGap3', 200);
-            }
-        }
         function sendLedPattern() {
             if (!bleLib || !bleLib.isConnected) {
                 addLog("Not connected", 'error');
                 return;
             }
             const sel = document.getElementById('ledInstanceSelect');
-            const instance = (sel && sel.style.display !== 'none') ? (parseInt(sel.value, 10) || 0) : 0;
+            const instance = (sel && document.getElementById('ledInstanceRow')?.style.display !== 'none')
+                ? (parseInt(sel.value, 10) || 0) : 0;
             const cfg = buildLedPatternBytes();
             const payloadHex = hexByte(instance) + cfg.map(hexByte).join('');
             const cmdHex = '0073' + payloadHex;
             bleLib.sendHexCommand(cmdHex).catch(function(e) { addLog('LED command error: ' + e.message, 'error'); });
+        }
+        function sendLedStop() {
+            if (!bleLib || !bleLib.isConnected) {
+                addLog("Not connected", 'error');
+                return;
+            }
+            const sel = document.getElementById('ledInstanceSelect');
+            let cmdHex = '0075';
+            if (sel && document.getElementById('ledInstanceRow')?.style.display !== 'none') {
+                cmdHex += hexByte(parseInt(sel.value, 10) || 0);
+            }
+            bleLib.sendHexCommand(cmdHex).catch(function(e) { addLog('LED stop error: ' + e.message, 'error'); });
+            stopLedVizAnimation();
         }
         function deviceReboot() {
             if (!bleLib || !bleLib.isConnected) return;
@@ -761,11 +1197,9 @@ input[type=file]::file-selector-button:active{
                 addLog('Bootloader reboot error: ' + e.message, 'error');
             }
         }
-        function setProgressBar(show, value) {
-            const wrap = document.getElementById('uploadProgressWrap');
-            const bar = document.getElementById('uploadProgress');
-            if (wrap) wrap.classList.toggle('visible', !!show);
-            if (bar) bar.value = value == null ? 0 : value;
+        function setProgressBar(_show, value) {
+            const bar = document.getElementById('uploadProgressBar');
+            if (bar) bar.style.width = (value == null ? 0 : value) + '%';
         }
         function getScheme() {
             return Math.min(Math.max(parseInt(document.getElementById('colorSchemeSelect')?.value || '0', 10), 0), 6);
@@ -779,9 +1213,8 @@ input[type=file]::file-selector-button:active{
             colors.forEach((hex) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'color-swatch' + (hex === cur ? ' selected' : '');
+                btn.className = 'color-swatch' + (hex === cur ? ' selected' : '') + ((hex === '#ffffff' || hex === '#aaaaaa') ? ' color-swatch--light' : '');
                 btn.style.background = hex;
-                btn.style.borderColor = (hex === '#ffffff' || hex === '#aaaaaa') ? 'var(--border-color)' : hex;
                 btn.title = hex;
                 btn.addEventListener('click', () => onSelect(hex));
                 container.appendChild(btn);
@@ -1184,6 +1617,11 @@ input[type=file]::file-selector-button:active{
             renderContent();
             input.value = '';
         }
+        function syncCanvasPreviewSize(canvas) {
+            if (!canvas || !canvas.width || !canvas.height) return;
+            canvas.style.setProperty('--canvas-ar-w', String(canvas.width));
+            canvas.style.setProperty('--canvas-ar-h', String(canvas.height));
+        }
         function createCanvas() {
             var width = widthInput;
             var height = heightInput;
@@ -1204,6 +1642,7 @@ input[type=file]::file-selector-button:active{
                 canvas.width = width;
                 canvas.height = height;
             }
+            syncCanvasPreviewSize(canvas);
             var ctx = canvas.getContext('2d', {
                 willReadFrequently: true
             });
@@ -1363,6 +1802,7 @@ input[type=file]::file-selector-button:active{
             setLedUI(false);
             setBuzzerUI(false);
             firmwareVersionPreview = '';
+            clearPreviewBatterySoc();
             const previewMeta = document.getElementById('previewMeta');
             const previewLockIcon = document.getElementById('previewLockIcon');
             if (previewMeta) previewMeta.textContent = '';
@@ -1390,7 +1830,7 @@ input[type=file]::file-selector-button:active{
                 bleLib.applyDithering(ctx, canvas.width, canvas.height, colorScheme, ditheringType);
             }
             const colorScheme = parseInt(document.getElementById('colorSchemeSelect').value) || 0;
-            const useFastRefresh = document.getElementById('fastRefreshToggle')?.checked || false;
+            const useFastRefresh = false;
             bleLib.sendCanvasToDisplay(canvas, colorScheme, {
                 rotation: displayRotation,
                 originalWidth: widthInput,
@@ -1434,8 +1874,10 @@ input[type=file]::file-selector-button:active{
                     addLog("Dynamic Config received (legacy, ignoring).");
                     setStatus("Dynamic config received (legacy).");
                 } else if (continuousHex === "00730000") {
-                    addLog("LED pattern done", 'success');
+                    addLog("LED command accepted", 'success');
                 } else if (continuousHex === "00750000") {
+                    addLog("LED flash stopped", 'success');
+                } else if (continuousHex === "00770000") {
                     addLog("Buzzer pattern done", 'success');
                 } else if (continuousHex.length >= 4 && cmdHex === "0052") {
                     addLog("Deep sleep ACK (device will go offline)", 'info');
@@ -1444,7 +1886,64 @@ input[type=file]::file-selector-button:active{
                     addLog("LED error (0x" + err + ")", 'error');
                 } else if (continuousHex.length >= 4 && continuousHex.substring(0, 4) === "FF75") {
                     const err = continuousHex.length >= 6 ? continuousHex.substring(4, 6) : "??";
+                    addLog("LED stop error (0x" + err + ")", 'error');
+                } else if (continuousHex.length >= 4 && continuousHex.substring(0, 4) === "FF77") {
+                    const err = continuousHex.length >= 6 ? continuousHex.substring(4, 6) : "??";
                     addLog("Buzzer error (0x" + err + ")", 'error');
+                } else if (cmdHex === "0082") {
+                    const bytesArr = (bytes && bytes.length) ? bytes : new Uint8Array();
+                    if (bytesArr.length >= 3) {
+                        const op = bytesArr[2];
+                        if (op === 0x80 && bytesArr.length >= 6) {
+                            const tt = bytesArr[3];
+                            const nfcType = tt === 0x01 ? 'URI' : (tt === 0x02 ? 'Well-known'
+                                : (tt === 0x03 ? 'MIME' : (tt === 0x04 ? 'Raw_NDEF' : 'Text')));
+                            const nfcLen = ((bytesArr[4] << 8) | bytesArr[5]) & 0xFFFF;
+                            const payload = bytesArr.slice(6, 6 + Math.min(nfcLen, Math.max(0, bytesArr.length - 6)));
+                            let decoded = tt === 0x04 ? '' : bytesToUtf8(payload);
+                            const typeSelect = document.getElementById('nfcTypeSelect');
+                            const mimeTypeInput = document.getElementById('nfcMimeTypeInput');
+                            const wkTypeInput = document.getElementById('nfcWellKnownTypeInput');
+                            const contentInput = document.getElementById('nfcContentInput');
+                            if (tt === 0x02 && payload.length >= 1) {
+                                const tlen = payload[0];
+                                if (payload.length >= (1 + tlen)) {
+                                    const typeBytes = payload.slice(1, 1 + tlen);
+                                    const bodyBytes = payload.slice(1 + tlen);
+                                    if (wkTypeInput) wkTypeInput.value = bytesToUtf8(typeBytes);
+                                    decoded = bytesToUtf8(bodyBytes);
+                                }
+                            }
+                            if (tt === 0x03 && payload.length >= 1) {
+                                const mlen = payload[0];
+                                if (payload.length >= (1 + mlen)) {
+                                    const mtBytes = payload.slice(1, 1 + mlen);
+                                    const bodyBytes = payload.slice(1 + mlen);
+                                    if (mimeTypeInput) mimeTypeInput.value = bytesToUtf8(mtBytes);
+                                    decoded = bytesToUtf8(bodyBytes);
+                                }
+                            }
+                            if (tt === 0x04 && payload.length) {
+                                decoded = Array.from(payload, b => hexByte(b)).join('');
+                            }
+                            if (typeSelect) {
+                                typeSelect.value = tt === 0x01 ? 'uri' : (tt === 0x02 ? 'wellknown'
+                                    : (tt === 0x03 ? 'mime' : (tt === 0x04 ? 'rawndef' : 'text')));
+                                onNfcTypeChanged();
+                            }
+                            if (contentInput) contentInput.value = decoded;
+                            addLog('NFC read: type=' + nfcType + ', len=' + nfcLen + ', content="' + decoded + '"', 'success');
+                        } else if (op === 0x81) {
+                            addLog('NFC write acknowledged (0x0082/0x81)', 'success');
+                        } else if (op === 0xFF) {
+                            const err = bytesArr.length >= 4 ? hexByte(bytesArr[3]) : '??';
+                            addLog('NFC error (0x' + err + ')', 'error');
+                        } else {
+                            addLog('NFC endpoint response (0x0082 op=0x' + hexByte(op) + ')', 'info');
+                        }
+                    } else {
+                        addLog('NFC endpoint response too short', 'warning');
+                    }
                 }
             }
         }
@@ -1576,6 +2075,7 @@ input[type=file]::file-selector-button:active{
                     applyParsedConfig(parsedConfig);
                 } catch (error) {
                     addLog("Error parsing config: " + error.message, 'error');
+                    setTimeout(function() { readAdvertisingData(true); }, 200);
                 }
             } catch (error) {
                 // Check if this is an authentication error
@@ -1605,17 +2105,29 @@ input[type=file]::file-selector-button:active{
                             applyParsedConfig(parsedConfig);
                         } catch (parseError) {
                             addLog("Error parsing config: " + parseError.message, 'error');
+                            setTimeout(function() { readAdvertisingData(true); }, 200);
                         }
                     } catch (authError) {
                         addLog("Authentication failed: " + authError.message, 'error');
+                        setTimeout(function() { readAdvertisingData(true); }, 200);
                     }
                 } else {
                     addLog("Config read failed: " + error.message, 'error');
+                    setTimeout(function() { readAdvertisingData(true); }, 200);
                 }
             }
         }
         function applyParsedConfig(parsedConfig) {
             lastDeviceParsedConfigForMsd = parsedConfig || null;
+            const powerOption = extractPowerOptionFromParsedConfig(parsedConfig);
+            deviceCapacityEstimator = powerOption && powerOption.capacityEstimator != null
+                ? powerOption.capacityEstimator
+                : null;
+            deviceHasNfcConfig = (parsedConfig && Array.isArray(parsedConfig.packets))
+                ? parsedConfig.packets.some(function(p) { return p.id === 0x2A; })
+                : false;
+            setConnectedUI(!!(bleLib && bleLib.isConnected));
+            setTimeout(function() { readAdvertisingData(true); }, 150);
             try {
                 const displayCfg = bleLib.extractDisplayConfig(parsedConfig);
                 if (!displayCfg) {
@@ -1671,7 +2183,9 @@ input[type=file]::file-selector-button:active{
             const scheme = validScheme != null ? validScheme : Math.min(Math.max(parseInt(document.getElementById('colorSchemeSelect')?.value || '0', 10), 0), 6);
             const previewMeta = document.getElementById('previewMeta');
             const previewLockIcon = document.getElementById('previewLockIcon');
-            if (previewMeta) previewMeta.textContent = ' · ' + widthInput + '×' + heightInput + ' · ' + schemeShort[scheme] + (firmwareVersionPreview ? ' · v' + firmwareVersionPreview : '');
+            if (previewMeta) {
+                previewMeta.textContent = ' · ' + widthInput + '×' + heightInput + ' · ' + schemeShort[scheme] + (firmwareVersionPreview ? ' · v' + firmwareVersionPreview : '');
+            }
             if (previewLockIcon) {
                 const enc = bleLib && bleLib.encryptionSession && bleLib.encryptionSession.authenticated;
                 previewLockIcon.style.display = '';
@@ -1770,6 +2284,7 @@ input[type=file]::file-selector-button:active{
         
         window.addEventListener('load', function () {
             setConnectedUI(false);
+            onNfcTypeChanged();
             createCanvas();
             updateDrawPalette();
             updateTextColorSwatches();
@@ -1785,18 +2300,53 @@ input[type=file]::file-selector-button:active{
             setStatus("Ready");
         });
     </script>
-  <div class="col panel footer">
-    <div class="footer-links">
-      <a href="../../index.html">Home</a>
-      <span class="footer-separator">•</span>
-      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
-      <span class="footer-separator">•</span>
-      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
-      <span class="footer-separator">•</span>
-      <a href="../../impressum.html">imprint (Impressum)</a>
-      <span class="footer-separator">•</span>
-      <a href="../../datenschutz.html">privacy (Datenschutz)</a>
+
     </div>
-  </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <a href="../../index.html" class="site-footer__lockup" aria-label="OpenDisplay home">
+            <img src="../../assets/brand/logo_dark.svg" alt="OpenDisplay" class="site-footer__logo-full" width="140" height="41">
+          </a>
+          <span class="site-footer__tag">The open e-paper standard</span>
+          <p class="site-footer__lead">An open standard that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.</p>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Build</span>
+          <a href="../../what-hardware-to-buy.html" class="od-foot-link">What hardware to buy</a>
+          <a href="../../firmware/display/index.html" class="od-foot-link">BLE Tester</a>
+          <a href="../../firmware/battery/index.html" class="od-foot-link">Battery calculator</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Reference</span>
+          <a href="../../protocol/index.html" class="od-foot-link">Protocol spec</a>
+          <a href="../../protocol/display-data-format.html" class="od-foot-link">Display data format</a>
+          <a href="../../protocol/flex-standard.html" class="od-foot-link">OpenDisplay Flex</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Flex tools</span>
+          <a href="../../protocol/flex-tools.html" class="od-foot-link">Overview</a>
+          <a href="../../firmware/toolbox/index.html" class="od-foot-link">Toolbox</a>
+          <a href="../../protocol/adding-displays.html" class="od-foot-link">Adding a new panel</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Community</span>
+          <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="od-foot-link">GitHub</a>
+          <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="od-foot-link">Discord</a>
+          <a href="https://www.openhomefoundation.org/" target="_blank" rel="noreferrer" class="od-foot-link">Open Home Foundation</a>
+        </div>
+      </div>
+      <div class="site-footer__bot">
+        <span>© 2026 OpenDisplay</span>
+        <div class="site-footer__legal">
+          <a href="../../impressum.html" class="od-foot-link">Legal notice</a>
+          <a href="../../datenschutz.html" class="od-foot-link">Privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

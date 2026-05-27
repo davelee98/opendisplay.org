@@ -1,216 +1,474 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Open-source firmware and protocol standard for e-paper displays. Supports ESP32-C3, ESP32-C6, and nRF52840 platforms with BLE communication and low power consumption.">
+  <meta name="description" content="OpenDisplay is an open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.">
   <link rel="canonical" href="https://opendisplay.org/">
-  <meta property="og:title" content="OpenDisplay - Open-source firmware and protocol for e-paper displays">
-  <meta property="og:description" content="Open-source firmware and protocol standard for e-paper displays. Supports ESP32-C3, ESP32-C6, and nRF52840 platforms with BLE communication and low power consumption.">
+  <meta property="og:title" content="OpenDisplay: the open e-paper standard">
+  <meta property="og:description" content="OpenDisplay is an open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://opendisplay.org/">
-  <link rel="shortcut icon" href="firmware/install/favicon.ico"> 
-  <link rel="stylesheet" href="https://opendisplay.org/common.css">
-  <title>OpenDisplay</title>
-<style>
-/* Page-specific styles */
-a > div[style*="background: var(--card-background)"]:hover {
-  border-color: var(--accent) !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06) !important;
-  transform: translateY(-2px);
-}
-
-.platform-badges {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.platform-badge {
-  padding: 8px 16px;
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
-}
-
-@media (max-width: 600px) {
-  .platform-badges {
-    grid-template-columns: repeat(2, 1fr);
+  <meta property="og:image" content="https://opendisplay.org/assets/brand/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OpenDisplay: the open e-paper standard">
+  <meta name="twitter:description" content="OpenDisplay is an open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.">
+  <meta name="twitter:image" content="https://opendisplay.org/assets/brand/og-image.png">
+  <link rel="icon" href="assets/brand/logo-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="css/home.css">
+  <title>OpenDisplay: the open e-paper standard</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://opendisplay.org/#website",
+        "url": "https://opendisplay.org/",
+        "name": "OpenDisplay",
+        "description": "OpenDisplay is an open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.",
+        "publisher": { "@id": "https://opendisplay.org/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://opendisplay.org/#organization",
+        "name": "OpenDisplay",
+        "url": "https://opendisplay.org/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://opendisplay.org/assets/brand/logo-mark.svg"
+        },
+        "sameAs": [
+          "https://github.com/OpenDisplay/",
+          "https://discord.gg/XmTHz8RfJE",
+          "https://www.openhomefoundation.org/"
+        ]
+      }
+    ]
   }
-}
-
-@media (max-width: 400px) {
-  .platform-badges {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
+  </script>
 </head>
-<body>
+<body class="page-home">
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  <main id="main-content">
-  <h1>OpenDisplay</h1>
-  <p style="text-align: center; color: var(--muted-foreground); font-size: 1.2rem; margin-top: -1rem; margin-bottom: 2rem;">
-    Open-source firmware and protocol standard for e-paper displays
-  </p>
 
-  <div class="col panel">
-    <h2>What is OpenDisplay?</h2>
-    <p class="intro-text">
-      OpenDisplay is both a <strong>firmware solution</strong> and a <strong>protocol standard</strong> for e-paper displays. 
-      It provides a complete ecosystem for creating smart, low-power e-paper displays that can be easily integrated 
-      with Home Assistant and other automation platforms.
-    </p>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 24px;">
-      <a href="firmware/toolbox/index.html" style="text-decoration: none; color: inherit; display: block;">
-        <div style="padding: 20px; background: var(--card-background); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 8px; transition: all 0.2s; cursor: pointer;">
-          <h3 style="margin-top: 0; font-size: 1.1rem;">Get started with firmware</h3>
-          <p style="margin: 0; color: var(--muted-foreground); line-height: 1.6;">
-            Open the Toolbox to flash OpenDisplay to your device, pick a preset configuration, and adjust settings.
-            Supports ESP32-S3, ESP32-C3, ESP32-C6, and nRF52840.
+  <header class="home-bar">
+    <div class="home-bar__accent" aria-hidden="true"></div>
+    <div class="home-bar__inner">
+      <a href="index.html" class="home-bar__brand" aria-label="OpenDisplay home">
+        <img src="assets/brand/logo-mark.svg" alt="" class="home-bar__mark" width="24" height="24">
+        <span class="home-bar__wordmark">OpenDisplay</span>
+      </a>
+      <button type="button" class="home-bar__toggle" aria-expanded="false" aria-controls="home-bar-menu" aria-label="Open menu">
+        <svg class="home-bar__toggle-icon home-bar__toggle-icon--open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="home-bar__toggle-icon home-bar__toggle-icon--close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <nav id="home-bar-menu" class="home-bar__nav" aria-label="Page sections">
+        <a href="#build" class="home-bar__link" data-nav="build">Get started</a>
+        <a href="#battery" class="home-bar__link" data-nav="battery">Battery</a>
+        <a href="#senders" class="home-bar__link" data-nav="senders">Developers</a>
+      </nav>
+      <div class="home-bar__icons">
+        <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="home-bar__icon" aria-label="OpenDisplay on GitHub (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="home-bar__icon" aria-label="Join OpenDisplay on Discord (opens in new tab)">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="tool-page">
+    <section class="hero">
+      <div class="hero__inner">
+        <div>
+          <h1 class="hero__title">
+            Your data.<br>
+            Your screen.<br>
+            <span class="hero__serif">Designed for e-paper.</span>
+          </h1>
+          <p class="hero__oneliner">
+            OpenDisplay is an open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, no cloud in the middle.
+          </p>
+          <div class="hero__ctas">
+            <a href="#build" class="od-cta-primary">
+              Get started
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </a>
+            <a href="protocol/index.html" class="od-cta-ghost">
+              Read the spec
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-display" id="hero-display" aria-hidden="true">
+          <div class="hero-display__tile collage__tile">
+            <div class="hero-display__screen collage__screen">
+              <div class="collage__grain"></div>
+              <div class="hero-display__wash" aria-hidden="true"></div>
+              <div class="hero-display__content collage__content"></div>
+            </div>
+            <div class="hero-display__caption collage__where"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pillars">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">What makes it different</div>
+            <h2 class="section-title">An open standard, not a closed platform.</h2>
+          </div>
+          <p class="section-lead">
+            Most e-paper projects today reinvent the wheel every time, and lock you into using their screen with their app or cloud. OpenDisplay is the open standard that separates the two sides cleanly, so nobody has to rebuild every part.
           </p>
         </div>
-      </a>
-      <a href="protocol/index.html" style="text-decoration: none; color: inherit; display: block;">
-        <div style="padding: 20px; background: var(--card-background); border: 1px solid var(--border-color); border-left: 4px solid var(--accent); border-radius: 8px; transition: all 0.2s; cursor: pointer;">
-          <h3 style="margin-top: 0; font-size: 1.1rem;">Protocol documentation</h3>
-          <p style="margin: 0; color: var(--muted-foreground); line-height: 1.6;">
-            BLE-based communication protocol with YAML-defined configuration schema. 
-            Enables interoperability between different clients and devices using a standardized interface.
+        <div class="pillars__grid">
+          <article class="pillar-card od-card fade-in">
+            <div class="pillar-card__icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3l4 4-4 4M20 7H8M8 21l-4-4 4-4M4 17h12"/></svg>
+            </div>
+            <h3 class="pillar-card__title">Sender ↔ receiver, by design</h3>
+            <p class="pillar-card__text">Senders generate the image; receivers display it. Two clean halves, one shared protocol, and either side can be swapped for a different implementation.</p>
+            <a href="protocol/index.html" class="pillar-card__link">Read the protocol →</a>
+          </article>
+          <article class="pillar-card od-card fade-in">
+            <div class="pillar-card__icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h3 class="pillar-card__title">The sender does the work</h3>
+            <p class="pillar-card__text">Server-side rendering, including dithering and color conversion, keeps receivers cheap, simple, and low-power on battery.</p>
+            <a href="protocol/display-data-format.html" class="pillar-card__link">How rendering works →</a>
+          </article>
+          <article class="pillar-card od-card fade-in">
+            <div class="pillar-card__icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+            </div>
+            <h3 class="pillar-card__title">Open spec, open firmware</h3>
+            <p class="pillar-card__text">The protocol, reference firmware, and browser tools are open source. Implement either side your way — no partner program required.</p>
+            <a href="protocol/index.html" class="pillar-card__link">Read the spec →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="use-cases">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">What it's actually for</div>
+            <h2 class="section-title">Screens in places a cable can't go.</h2>
+          </div>
+          <p class="section-lead">
+            Wireless means a screen can sit on a closet shelf, a bathroom cabinet, or a hallway hook — doing one job well, without running a cable. A handful we use ourselves.
           </p>
         </div>
-      </a>
-    </div>
-  </div>
+        <div class="use-cases__grid">
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb"><div class="use-card__thumb-inner"><div class="collage__grain"></div><div class="collage__label">WED · OUT</div><div class="collage__value">14°</div><div class="collage__meta"><span class="ink-red">rain in 12m</span> · radar 2km</div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Closet &amp; front door</div><h3 class="use-card__what">Weather on the way out</h3><p class="use-card__why">Forecast while you dress, rain radar as you leave. Two tags, same morning routine, no phone required.</p></div>
+          </article>
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb use-card__thumb--spectra"><div class="use-card__thumb-inner use-card__thumb-inner--frame"><div class="collage__grain"></div><div class="use-card__spectra-photo" aria-hidden="true"></div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Side table</div><h3 class="use-card__what">Picture frame, in six colors</h3><p class="use-card__why">A 7.3″ Spectra 6 panel on a wireless frame. The sender dithers your photos to the palette; the screen just paints what arrives.</p></div>
+          </article>
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb"><div class="use-card__thumb-inner"><div class="collage__grain"></div><div class="collage__label">THU · POLLEN</div><div class="collage__value ink-yellow">Med</div><div class="collage__meta">grasses · oak</div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Bathroom shelf</div><h3 class="use-card__what">Pollen before you commute</h3><p class="use-card__why">Glance during the morning routine and you know whether hayfever is about to ruin the day.</p></div>
+          </article>
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb"><div class="use-card__thumb-inner"><div class="collage__grain"></div><div class="collage__label">MEDS</div><div class="collage__value">AM ✓ <span class="ink-red">PM ·</span></div><div class="collage__meta">last 08:14</div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Meds cabinet</div><h3 class="use-card__what">Did I take it today?</h3><p class="use-card__why">Tag with morning + evening buttons, so the source of truth lives where the meds live.</p></div>
+          </article>
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb"><div class="use-card__thumb-inner"><div class="collage__grain"></div><div class="collage__label">NEXT · 09:30</div><div class="collage__value">Standup</div><div class="collage__meta ink-yellow">in 12 min</div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Kitchen wall</div><h3 class="use-card__what">Next-meeting reminder</h3><p class="use-card__why">For people working from home, placed wherever you tend to lose track of time.</p></div>
+          </article>
+          <article class="use-card od-card fade-in">
+            <div class="use-card__thumb"><div class="use-card__thumb-inner"><div class="collage__grain"></div><div class="collage__label">TODAY · ENERGY</div><div class="collage__value">4.3 kWh</div><div class="collage__meta">peak 12:00 · −8% wow</div></div></div>
+            <div class="use-card__body"><div class="use-card__where">Hallway</div><h3 class="use-card__what">Energy used today</h3><p class="use-card__why">Glance on your way past and you know whether to hold off on the dishwasher until prices drop.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  <div class="col panel">
-    <h2>Firmware</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-      <div>
-        <strong>Low Power</strong>
-        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Deep sleep support with microamp-level current consumption</p>
-      </div>
-      <div>
-        <strong>BLE Communication</strong>
-        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Bluetooth Low Energy for wireless updates and configuration</p>
-      </div>
-      <div>
-        <strong>Multiple Color Schemes</strong>
-        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">B/W, B/W+Red, B/W+Yellow, 6-color, and grayscale support</p>
-      </div>
-      <div>
-        <strong>Flexible Configuration</strong>
-        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">YAML-based config system with preset support</p>
-      </div>
-      <div>
-        <strong>Direct Write Mode</strong>
-        <p style="color: var(--muted-foreground); margin: 4px 0 0 0; font-size: 0.9rem;">Bufferless image transfer for efficient memory usage</p>
-      </div>
-    </div>
-    
-      <h3>Supported Platforms</h3>
-      <div class="platform-badges">
-        <span class="platform-badge">ESP32-S3</span>
-        <span class="platform-badge">ESP32-C3</span>
-        <span class="platform-badge">ESP32-C6</span>
-        <span class="platform-badge">nRF52840</span>
-        <span class="platform-badge">nRF52811</span>
-      </div>
-  </div>
+    <section class="build-path build-path--dark" id="build">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Get started</div>
+            <h2 class="section-title">Buy a screen, or build one in an afternoon.</h2>
+          </div>
+          <p class="section-lead">
+            Pick a supported screen from our hardware guide, or wire a dev board and panel yourself. Either way: flash OpenDisplay firmware in the browser, send a test image, then connect your sender.
+          </p>
+        </div>
 
-  <div class="col panel">
-    <h2>Get Started</h2>
-    <div class="quick-links-grid">
-      <a href="firmware/toolbox/index.html" class="quick-link-card">
-        <div class="quick-link-title">Toolbox</div>
-        <div class="quick-link-description">
-          Install firmware through the browser, apply premade configs, and customize display size, color mode, and device options.
+        <div class="build__entry-ctas">
+          <a href="what-hardware-to-buy.html" class="od-cta-primary">
+            What hardware to buy
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="firmware/toolbox/index.html" class="od-cta-ghost">
+            Open the Toolbox
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
         </div>
-      </a>
-      <a href="firmware/display/index.html" class="quick-link-card">
-        <div class="quick-link-title">BLE tester</div>
-        <div class="quick-link-description">
-          Upload and preview images over Bluetooth, draw on a canvas, and send buffers to your e-paper display.
-        </div>
-      </a>
-      <a href="firmware/battery/index.html" class="quick-link-card">
-        <div class="quick-link-title">Battery life calculator</div>
-        <div class="quick-link-description">
-          Estimate runtime from capacity, standby current, update energy, and interval. Load values from BLE or presets and view breakdown charts.
-        </div>
-      </a>
-      <a href="firmware/adding-displays.html" class="quick-link-card">
-        <div class="quick-link-title">Adding new displays</div>
-        <div class="quick-link-description">
-          Guide for adding panel support: finding hardware, firmware changes, presets, testing, and power measurement.
-        </div>
-      </a>
-      <a href="firmware/seeed_display_compatibility.html" class="quick-link-card">
-        <div class="quick-link-title">Seeed display compatibility</div>
-        <div class="quick-link-description">
-          Compatibility matrix for Seeed Studio ePaper panels: resolution, partial refresh, and setup notes.
-        </div>
-      </a>
-      <a href="firmware/reusing_solum_displays.html" class="quick-link-card">
-        <div class="quick-link-title">Reusing Solum displays</div>
-        <div class="quick-link-description">
-          Solum M3 prebuild tags: FCC IDs, color modes, Toolbox preset links, flashing with J-Link, and third-party firmware caveats.
-        </div>
-      </a>
-      <a href="protocol/index.html" class="quick-link-card">
-        <div class="quick-link-title">Protocol standard</div>
-        <div class="quick-link-description">
-          BLE flow, OpenDisplay Language schema, display data formats, and protocol documentation.
-        </div>
-      </a>
-      <a href="designer/index.html" class="quick-link-card">
-        <div class="quick-link-title">Layout designer</div>
-        <div class="quick-link-description">
-          Visual layout editor with live preview; export OpenDisplay Language for Home Assistant drawcustom.
-        </div>
-      </a>
-      <a href="homeassistant/index.html" class="quick-link-card">
-        <div class="quick-link-title">Home Assistant integration</div>
-        <div class="quick-link-description">
-          Entities, services, tags, and installation. Works with BLE proxies—no Wi-Fi access point required on the display.
-        </div>
-      </a>
-      <a href="https://github.com/OpenDisplay/" target="_blank" class="quick-link-card" aria-label="View source code on GitHub (opens in new tab)">
-        <div class="quick-link-title">Source code</div>
-        <div class="quick-link-description">
-          Firmware and client repos, issues, and contributions on GitHub.
-        </div>
-      </a>
-    </div>
-  </div>
 
-  <div class="col panel">
-    <h2>Community</h2>
-    <p class="intro-text">
-      Join the OpenDisplay community to get help, share your projects, discuss implementations, 
-      and connect with other users and developers.
-    </p>
-    <div style="margin-top: 20px;">
-      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" class="tool-link" aria-label="Join OpenDisplay Discord community (opens in new tab)">Join Discord</a>
-    </div>
-  </div>
+        <p class="build__diy-label">Build your own</p>
 
-  <div class="col panel footer">
-    <div class="footer-links">
-      <a href="https://github.com/OpenDisplay/" target="_blank" aria-label="View on GitHub (opens in new tab)">GitHub</a>
-      <span class="footer-separator">•</span>
-      <a href="https://discord.gg/XmTHz8RfJE" target="_blank" aria-label="Join OpenDisplay Discord community (opens in new tab)">Discord</a>
-      <span class="footer-separator">•</span>
-      <a href="impressum.html">imprint (Impressum)</a>
-      <span class="footer-separator">•</span>
-      <a href="datenschutz.html">privacy (Datenschutz)</a>
-    </div>
-  </div>
+        <div class="build-steps">
+          <a href="what-hardware-to-buy.html" class="build-step build-step--link">
+            <span class="build-step__num"><span class="build-step__bullet">01</span> Step</span>
+            <h3 class="build-step__title">Pick or buy hardware</h3>
+            <p class="build-step__text">A supported dev board (ESP32-S3/C3/C6, nRF52840) and any compatible e-paper panel, or a ready-made screen from the guide above.</p>
+          </a>
+          <a href="firmware/toolbox/index.html" class="build-step build-step--link">
+            <span class="build-step__num"><span class="build-step__bullet">02</span> Step</span>
+            <h3 class="build-step__title">Flash in the browser</h3>
+            <p class="build-step__text">The Toolbox installs firmware over USB, picks a preset for your panel, and tunes settings. No IDE required.</p>
+          </a>
+          <a href="firmware/display/index.html" class="build-step build-step--link">
+            <span class="build-step__num"><span class="build-step__bullet">03</span> Step</span>
+            <h3 class="build-step__title">Send your first picture</h3>
+            <p class="build-step__text">Push an image over Web Bluetooth, straight from the browser, end-to-end, before adding any sender to the loop.</p>
+          </a>
+          <a href="https://github.com/OpenDisplay/Home_Assistant_Integration" class="build-step build-step--link" target="_blank" rel="noopener noreferrer">
+            <span class="build-step__num"><span class="build-step__bullet">04</span> Step</span>
+            <h3 class="build-step__title">Pair with a sender</h3>
+            <p class="build-step__text">Once the screen is proven, point Home Assistant or any OpenDisplay-compatible sender at it.</p>
+          </a>
+        </div>
+
+        <p class="build__note">Web Bluetooth + Web Serial · Firefox, Chrome, Edge</p>
+      </div>
+    </section>
+
+    <section class="battery" id="battery">
+      <div class="container" id="battery-widget">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Battery</div>
+            <h2 class="section-title">Years on a charge</h2>
+          </div>
+          <p class="section-lead">Why BLE boards can run for years on a coin cell — and why we don't recommend battery power on ESP32. Adjust the inputs below using measured panel data where available.</p>
+        </div>
+
+        <div class="battery__panel">
+          <div class="battery__panel-top">
+            <div class="battery__controls">
+              <div class="battery__field">
+                <span class="battery__field-label">Panel</span>
+                <div class="battery__picker-row battery__picker-row--displays" data-picker-group="display"></div>
+              </div>
+
+              <div class="battery__field">
+                <div class="battery__field-head">
+                  <span class="battery__field-label">Battery</span>
+                  <span class="battery__field-value" data-batt-capacity>2000 mAh</span>
+                </div>
+                <div class="battery__picker-row battery__picker-row--batteries" data-picker-group="battery">
+                  <button type="button" class="batt-pick" data-id="cr2450" aria-pressed="false">
+                    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" aria-hidden="true"><circle cx="14" cy="11" r="9" stroke="currentColor" stroke-width="1.5"/><circle cx="14" cy="11" r="3.5" stroke="currentColor" stroke-width="1"/></svg>
+                    <span class="batt-pick__label">CR2450</span>
+                    <span class="batt-pick__sub">600 mAh</span>
+                  </button>
+                  <button type="button" class="batt-pick" data-id="cr2450x2" aria-pressed="false">
+                    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" aria-hidden="true"><circle cx="10" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/></svg>
+                    <span class="batt-pick__label">2× CR2450</span>
+                    <span class="batt-pick__sub">1200 mAh</span>
+                  </button>
+                  <button type="button" class="batt-pick batt-pick--active" data-id="lipo2000" aria-pressed="true">
+                    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" aria-hidden="true"><rect x="3" y="4" width="22" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9 H25" stroke="currentColor" stroke-width="0.8" opacity="0.5"/><rect x="6" y="7" width="3" height="8" fill="var(--od-blue)"/></svg>
+                    <span class="batt-pick__label">LiPo</span>
+                    <span class="batt-pick__sub">2000 mAh</span>
+                  </button>
+                  <button type="button" class="batt-pick" data-id="lipo4000" aria-pressed="false">
+                    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" aria-hidden="true"><rect x="3" y="4" width="22" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 9 H25" stroke="currentColor" stroke-width="0.8" opacity="0.5"/></svg>
+                    <span class="batt-pick__label">LiPo</span>
+                    <span class="batt-pick__sub">4000 mAh</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="battery__field">
+                <div class="battery__field-head">
+                  <span class="battery__field-label">Update interval</span>
+                  <span class="battery__field-value" data-batt-interval>every 2 h</span>
+                </div>
+                <input class="od-range" type="range" min="1" max="240" step="1" value="120" data-batt-range aria-label="Update interval in minutes">
+                <span class="battery__field-sub">How often the sender pushes a new picture to the screen.</span>
+              </div>
+
+              <div class="battery__field">
+                <div class="battery__field-head">
+                  <span class="battery__field-label">Chip</span>
+                  <span class="battery__field-value" data-batt-standby>20 µA standby</span>
+                </div>
+                <div class="battery__picker-row battery__picker-row--chips" data-picker-group="chip"></div>
+                <p class="battery__warn" data-batt-esp-warn hidden>Not recommended for battery use. ESP32 idle draw (~80&nbsp;mA) is far higher than BLE MCUs, use USB power, or pick a BLE board in our <a href="what-hardware-to-buy.html">hardware guide</a>.</p>
+              </div>
+            </div>
+
+            <div class="battery__result">
+              <div class="battery__result-grid"></div>
+              <span class="battery__result-eye">● Estimated life</span>
+              <h3 class="battery__result-big">
+                <span data-batt-life-value>9.0</span><span class="battery__result-unit" data-batt-life-unit>years</span>
+              </h3>
+              <div class="battery__result-sub" data-batt-life-sub>9 yr 0 mo · 3,297 days</div>
+            </div>
+          </div>
+
+          <div class="battery__breakdown">
+            <div>
+              <span class="battery__bd-eye" data-batt-refresh-pct>Refresh draw · 21%</span>
+              <span class="battery__bd-num" data-batt-refresh-mah>10.56<span class="batt-bd-unit"> µAh / update</span></span>
+              <span class="battery__bd-sub" data-batt-refresh-sub>38 mC/update · 4.26″ mono</span>
+            </div>
+            <div>
+              <span class="battery__bd-eye" data-batt-standby-pct>Standby draw · 79%</span>
+              <span class="battery__bd-num" data-batt-standby-mah>0.48<span class="batt-bd-unit"> mAh / day</span></span>
+              <span class="battery__bd-sub" data-batt-standby-sub>20 µA × 24 h · EFR32BG22 deep sleep</span>
+            </div>
+            <div>
+              <span class="battery__bd-eye">Total daily</span>
+              <span class="battery__bd-num" data-batt-daily-mah>0.61<span class="batt-bd-unit"> mAh / day</span></span>
+              <span class="battery__bd-sub" data-batt-daily-sub>3,297 days from one charge</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="battery__note">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="M6 10v4M10 10v4M14 10v4"/></svg>
+          <span class="battery__note-copy">Approximation using measured panel refresh energy where available. Real-world numbers vary with temperature and BLE overhead. Use the full calculator for other displays. We currently do not recommend battery-powered operation on ESP-based displays. <a href="firmware/battery/index.html">Open full calculator →</a></span>
+        </p>
+      </div>
+    </section>
+
+    <section class="senders" id="senders">
+      <div class="container">
+        <div class="senders__grid">
+          <div>
+            <div class="section-eyebrow">For app developers</div>
+            <h2 class="section-title">Implement once, reach every screen</h2>
+            <p class="senders__text">Home Assistant is the reference sender today. The <a href="https://github.com/OpenDisplay/py-opendisplay" target="_blank" rel="noreferrer">Python SDK</a> is for everyone else: photo apps, custom dashboards, anything that wants to put a picture on a screen. A picture is a picture; what's in it is up to you.</p>
+            <p class="senders__text">The sender does the heavy work, including dithering for whatever panel the receiver advertises, so screens can stay cheap, simple, and battery-powered.</p>
+            <div class="senders__ctas">
+              <a href="https://github.com/OpenDisplay/py-opendisplay" target="_blank" rel="noreferrer" class="od-cta-ghost">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+                Read the SDK docs
+              </a>
+            </div>
+          </div>
+          <div class="code-card">
+            <div class="code-card__head">
+              <span><span class="code-card__dot"></span>send_to_tag.py</span>
+            </div>
+            <div><span class="code-kw">from</span> opendisplay <span class="code-kw">import</span> OpenDisplayDevice</div>
+            <div><span class="code-kw">from</span> PIL <span class="code-kw">import</span> Image</div>
+            <div>&nbsp;</div>
+            <div><span class="code-kw">async with</span> OpenDisplayDevice(device_name=<span class="code-str">"OD123456"</span>) <span class="code-kw">as</span> device:</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-kw">await</span> device.upload_image(Image.open(<span class="code-str">"photo.jpg"</span>))</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ohf-values">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow ohf-values__eyebrow"><span class="ohf-row__dot"></span>Collaboration partner · Open Home Foundation</div>
+            <h2 class="section-title">What we stand for</h2>
+          </div>
+          <p class="section-lead">
+            OpenDisplay is built around the values the Open Home Foundation stands for. They aren't decorative. They're the constraints that shape every decision about the protocol, the firmware, and the tools.
+          </p>
+        </div>
+        <div class="ohf-values__grid">
+          <article class="ohf-values__card">
+            <span class="ohf-values__num">01 · Privacy</span>
+            <h3 class="ohf-values__heading">Your screens never call home.</h3>
+            <p class="ohf-values__text">Senders run locally. Receivers talk to senders over Bluetooth. No cloud sits in the middle reading what's on your wall, and no account is required to use the protocol.</p>
+            <div class="ohf-values__line"><span>no telemetry · no account · BLE local</span></div>
+          </article>
+          <article class="ohf-values__card">
+            <span class="ohf-values__num">02 · Choice</span>
+            <h3 class="ohf-values__heading">Any sender, any receiver.</h3>
+            <p class="ohf-values__text">The standard is open and free to implement. Swap the screen, swap the data source, swap the firmware. Hardware vendors and DIY makers ship into the same ecosystem on equal terms.</p>
+            <div class="ohf-values__line"><span>open spec · GPL-v3 · vendor-agnostic</span></div>
+          </article>
+          <article class="ohf-values__card">
+            <span class="ohf-values__num">03 · Sustain</span>
+            <h3 class="ohf-values__heading">Years on a charge.</h3>
+            <p class="ohf-values__text">Server-side rendering keeps receivers low-power. From a coin cell to a frame LiPo, that can mean years on a charge, even on Spectra 6 when updates are sparse.</p>
+            <div class="ohf-values__line"><span>low standby · partial refresh · re-use</span></div>
+          </article>
+        </div>
+        <div class="ohf-values__footer">
+          <a href="https://www.openhomefoundation.org/" target="_blank" rel="noreferrer" class="ohf-values__external">
+            About the Open Home Foundation
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <a href="index.html" class="site-footer__lockup" aria-label="OpenDisplay home">
+            <img src="assets/brand/logo_dark.svg" alt="OpenDisplay" class="site-footer__logo-full" width="140" height="41">
+          </a>
+          <span class="site-footer__tag">The open e-paper standard</span>
+          <p class="site-footer__lead">An open standard and open firmware that lets any sender put pictures on any screen. Local, low-power, designed for e-paper.</p>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Build</span>
+          <a href="what-hardware-to-buy.html" class="od-foot-link">What hardware to buy</a>
+          <a href="firmware/display/index.html" class="od-foot-link">BLE Tester</a>
+          <a href="firmware/battery/index.html" class="od-foot-link">Battery calculator</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Reference</span>
+          <a href="protocol/index.html" class="od-foot-link">Protocol spec</a>
+          <a href="protocol/display-data-format.html" class="od-foot-link">Display data format</a>
+          <a href="protocol/flex-standard.html" class="od-foot-link">OpenDisplay Flex</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Flex tools</span>
+          <a href="protocol/flex-tools.html" class="od-foot-link">Overview</a>
+          <a href="firmware/toolbox/index.html" class="od-foot-link">Toolbox</a>
+          <a href="protocol/adding-displays.html" class="od-foot-link">Adding a new panel</a>
+        </div>
+        <div class="site-footer__col">
+          <span class="site-footer__col-h">Community</span>
+          <a href="https://github.com/OpenDisplay/" target="_blank" rel="noreferrer" class="od-foot-link">GitHub</a>
+          <a href="https://discord.gg/XmTHz8RfJE" target="_blank" rel="noreferrer" class="od-foot-link">Discord</a>
+          <a href="https://www.openhomefoundation.org/" target="_blank" rel="noreferrer" class="od-foot-link">Open Home Foundation</a>
+        </div>
+      </div>
+      <div class="site-footer__bot">
+        <span>© 2026 OpenDisplay</span>
+        <div class="site-footer__legal">
+          <a href="impressum.html" class="od-foot-link">Legal notice</a>
+          <a href="datenschutz.html" class="od-foot-link">Privacy policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/home.js"></script>
+  <script src="js/hero-display.js"></script>
+  <script src="js/battery-widget.js"></script>
 </body>
 </html>
-
