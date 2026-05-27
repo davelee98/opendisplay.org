@@ -343,6 +343,29 @@
             "data": "9",
             "clk": "7"
          },
+         "led": {
+            "instance_number": "0x0",
+            "led_type": "1",
+            "led_1_r": "0x1a",
+            "led_flags": "0x1"
+         },
+         "passiveBuzzer": {
+            "instance_number": "0x0",
+            "drive_pin": "45",
+            "flags": 1
+         },
+         "dataBus": {
+            "instance_number": "0x0",
+            "bus_type": "1",
+            "pin_1": "20",
+            "pin_2": "19"
+         },
+         "sensorData": {
+            "sensor_type": "4",
+            "instance_number": "0",
+            "bus_id": "0x0",
+            "i2c_addr_7bit": "0x44"
+         },
          "powerDefaults": {
             "battery_sense_pin": "1",
             "battery_sense_enable_pin": "21",
