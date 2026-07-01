@@ -1730,8 +1730,11 @@ function renderBuilder(){
         } else {
           const input = document.createElement('input');
           input.style.flex='1';
-          // Special handling for WiFi fields
-          if (f.name === 'ssid') {
+          if (f.type === 'text') {
+            input.type = 'text';
+            input.placeholder = `text, fixed ${f.size} bytes, null-terminated`;
+            input.maxLength = f.size - 1; // reserve last byte for null terminator
+          } else if (f.name === 'ssid') {
             input.type = 'text';
             input.placeholder = 'WiFi SSID (fixed 32 bytes, null-terminated)';
             input.maxLength = 32;
@@ -1774,10 +1777,12 @@ function collectPacketBytes(){ if(!schema) { alert('Load schema first'); return 
       if(f.enum && (!raw || raw==='')){
       }
       if(fsize){
-        if(f.name === 'ssid' || f.name === 'password'){
+        if(f.type === 'text' || f.name === 'ssid' || f.name === 'password'){
           const str = (raw || '').toString();
           const encoder = new TextEncoder();
-          const bytes = encoder.encode(str);
+          // slice to fsize-1 so the last byte is always 0 (null terminator), even if the
+          // encoded UTF-8 byte count equals fsize (possible with multi-byte characters)
+          const bytes = encoder.encode(str).slice(0, fsize - 1);
           for(let i=0;i<fsize;i++){
             packet.push(i < bytes.length ? bytes[i] : 0);
           }
@@ -2106,7 +2111,7 @@ function parseRawBytes(bytes){
             const available = view.slice(cur, view.length-2); pkt.fields.push({name:f.name,raw:bytesToHex(available),note:'truncated'}); cur = view.length-2; }
           else{
             const valBytes = view.slice(cur, cur+s);
-            if (f.name === 'ssid' || f.name === 'password') {
+            if (f.type === 'text' || f.name === 'ssid' || f.name === 'password') {
               const z = valBytes.indexOf(0);
               const slice = z >= 0 ? valBytes.slice(0, z) : valBytes;
               const text = new TextDecoder('utf-8', { fatal: false }).decode(slice);
@@ -2348,7 +2353,12 @@ function renderBuilderFromInstances(){
         } else { 
           const input = document.createElement('input');
           input.style.flex='1';
-          if (f.name === 'ssid') {
+          if (f.type === 'text') {
+            input.type = 'text';
+            input.placeholder = `text, fixed ${f.size} bytes, null-terminated`;
+            input.maxLength = f.size - 1; // reserve last byte for null terminator
+            input.value = inst.fields[f.name] || '';
+          } else if (f.name === 'ssid') {
             input.type = 'text';
             input.placeholder = 'WiFi SSID (fixed 32 bytes, null-terminated)';
             input.maxLength = 32;

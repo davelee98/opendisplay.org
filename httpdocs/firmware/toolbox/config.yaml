@@ -20,7 +20,7 @@ ble_proto:
 
         '
   version: 1
-  minor_version: 2
+  minor_version: 3
   packet_structure:
     description: 'outer_packet wraps the overall transfer and contains a sequence of single_packet entries. single_packet
       defines the structure of each entry contained in the packets field of outer_packet.
@@ -1649,3 +1649,45 @@ ble_proto:
       - name: reserved
         size: 20
         description: Reserved bytes for future flash extensions
+    44:
+      name: data_extended
+      required: false
+      repeatable: false
+      description: Extended device identity strings. Each field is a fixed 32-byte null-terminated UTF-8 string, zero-padded. Default value for all fields is empty string.
+      fields:
+      - name: manufacturer_name
+        size: 32
+        type: text
+        description: Manufacturer name (null-terminated, zero-padded)
+      - name: model_name
+        size: 32
+        type: text
+        description: Model name (null-terminated, zero-padded)
+      - name: serial_number
+        size: 32
+        type: text
+        description: Serial number (null-terminated, zero-padded)
+      - name: friendly_name
+        size: 32
+        type: text
+        description: Human-friendly device name (null-terminated, zero-padded)
+      - name: device_location
+        size: 32
+        type: text
+        description: Physical or logical location of the device (null-terminated, zero-padded)
+      - name: device_id
+        size: 32
+        type: text
+        description: Unique device identifier string (null-terminated, zero-padded)
+      - name: custom_string_1
+        size: 32
+        type: text
+        description: User-defined string field 1 (null-terminated, zero-padded)
+      - name: custom_string_2
+        size: 32
+        type: text
+        description: User-defined string field 2 (null-terminated, zero-padded)
+      - name: custom_string_3
+        size: 32
+        type: text
+        description: User-defined string field 3 (null-terminated, zero-padded)
