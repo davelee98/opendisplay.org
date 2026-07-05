@@ -891,7 +891,7 @@ class OpenDisplayBLE {
     let retries = 0;
     while (retries <= this.gattMaxRetries) {
       try {
-        await this.characteristic.writeValueWithoutResponse(commandToSend);
+        await this.writeCommandValue(commandToSend);
         return;
       } catch (error) {
         if (error.name === 'NetworkError' && error.message.includes('GATT operation') && retries < this.gattMaxRetries) {
@@ -903,6 +903,48 @@ class OpenDisplayBLE {
         }
       }
     }
+  }
+
+  /**
+   * Write a value to the command characteristic.
+   *
+   * Prefers writeValueWithoutResponse() for throughput, but some engines —
+   * notably WebKit/Bluefy on iOS — don't reliably support it, and a
+   * characteristic may only advertise the "write" (with response) property.
+   * Fall back to writeValueWithResponse() (and remember the choice so we don't
+   * keep retrying the unsupported path). The firmware uses application-level
+   * acks (0x41/0x42), so the ATT write type does not change protocol behaviour.
+   */
+  async writeCommandValue(data) {
+    const props = this.characteristic.properties;
+    const canWriteWithout =
+      !this._writeWithoutResponseUnsupported &&
+      typeof this.characteristic.writeValueWithoutResponse === 'function' &&
+      (!props || props.writeWithoutResponse !== false);
+
+    if (canWriteWithout) {
+      try {
+        await this.characteristic.writeValueWithoutResponse(data);
+        return;
+      } catch (error) {
+        // Only fall back on "not supported"; propagate transient errors
+        // (e.g. NetworkError) so the caller's retry loop can handle them.
+        const canFallback = typeof this.characteristic.writeValueWithResponse === 'function';
+        if (error && error.name === 'NotSupportedError' && canFallback) {
+          this._writeWithoutResponseUnsupported = true;
+          this.log('writeValueWithoutResponse unsupported; using writeValueWithResponse', 'warning');
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    if (typeof this.characteristic.writeValueWithResponse === 'function') {
+      await this.characteristic.writeValueWithResponse(data);
+      return;
+    }
+    // Legacy engines expose only writeValue().
+    await this.characteristic.writeValue(data);
   }
   
   /**
